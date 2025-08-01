@@ -59,8 +59,9 @@ const App: React.FC = () => {
 
       <Layout style={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
         <Header
-          style={{ padding: 0, background: "#CBC6FF", maxHeight: "6vh" }}
-        />
+          // className="text-xl ml-auto mr-8 bg-[#CBC6FF] text-[#8E55D9] font-semibold flex items-center justify-between"
+          style={{ padding: 0, background: "#CBC6FF", maxHeight: "6vh", textAlign: "right", color: "black", fontSize: "17px", fontWeight: "500" }}
+        >username</Header>
         <Header
           style={{
             padding: 0,
