@@ -9,3 +9,9 @@ Foertend: ตอนนี้โครงสร้างน่าจะใช้�
 ถ้าเชื่อม Route แล้ว เวลา dev หรือเปิดหน้าก็เปิดที่ http://localhost:5173/patient-info เป็นต้น (patient-info คือชื่อ path ที่ตี่งไว้)
 
 ตอน commit ดู branch ดีๆ อย่าพึ่งเอาขึ้น main
+
+วิธีใช้ github
+https://youtu.be/OyTeEjFcEXc?si=rwAW8A7H-XNDU_iDhttps://youtu.be/OyTeEjFcEXc?si=rwAW8A7H-XNDU_iD
+
+วิธีใช้ github desktop
+https://youtu.be/I7PXyKUdAug?si=1IMWPcurrEX6lXRO
