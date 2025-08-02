@@ -15,7 +15,7 @@ import ServiceInfoPage from "./pages/service_info/index"
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/home" element={<HomeInfoPage />} />
+      <Route path="/" element={<HomeInfoPage />} />
       <Route path="/patient" element={<PatientInfoPage />} />
       <Route path="/treatment" element={<TreatmentInfoPage />} />
       <Route path="/schedule" element={<ScheduleInfoPage />} />
