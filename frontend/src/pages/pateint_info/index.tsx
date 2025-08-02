@@ -1,7 +1,11 @@
 import React from "react";
 
 const PatientInfoPage = () => {
-  return <div>Patient Information Page</div>;
+  return (
+  <div className="container"> Patient Information Page
+
+  </div>
+  );
 };
 
 export default PatientInfoPage;

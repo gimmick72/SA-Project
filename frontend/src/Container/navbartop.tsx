@@ -15,7 +15,7 @@ const NavbarTop: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
-          paddingRight: "10%",
+          paddingRight: "4%",
         }}
       >
         <FaRegUserCircle style={{ marginRight: "18px", marginTop: "2px", width: "20px", height: "auto" }} />
@@ -26,7 +26,7 @@ const NavbarTop: React.FC = () => {
             fontWeight: "500",
           }}
         >
-          username
+          Username
         </span>
       </Header>
 

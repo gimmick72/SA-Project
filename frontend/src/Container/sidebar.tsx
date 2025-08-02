@@ -2,16 +2,27 @@ import React from "react";
 import { Layout, Menu } from "antd";
 import logo from "../assets/logo.png";
 import { menuItems } from "../components/menuItems";
+import { useNavigate } from "react-router-dom";
 
 const { Sider } = Layout;
 
+
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleMenuClick = (e: any) => {
+    const item = menuItems.find((i) => i.key === e.key);
+    if (item) {
+      navigate(item.path);
+    }
+  };
+
+
   return (
     <Sider
       style={{
         backgroundColor: "white",
         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-       
       }}
     >
       <div
@@ -43,8 +54,8 @@ const Sidebar: React.FC = () => {
           margin: "12px 16px 16px 16px",
         }}
       />
-
-      <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]} items={menuItems} />
+      
+      <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]} items={menuItems} onClick={handleMenuClick} />
     </Sider>
   );
 };
