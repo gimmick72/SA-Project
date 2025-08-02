@@ -7,13 +7,8 @@ import (
 
 type DentistMenagement struct {
 	gorm.Model	`gorm:"primaryKey"`
-
-	// DentiatID uint
-	// Dentist Dentist `gorm:"forreignKey"`
-
-	ServiceID uint 
-	Service	Service	`grom:"foreignKey"`
-
+	Room string
 	Date time.Time
 	Timein time.Time
+	TimeOut time.Time
 }
