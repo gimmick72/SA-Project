@@ -1,9 +1,23 @@
+* {
+  box-sizing: border-box; 
+}
+
 html, body, #root {
-    height: 100%;
-    width: 100%;
+    min-height: 100vh;
+    min-width: 100vw;
     margin: 0;
     padding: 0;
     background-color: "#FDFAFF";
+    overflow: hidden;
   }
 
+  /* เปลี่ยนสีพื้นหลังของเมนูที่ถูกเลือก */
+.ant-menu-item-selected {
+  background-color: #F8ECFF !important;
+}
 
+/* เปลี่ยนสี text ของเมนูที่ถูกเลือก (ถ้าต้องการ) */
+.ant-menu-item-selected a,
+.ant-menu-item-selected {
+  color: #8117ba !important;
+}

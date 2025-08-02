@@ -1,22 +1,27 @@
-import React, { useState, useEffect } from "react";
-import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
 
 const Clock: React.FC = () => {
-  const [currentTime, setCurrentTime] = useState(dayjs().format("HH:mm:ss"));
+  const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(dayjs().format("HH:mm:ss"));
+      const now = new Date();
+      const formattedTime = now.toLocaleString("en-GB", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      setCurrentTime(formattedTime);
     }, 1000);
 
     return () => clearInterval(timer);
   }, []);
 
-  return (
-    <span className="text-xl font-semibold text-black">
-      {currentTime}
-    </span>
-  );
+  return <span>{currentTime}</span>;
 };
 
 export default Clock;

@@ -1,13 +1,15 @@
-import './App.css';
-import React from 'react';
-import FullLayout from './FullLayout';
+import React from "react";
+import { BrowserRouter } from "react-router-dom";
+import FullLayout from "./layout/FullLayout";
+import AppRoutes from "./AppRoutes";
+import "./App.css"; // Import your global styles here
 
-
-function App() {
-  return (
+const App = () => (
+  <BrowserRouter>
     <FullLayout>
-        
-      </FullLayout>
-  );
-}
+      <AppRoutes />
+    </FullLayout>
+  </BrowserRouter>
+);
+
 export default App;
