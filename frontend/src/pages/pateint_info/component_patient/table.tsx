@@ -3,9 +3,8 @@ import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-// import Content from './Container/content';
+import { Link } from 'react-router-dom'; // อย่าลืม import Link ด้วย!
 
-// กำหนด interface ให้ตรงกับ columns ที่ใช้จริง
 interface DataType {
   key: string;
   patient_id: string;
@@ -43,24 +42,38 @@ const columns: ColumnsType<DataType> = [
   {
     title: 'Action',
     key: 'action',
-    width: 250,
+    width: 280,
     render: (_, record) => (
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button type="button"style={{
-          backgroundColor: '#BBE6F9', 
-          color: 'black',
-          border: 'none', 
-          borderRadius: '13px',
-          cursor: 'pointer'
-        }} >บันทึกบริการ</button>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <Link to="/patient/initial">
+          <button
+            type="button"
+            style={{
+              backgroundColor: '#BBE6F9',
+              color: 'black',
+              border: 'none',
+              borderRadius: '13px',
+              cursor: 'pointer',
+              padding: '4px 8px',
+            }}
+          >
+            บันทึกบริการ
+          </button>
+        </Link>
 
-        <button type="button" style={{
-          backgroundColor: '#F9F9BB', 
-          color: 'black',
-          border: 'none', 
-          borderRadius: '13px',
-          cursor: 'pointer'
-        }}>ดูรายละเอียด</button>
+        <button
+          type="button"
+          style={{
+            backgroundColor: '#F9F9BB',
+            color: 'black',
+            border: 'none',
+            borderRadius: '13px',
+            cursor: 'pointer',
+            padding: '4px 8px',
+          }}
+        >
+          ดูรายละเอียด
+        </button>
         <FaRegEdit style={{ color: 'black', cursor: 'pointer' }} />
         <MdDeleteOutline style={{ color: 'red', cursor: 'pointer' }} />
       </div>
@@ -68,7 +81,6 @@ const columns: ColumnsType<DataType> = [
   },
 ];
 
-// ตัวอย่างข้อมูล
 const data: DataType[] = [
   {
     key: '1',
@@ -101,14 +113,20 @@ const data: DataType[] = [
 ];
 
 const CustomTable: React.FC = () => (
-  <div >
-    {/* <Content /> */}
+  <div
+    style={{
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '20px',
+      overflowX: 'auto',
+    }}
+  >
     <Table
       columns={columns}
       dataSource={data}
       scroll={{ x: 'max-content' }}
-      style={{ width: '80%',justifyContent: 'center', margin: '0 auto' }}
-
+      pagination={false}
+      bordered
     />
   </div>
 );

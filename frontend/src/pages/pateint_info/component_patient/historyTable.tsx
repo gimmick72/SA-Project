@@ -41,7 +41,7 @@ const data: DataType[] = [
 const App: React.FC = () => {
   return (
     <div>
-      <Card style={{ width: 300 }}>
+      <Card style={{ width: 500, margin:"0" }}>
         <Table<DataType>
           columns={columns}
           dataSource={data}
