@@ -1,0 +1,134 @@
+import React from "react";
+import { Layout, Menu, Typography, Avatar, Row, Col, Card } from "antd";
+import {
+  UserOutlined,
+} from "@ant-design/icons";
+import { Link } from "react-router-dom";
+
+import ClinicPromo from "./ClinicPromo";
+import PhotoPromo from "./PhotoPromo";
+import OurDentistsPage from "../OurDentistsPage/OurDentistsPage";
+import ServicesPage from "../Services/ServicesPage";
+import ContactPage from "../ContactUs/ContactUs";
+import PriceGuidePage from "../PriceGuide/PriceGuidePage";
+import BookingQueuePage from "../Booking";
+
+
+
+const { Header, Content } = Layout;
+const { Title } = Typography;
+const menuItems = [
+  { label: "หน้าแรก", path: "/" },
+  { label: "ทันตแพทย์ของเรา", path: "/dentists" },
+  { label: "บริการ", path: "/services" },
+  { label: "จองคิว", path: "/booking" },
+  { label: "ติดต่อเรา", path: "/contact" },
+];
+
+const HomePage: React.FC = () => {
+  return (
+    <Layout style={{ minHeight: "100vh", fontFamily: "sans-serif", backgroundColor: "#F5F2F9" }}>
+      <Header
+        style={{
+          backgroundColor: "#E7DDF6",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 40px",
+          minWidth: "1000px",
+          // position: "sticky",
+          // top: 0,
+        }}
+      >
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <Avatar src="/logo.png" shape="circle" size="large" />
+          <Title level={3} style={{ margin: 0, color: "#722ED1" }}>
+            TooThoot
+          </Title>
+        </div>
+
+        {/* Menu */}
+        <Menu
+          mode="horizontal"
+          style={{
+            backgroundColor: "#E7DDF6",
+            borderBottom: "none",
+            display: "flex",
+            justifyContent: "center",
+            flex: 1,
+          }}
+        >
+        
+          <Menu.Item key="home">
+            <a href="#home">หน้าแรก</a>
+          </Menu.Item>
+          <Menu.Item key="dentists">
+            <a href="#dentists">ทันตแพทย์ของเรา</a>
+          </Menu.Item>
+          <Menu.Item key="services">
+            <a href="#services">บริการ</a>
+          </Menu.Item>
+          <Menu.Item key="contact">
+            <a href="#contact">ติดต่อเรา</a>
+          </Menu.Item>
+          <Menu.Item key="booking">
+            <a href="#booking">จองคิว</a>
+          </Menu.Item>
+        </Menu>
+
+        {/* Sign In */}
+        <div style={{ color: "#722ED1", fontWeight: 600, cursor: "pointer" }}>
+          <UserOutlined style={{ marginRight: 6 }} />
+          ลงชื่อเข้าใช้
+        </div>
+      </Header>
+
+      {/* Content */}
+      <Content style={{ padding: "60px 20px" }}>
+        <Row justify="center">
+          <Col xs={24} md={20} lg={18}>
+            <Card
+              bordered={false}
+              style={{
+                borderRadius: 24,
+                padding: 24,
+                backgroundColor: "#fff",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              }}
+            >
+              <Row gutter={24}>
+                <Col xs={24} md={12}>
+                  <ClinicPromo />
+                </Col>
+                <Col xs={24} md={12}>
+                  <PhotoPromo />
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+        <div id="dentists" style={{ marginTop: "80px" }}>
+          <OurDentistsPage />
+        </div>
+        <div id="services" style={{ marginTop: "80px" }}>
+          <ServicesPage />
+        </div>
+        <div id="priceguide">
+          <PriceGuidePage />
+        </div>
+        <div id="contact" style={{ marginTop: "80px" }}>
+          <ContactPage />
+        </div>
+        <div id="booking" style={{ marginTop: "80px" }}>
+          <BookingQueuePage />
+        </div>
+
+        
+
+      </Content>
+    </Layout>
+  );
+};
+
+export default HomePage;

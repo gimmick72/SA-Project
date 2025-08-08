@@ -1,0 +1,128 @@
+.wrapper {
+    margin-left: 2rem;
+    padding: 0;
+    max-width: 100%;        
+    /* border: 1px solid #ccc; */
+    width: 100vw;
+    height: 100vh; /* ใช้ความสูงเต็มหน้าจอ */
+  }
+  
+
+.row-container {
+    display: flex;
+    gap: 2rem; /* ระยะห่างระหว่างคอลัมน์ */
+    margin-bottom: 1.5rem;
+  }
+/* .group {
+    flex: 1 ;        
+    display: flex;
+    flex-direction: column;
+  }
+   */
+.inputbox{
+    margin-top: 0.5rem;
+    width: 80%;
+    border: 1px solid gray;
+    border-radius: 8px;
+    font-size: 17px;
+    padding-left: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    margin-right: 0;
+    margin-bottom: 1rem;
+
+}
+
+/* .row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    flex-wrap: wrap; 
+    margin-left: 4px;
+  } */
+  
+  
+.gender-options {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.25rem;
+    align-items: center;
+  }
+
+.header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-weight: semi-bold;
+    margin-bottom: 1rem;
+    color: black;
+}
+.header-element {
+    border-left: 2px solid black; /* สร้างเส้นแนวตั้งสีดำ หนา 2px */
+    margin-left: 0.5rem; /* ระยะห่างจากขอบซ้าย */
+}
+.row1,.row2,.row3,.row4,.row5,.row6,.row7{
+    display: flex;
+    flex-direction: row;
+}
+
+.drug-allergy-input {
+    margin-top: 0.5rem;
+    width: 40%;
+    border: 1px solid gray;
+    border-radius: 8px;
+    font-size: 17px;
+    padding-left: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+
+}
+
+.drug-allergy-text{
+    width: 60px;
+    margin-right: 1rem;
+}
+
+.contact-inputbox{
+    margin-top: 0.5rem;
+    width: 20%;
+    border: 1px solid gray;
+    border-radius: 8px;
+    font-size: 17px;
+    padding-left: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.save-button {
+    background-color: #CFF7D3; /* สีเขียว */
+    color: black; 
+    padding: 5px 20px; /* ระยะห่างภายใน */
+    border: 1px solid black; /* ไม่มีเส้นขอบ */
+    border-radius: 5px; /* มุมโค้งมน */
+    cursor: pointer; /* แสดงเคอร์เซอร์เป็นมือเมื่อวางเมาส์ */
+    font-size: 13px; /* ขนาดตัวอักษร */
+    font-weight: bold; /* ตัวหนา */
+    margin-right: 1rem; /* ระยะห่างด้านขวา */
+    margin-top: 2.5rem;
+    
+}
+.cancel-button{
+    background-color: #F7D3D3; /* สีแดง */
+    color: black; 
+    padding: 5px 20px; /* ระยะห่างภายใน */
+    border: 1px solid black; /* ไม่มีเส้นขอบ */
+    border-radius: 5px; /* มุมโค้งมน */
+    cursor: pointer; /* แสดงเคอร์เซอร์เป็นมือเมื่อวางเมาส์ */
+    font-size: 13px; /* ขนาดตัวอักษร */
+    font-weight: bold; /* ตัวหนา */
+}
+
+.button{
+    align-items: end;
+    margin-left:80% ;
+}
