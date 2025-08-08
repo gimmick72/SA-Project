@@ -4,9 +4,6 @@ import "./design/index.css";
 import PatienTable from "./component_patient/table";
 
 const PatientInfoPage = () => {
-<<<<<<< Updated upstream
-  return <div>Patient Information Page</div>;
-=======
   return (
   
   <div className="wrapper">
@@ -23,7 +20,6 @@ const PatientInfoPage = () => {
       <PatienTable />
   </div>
   );
->>>>>>> Stashed changes
 };
 
 export default PatientInfoPage;
