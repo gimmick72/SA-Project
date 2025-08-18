@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import HomeInfoPage from "../pages/home_info/index";
+import HomePage from "../pages/home/index";
 import TreatmentInfoPage from "../pages/treatment_info/index";
 import ScheduleInfoPage from "../pages/schedule_info/index";
 import MedicineInfoPage from "../pages/medicine_page/index";
@@ -14,7 +14,7 @@ import PatientRoutes from "./patientRoute";  // <-- Import Array of Route
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<HomeInfoPage />} />
+      <Route path="/" element={<HomePage />} />
       {PatientRoutes}
       <Route path="/treatment" element={<TreatmentInfoPage />} />
       <Route path="/schedule" element={<ScheduleInfoPage />} />
