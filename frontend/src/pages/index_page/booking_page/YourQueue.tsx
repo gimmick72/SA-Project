@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import { Card, Layout } from 'antd';
 import './yourQueue.css';
-import Navbar from "../../Container/index_page/navbar"; 
-
+ 
 const YourQueue = () => {
   return (
     <>
-    <Navbar/>
     <div style={{
         // border: `1px solid black`,
         borderRadius: "20px",

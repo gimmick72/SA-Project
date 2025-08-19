@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import Card from "antd/es/card";
 const { Meta } = Card;
+import { Outlet } from "react-router-dom";
+
 
 const BookingPage = () => {
   return (
     <>
+    <Outlet /> 
       <div
         style={{
           padding: "2rem",
@@ -73,4 +76,4 @@ const BookingPage = () => {
     </>
   );
 };
-export default BookingPage; 
+export default BookingPage;

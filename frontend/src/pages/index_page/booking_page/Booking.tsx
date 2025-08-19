@@ -1,11 +1,9 @@
 import { Link } from "react-router-dom";
-import Calendar from "antd/es/calendar";
-import theme from "antd/es/theme";
-import type { CalendarProps } from "antd/es/calendar";
+import { Calendar, theme } from "antd";
+import type { CalendarProps } from "antd";
 import type { Dayjs } from "dayjs";
 import "./booking.css";
-import Navbar from "../../Container/index_page/navbar";
-
+import { Outlet } from "react-router-dom";
 const onPanelChange = (value: Dayjs, mode: CalendarProps<Dayjs>["mode"]) => {
   console.log(value.format("YYYY-MM-DD"), mode);
 };
@@ -21,7 +19,7 @@ const Booking = () => {
 
   return (
     <>
-      <Navbar />
+    <Outlet/>
       <div
         style={{
           minHeight: "70vh",
@@ -94,4 +92,4 @@ const Booking = () => {
     </>
   );
 };
-export default Booking; 
+export default Booking;
