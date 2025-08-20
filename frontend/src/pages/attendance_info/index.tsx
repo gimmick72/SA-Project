@@ -1,10 +1,13 @@
 import React from "react";
-
+import FullLayout from "../../layout/FullLayout";
 const AttendaceInfoPage = () => {
   return (
-  <div className="container"> Attendance Information Page
+  <FullLayout>
+
+   <div className="container"> Attendance Information Page
 
   </div>
+  </FullLayout> 
   );
 };
 
