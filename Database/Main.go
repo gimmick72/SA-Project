@@ -1,91 +1,78 @@
+// main.go
 package main
 
 import (
+	"log"
+	"os"
+
+	"Database/configs"
+	"Database/controllers"
 	"Database/entity"
 
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	db, err := gorm.Open(sqlite.Open("DatabaseProject_SA.db"), &gorm.Config{})
+	configs.ConnectDatabase()
 
-	if err != nil {
-		panic("Failed to connect database")
+	// AutoMigrate เฉพาะส่วนเวชภัณฑ์
+	migrateAll()
+
+	r := gin.Default()
+	r.Use(simpleCORS())
+
+	// health check
+	r.GET("/health", func(c *gin.Context) { c.JSON(200, gin.H{"ok": true}) })
+
+	api := r.Group("/api")
+	{
+		// ---------- Supplies API ----------
+		api.GET("/supplies", controllers.ListSupplies)   // ค้นหา/กรอง/แบ่งหน้า/เรียง
+		api.DELETE("/supplies/:id", controllers.DeleteSupply) // ✅ เรียกจาก controllers
+		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
 	}
 
-	//Create Table//
-	//CaseData
-	db.AutoMigrate(&entity.CaseData{},
-		&entity.ToothNumber{},
-		&entity.ToothPosition{},
-		&entity.Treatment{},
-		&entity.TreatmentTooth{},
-	)
+  port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Println("server running on :" + port)
+	if err := r.Run(":" + port); err != nil {
+		log.Fatal(err)
+	}
+}
 
-	//DentistMenagement
-	db.AutoMigrate(&entity.DentistMenagement{})
+// -----------------------------------------------------------
+// AutoMigrate
+// -----------------------------------------------------------
+func migrateAll() {
+	// เวชภัณฑ์
+	must(configs.DB.AutoMigrate(
+		&entity.Supply{},
+		&entity.RecordSupply{}, // ✅ ชื่อ struct ตรงกับ entity
+	))
 
-	//Member
-	db.AutoMigrate(&entity.Member{},
-		&entity.Role{},
-		&entity.MemberRole{},
-	)
+	log.Println("✅ AutoMigrate done")
+}
 
-	//Patient
-	db.AutoMigrate(&entity.Patient{},
-		&entity.ContactPerson{},
-		&entity.Address{},
-		&entity.InitialSymptomps{},
-		&entity.InitialSymptomps{},
-	)
+func must(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
-	//Payment
-	db.AutoMigrate(&entity.CouterService{},
-		&entity.CashPayment{},
-		&entity.OnlinePayment{},
-		&entity.CreditCard{},
-		&entity.Transaction{},
-	)
-
-	//PeesonalData
-	db.AutoMigrate(&entity.PersonalData{},
-		&entity.Department{},
-	)
-
-	//Room
-	db.AutoMigrate(&entity.Room{},
-		&entity.RoomReservation{},
-	
-	)
-	
-	//Service
-	db.AutoMigrate(&entity.Service{},
-		&entity.Promotion{},
-		&entity.ServicePromotion{},
-
-	)
-	//Queue
-	db.AutoMigrate(&entity.Timeslot{},
-		&entity.Queue{},
-	)
-
-	//StaffWorkTime
-	db.AutoMigrate(&entity.Shifts{},
-		&entity.Schedules{},
-	)
-
-	//Supply
-	db.AutoMigrate(&entity.Supply{},
-		&entity.RecordSupple{},
-	)
-
-	//Use for create Data mocup //
-	//Insert Data
-	// 	db.Create(&entity.Service{
-	// 	NameService: "healty",
-	// 	DetailService: "xxxxxxxxxxxxxxxx",
-	// 	Cost: 100.00,
-	// })
-
+// -----------------------------------------------------------
+// Middlewares
+// -----------------------------------------------------------
+func simpleCORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
 }
