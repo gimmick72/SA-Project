@@ -1,5 +1,5 @@
 import { useRoutes } from "react-router-dom";
-import AdminRoute from "./AdminRoutes";
+import AdminRoute from "./StaffRoutes";
 import HomeRoutes from "./HomeRoutes";
 
 function ConfigRoutes() {
