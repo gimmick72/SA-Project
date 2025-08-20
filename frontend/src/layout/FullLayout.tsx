@@ -1,6 +1,6 @@
 // src/layouts/FullLayout.tsx
 import React from "react";
-import { Layout } from "antd";
+import Layout from "antd/es/layout";
 import Sidebar from "../Container/sidebar";
 import NavbarTop from "../Container/navbartop";
 import Content from "../Container/content";

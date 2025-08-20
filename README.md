@@ -1,4 +1,4 @@
-Foertend: ตอนนี้โครงสร้างน่าจะใช้งานได้ระดับหนึ่งแล้ว แต่ยังไม่ได้เชื่อม Route ให้แต่ละคนแยก path ของตัวเอง 
+Forntend: ตอนนี้โครงสร้างน่าจะใช้งานได้ระดับหนึ่งแล้ว แต่ยังไม่ได้เชื่อม Route ให้แต่ละคนแยก path ของตัวเอง 
 
 แนวทางในการเชื่อม Route คือ
 1.ให้แต่ละคนสร้าง folder ของตัวเองใน src/pages ก่อน
@@ -12,3 +12,5 @@ https://youtu.be/OyTeEjFcEXc?si=rwAW8A7H-XNDU_iDhttps://youtu.be/OyTeEjFcEXc?si=
 
 วิธีใช้ github desktop
 https://youtu.be/I7PXyKUdAug?si=1IMWPcurrEX6lXRO
+
+note: ถ้าใช้ไม่ได้ในห้ unintall type antd ออก ใน folder forntend
