@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./design/contact.css";
+import FullLayout from "../../layout/FullLayout";
 
 const ContactPage = () => {
   return (
+    <FullLayout>
+
     <div className="wrapper">
       <div className="header">
         <h2 style={{ fontWeight: "600" }}>ข้อมูลประจำตัว</h2>
@@ -177,6 +180,7 @@ const ContactPage = () => {
         </button>
       </div>
     </div>
+    </FullLayout>
   );
 };
 export default ContactPage;
