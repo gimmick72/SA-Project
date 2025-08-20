@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import type { RouteObject } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import IndexLayout from "../layout/IndexLayout";
 import Loadable from "../components/third-patry/Loadable";
 
@@ -14,41 +15,41 @@ const ServicePage = Loadable(lazy(() => import("../pages/index_page/Services/ind
 
 const IndexRoutes: RouteObject[] = [
   {
-    path: "/",                  // root path
-    element: <IndexLayout />,   // layout ที่มี Navbar + Outlet
+    path: "/",                         // 👉 root
+    element: <IndexLayout />,          // layout
     children: [
+      // {
+      //   index: true,                   // 👉 default ของ "/"
+      //   element: <Navigate to="/home" replace />, // redirect ไป /home
+      // },
+      // {
+      //   path: "home",                  
+      //   element: <HomePage />,
+      // },
       {
-        index: true,            // default = "/"
-        element: <HomePage />,
-      },
-      {
-        path: "home",           // /home
-        element: <HomePage />,
-      },
-      {
-        path: "booking",        // /booking
+        path: "booking",
         element: <BookingPage />,
         children: [
           {
-            path: "queue",      // /booking/queue
+            path: "queue",
             element: <BookingQueue />,
           },
         ],
       },
       {
-        path: "dentists",       // /dentists
+        path: "dentists",
         element: <OurDentist />,
       },
       {
-        path: "contact",        // /contact
+        path: "contact",
         element: <ContactUs />,
       },
       {
-        path: "guide-service",  // /guide-service
+        path: "guide-service",
         element: <PriceGuide />,
       },
       {
-        path: "services",       // /services
+        path: "services",
         element: <ServicePage />,
       },
     ],

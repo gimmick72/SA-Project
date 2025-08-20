@@ -11,7 +11,7 @@ const { Header } = Layout;
 const { Title } = Typography;
 
 const items = [
-  { key: "home", label: <Link to="/home">หน้าแรก</Link> },
+  { key: "home", label: <Link to="/">หน้าแรก</Link> },
   { key: "dentists", label: <Link to="/dentists">ทันตแพทย์ของเรา</Link> },
   { key: "services", label: <Link to="/services">บริการ</Link> },
   { key: "contact", label: <Link to="/contact">ติดต่อเรา</Link> },

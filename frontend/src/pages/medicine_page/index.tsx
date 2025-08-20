@@ -1,3 +1,13 @@
+import React from "react";
+import FullLayout from "../../layout/FullLayout";
+const MedicineInfoPage = () => {
+  return (
+    <FullLayout>
+
+  <div className="container"> Medicine Information Page
+
+  </div>
+    </FullLayout>
 // src/pages/medicine_page/index.tsx
 
 import React, { useState } from 'react';

@@ -13,12 +13,12 @@
 
 
 import { useRoutes } from "react-router-dom";
-import AdminRoutes from "./AdminRoutes";
+import StaffRoutes from "./StaffRoutes";
 import HomeRoutes from "./HomeRoutes";
 
 function ConfigRoutes() {
   // รวม Route ทั้งหมดเข้าด้วยกัน
-  const routes = [...HomeRoutes, ...AdminRoutes];
+  const routes = [...HomeRoutes, ...StaffRoutes];
 
   return useRoutes(routes);
 }
