@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomeInfoPage from "./pages/home_info/index"
 import PatientInfoPage from "./pages/pateint_info/index";
@@ -10,6 +10,7 @@ import QueueInfoPage from "./pages/queue_info/index"
 import PaymentInfoPage from "./pages/payment_info/index"
 import AttendanceInfoPage from "./pages/attendance_info/index"
 import ServiceInfoPage from "./pages/service_info/index"
+import StaffDetail from "./pages/staff_info/StaffDetail";
 
 
 const AppRoutes = () => {
@@ -25,10 +26,11 @@ const AppRoutes = () => {
       <Route path="/payment" element={<PaymentInfoPage />} />
       <Route path="/attendance" element={<AttendanceInfoPage />} />
       <Route path="/service" element={<ServiceInfoPage />} />
-
-    </Routes >
+      <Route path="/staff/PersonalData/:Employee_ID" element={<StaffDetail />} />
+    </Routes>
   );
 };
+
 
 export default AppRoutes;
 
