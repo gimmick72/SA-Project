@@ -20,6 +20,7 @@ const AddPatient = Loadable(lazy(() => import("../pages/pateint_info/AddPatientP
 const InitialSymptoms = Loadable(lazy(() => import("../pages/pateint_info/InitialPage")));
 const PatienTable = Loadable(lazy(() => import("../pages/pateint_info/component_patient/table")));
 
+
 const AdminRoutes: RouteObject[] = [
   {
     path: "/staff-home",
