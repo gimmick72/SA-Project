@@ -22,7 +22,7 @@ const PatienTable = Loadable(lazy(() => import("../pages/patient_info/component_
 
 const AdminRoutes: RouteObject[] = [
   {
-    path: "/staff-home",
+    path: "/home",
     element: <HomeInfoPage />,
   },
   {

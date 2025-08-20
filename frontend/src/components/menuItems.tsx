@@ -7,7 +7,7 @@ import { FaRegSave } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
 export const menuItems = [
-  { key: "1", icon: TiHomeOutline, label: "หน้าหลัก", path: "/staff-home" },
+  { key: "1", icon: TiHomeOutline, label: "หน้าหลัก", path: "/home" },
   { key: "2", icon: LuClipboardPen, label: "ประวัติคนไข้", path: "/patient" },
   { key: "3", icon: FaStethoscope, label: "การรักษา", path: "/treatment" },
   { key: "4", icon: LuCalendar, label: "ตารางแพทย์", path: "/schedule" },
