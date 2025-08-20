@@ -9,7 +9,7 @@ const { Option } = Select;
 const AddSupplyPage = () => {
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
+  const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
     message.success('เพิ่มเวชภัณฑ์สำเร็จ!');
     form.resetFields();
