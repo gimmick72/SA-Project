@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./design/pateint.css";
+import FullLayout from "../../layout/FullLayout";
 
 const AddPatientPage = () => {
   return (
+    <FullLayout>
+
     <div className="wrapper">
       <div className="header">
         <h2 style={{ fontWeight: "600" }}>ข้อมูลประจำตัว</h2>
@@ -234,6 +237,7 @@ const AddPatientPage = () => {
         </button>
       </div>
     </div>
+    </FullLayout>
   );
 };
 

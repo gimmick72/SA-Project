@@ -6,6 +6,8 @@ import FullLayout from "../../layout/FullLayout";
 
 const PatientInfoPage = () => {
   return (
+    <>
+    
     <FullLayout>
   <div className="wrapper">
        <div className="header">
@@ -19,8 +21,11 @@ const PatientInfoPage = () => {
       </div>
       <br />
       <PatienTable />
+
   </div>
     </FullLayout>
+    </>
+    
   );
 };
 
