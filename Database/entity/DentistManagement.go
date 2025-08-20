@@ -6,7 +6,7 @@ import (
 )
 
 type DentistMenagement struct {
-	gorm.Model	`gorm:"primaryKey"`
+	gorm.Model
 	Room string
 	Date time.Time
 	Timein time.Time

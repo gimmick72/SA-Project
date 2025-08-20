@@ -18,7 +18,7 @@ func main() {
 	//CaseData
 	db.AutoMigrate(&entity.CaseData{},
 		&entity.ToothNumber{},
-		&entity.ToothPodition{},
+		&entity.ToothPosition{},
 		&entity.Treatment{},
 		&entity.TreatmentTooth{},
 	)
@@ -53,20 +53,21 @@ func main() {
 		&entity.Department{},
 	)
 
-	//Queue
-	db.AutoMigrate(&entity.Queue{},
-		&entity.Timeslot{},
-	)
-
 	//Room
 	db.AutoMigrate(&entity.Room{},
 		&entity.RoomReservation{},
+	
 	)
-
+	
 	//Service
 	db.AutoMigrate(&entity.Service{},
 		&entity.Promotion{},
 		&entity.ServicePromotion{},
+
+	)
+	//Queue
+	db.AutoMigrate(&entity.Timeslot{},
+		&entity.Queue{},
 	)
 
 	//StaffWorkTime

@@ -4,20 +4,19 @@ import (
 	"time"
 )
 
-
 type Queue struct{
 	gorm.Model
 	Username string
 	QueueBooking time.Time
 	
-	PatientId uint
-	Patient Patient `gorm:"foreignKey"`
+	PatientID uint
+	Patient Patient `gorm:"foreignKey:PatientID;references:ID"`
 	
 	ServiceID uint
-	Service Service `gorm:"foreignKey"`
+	Service Service `gorm:"foreignKey:ServiceID;references:ID"`
 	
-	Timeslot uint
-	Timerslot Timeslot `gorm:"foreignKey"`
+	TimeslotID uint
+	Timerslot Timeslot `gorm:"foreignKey:TimeslotID;references:ID"`
 }
 
 type Timeslot struct{

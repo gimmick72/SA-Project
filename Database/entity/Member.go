@@ -21,8 +21,8 @@ type MemberRole struct {
 	gorm.Model
 
 	MemberId uint
-	Member   Member `gorm:"foreignKey"`
+	Member   Member
 
 	RoleID uint
-	Role   Role `gorm:"foreignkey"`
+	Role   Role
 }

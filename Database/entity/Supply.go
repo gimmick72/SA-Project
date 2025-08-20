@@ -13,7 +13,7 @@ type Supply struct{
 	Quantity int
 
 	CaseDataID uint
-	CaseData CaseData `gorm:"foreignKey"`
+	CaseData CaseData 
 }
 
 type RecordSupple struct{
@@ -21,5 +21,5 @@ type RecordSupple struct{
 	DateRecord time.Time
 
 	SupplyID uint
-	Supply Supply `gorm:"foreignKey"`
+	Supply Supply 
 }
