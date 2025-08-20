@@ -6,6 +6,7 @@ import { MedicineBoxOutlined } from '@ant-design/icons';
 import AllSuppliesPage from './AllSuppliesPage';
 import AddSupplyPage from './AddSupplyPage';
 import DispensePage from './DispensePage';
+import FullLayout from '../../layout/FullLayout';
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
@@ -32,45 +33,47 @@ const MedicinePage = () => {
   };
 
   return (
-    <div style={{ padding: '0px' }}>
-      <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center' }}>
-        <Title level={2} style={{ margin: 0 }}>
-          เวชภัณฑ์
-        </Title>
-      </div>
+    <FullLayout>
+      <div style={{ padding: '0px' }}>
+        <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center' }}>
+          <Title level={2} style={{ margin: 0 }}>
+            เวชภัณฑ์
+          </Title>
+        </div>
 
-      <Card
-        style={{ borderRadius: '12px', marginTop: '24px' }}
-        bodyStyle={{ padding: '0 24px 24px 24px' }}
-      >
-        <Tabs
-          defaultActiveKey="1"
-          activeKey={activeKey}
-          onChange={onTabChange}
-          tabBarStyle={{ marginBottom: '0' }}
+        <Card
+          style={{ borderRadius: '12px', marginTop: '24px' }}
+          bodyStyle={{ padding: '0 24px 24px 24px' }}
         >
-          <TabPane
-            tab={renderTabTitle('1', 'รายการเวชภัณฑ์ทั้งหมด')}
-            key="1"
+          <Tabs
+            defaultActiveKey="1"
+            activeKey={activeKey}
+            onChange={onTabChange}
+            tabBarStyle={{ marginBottom: '0' }}
           >
-            <AllSuppliesPage />
-          </TabPane>
-          <TabPane
-            tab={renderTabTitle('2', 'เพิ่มเวชภัณฑ์ใหม่')}
-            key="2"
-          >
-            <AddSupplyPage />
-          </TabPane>
-          <TabPane
-            tab={renderTabTitle('3', 'การเบิกจ่ายเวชภัณฑ์')}
-            key="3"
-          >
-            <DispensePage />
-          </TabPane>
-        </Tabs>
-      </Card>
-    </div>
-  );
+            <TabPane
+              tab={renderTabTitle('1', 'รายการเวชภัณฑ์ทั้งหมด')}
+              key="1"
+            >
+              <AllSuppliesPage />
+            </TabPane>
+            <TabPane
+              tab={renderTabTitle('2', 'เพิ่มเวชภัณฑ์ใหม่')}
+              key="2"
+            >
+              <AddSupplyPage />
+            </TabPane>
+            <TabPane
+              tab={renderTabTitle('3', 'การเบิกจ่ายเวชภัณฑ์')}
+              key="3"
+            >
+              <DispensePage />
+            </TabPane>
+          </Tabs>
+        </Card>
+      </div>
+    </FullLayout>
+      );
 };
 
 export default MedicinePage;
