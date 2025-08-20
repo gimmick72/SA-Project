@@ -25,7 +25,6 @@ const AppRoutes = () => {
       <Route path="/payment" element={<PaymentInfoPage />} />
       <Route path="/attendance" element={<AttendanceInfoPage />} />
       <Route path="/service" element={<ServiceInfoPage />} />
-
     </Routes >
   );
 };

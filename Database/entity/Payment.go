@@ -17,7 +17,7 @@ type CashPayment struct{
 	ChangeGiven int
 
 	CouterServiceID uint
-	CouterService CouterService `gorm:"foreignKey"`
+	CouterService CouterService
 }
 
 type OnlinePayment struct{
@@ -45,14 +45,14 @@ type Transaction struct{
 	Status string
 
 	OnlinePaymentID uint
-	OnlinePayment OnlinePayment `gorm:"foreignKey"`
+	OnlinePayment OnlinePayment
 
 	CreditCardID uint
-	CreditCard CreditCard `gorm:"foreignKey"`
+	CreditCard CreditCard
 
 	CashPaymentID uint
-	CashPayment CashPayment `gorm:"foreignKey"`
+	CashPayment CashPayment
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient Patient
 }
