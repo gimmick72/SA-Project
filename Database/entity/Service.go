@@ -22,10 +22,10 @@ type ServicePromotion struct{
 	gorm.Model
 
 	ServiceID uint
-	Service Service `gorm:"foreignKey"`
+	Service Service
 
 	PromotionID uint
-	Promotion Promotion `gorm:"foreignKey"`
+	Promotion Promotion
 
 	StartDate time.Time
 	EndDate time.Time

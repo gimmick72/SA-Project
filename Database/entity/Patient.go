@@ -29,7 +29,7 @@ type ContactPerson struct{
 	ContactperPhone string
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"` 
+	Patient Patient
 }
 
 type Address struct{
@@ -42,7 +42,7 @@ type Address struct{
 	Postcod string
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient Patient
 }
 
 type InitialSymptomps struct{
@@ -55,18 +55,19 @@ type InitialSymptomps struct{
 	Height float64
 	
 	ServiceID uint
-	Service Service `gorm:"foreignKey"`
+	Service Service
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient Patient
 }
 
 type HistoryPatien struct{
 	gorm.Model
 	
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient []Patient
 
 	ServiceID uint
-	Service Service `gorm:"foreignKey"`
+	Service []Service
+
 }

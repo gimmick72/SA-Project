@@ -17,6 +17,7 @@ type Supply struct {
 
 	//seDataID uint
 	//Casea CaseData `gorm:"foreignKey"`
+
 }
 
 type RecordSupply struct {
@@ -26,3 +27,4 @@ type RecordSupply struct {
     SupplyID uint
     Supply   Supply `gorm:"foreignKey:SupplyID"`
 }
+

@@ -32,7 +32,7 @@ func main() {
 		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
 	}
 
-	port := os.Getenv("PORT")
+  port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}

@@ -20,8 +20,8 @@ type Schedules struct {
 	SchedulesDate time.Time
 
 	ShiftsID uint
-	Shifts   Shifts `gorm:"foreignKey"`
+	Shifts   Shifts
 
 	PersonalDataID uint
-	PersonalData   PersonalData `gorm:"foreignKey"`
+	PersonalData   PersonalData
 }
