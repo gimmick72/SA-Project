@@ -3,8 +3,9 @@ import type { RouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import IndexLayout from "../layout/IndexLayout";
 import Loadable from "../components/third-patry/Loadable";
+import HomePage from "../Container/index_page/navbar";
 
-const HomePage = Loadable(lazy(() => import("../pages/index_page/index")));
+const IndexPage = Loadable(lazy(() => import("../pages/index_page/index")));
 const BookingPage = Loadable(lazy(() => import("../pages/index_page/booking_page/index")));
 const BookingQueue = Loadable(lazy(() => import("../pages/index_page/booking_page/Booking")));
 
@@ -18,13 +19,13 @@ const IndexRoutes: RouteObject[] = [
     path: "/",                         // 👉 root
     element: <IndexLayout />,          // layout
     children: [
+      {
+        index: true,                   // 👉 default ของ "/"
+        element: <IndexPage />, // redirect ไป /home
+      },
       // {
-      //   index: true,                   // 👉 default ของ "/"
-      //   element: <Navigate to="/home" replace />, // redirect ไป /home
-      // },
-      // {
-      //   path: "home",                  
-      //   element: <HomePage />,
+      //   path: "/",                  
+      //   element: <IndexPage />,
       // },
       {
         path: "booking",
