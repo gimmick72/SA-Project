@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
+	"time"
 	"github.com/gin-gonic/gin"
 
 	"Database/configs"
@@ -98,6 +98,63 @@ func DeleteSupply(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// ----- สร้างเวชภัณฑ์ใหม่ -----
+type CreateSupplyReq struct {
+	Code       string `json:"code"        binding:"required"`
+	Name       string `json:"name"        binding:"required"`
+	Category   string `json:"category"    binding:"required"`
+	Quantity   int    `json:"quantity"    binding:"required,min=0"`
+	Unit       string `json:"unit"        binding:"required"`
+	ImportDate string `json:"import_date" binding:"required"` // "YYYY-MM-DD"
+	ExpiryDate string `json:"expiry_date" binding:"required"` // "YYYY-MM-DD"
+}
+
+func CreateSupply(c *gin.Context) {
+	var req CreateSupplyReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request: " + err.Error()})
+		return
+	}
+
+	// ตรวจซ้ำรหัส (ถ้าอยากข้าม เช็คนี้ลบออกได้)
+	var exist int64
+	if err := configs.DB.Model(&entity.Supply{}).
+		Where("code = ?", req.Code).
+		Count(&exist).Error; err == nil && exist > 0 {
+		c.JSON(http.StatusConflict, gin.H{"error": "รหัสเวชภัณฑ์นี้มีอยู่แล้ว"})
+		return
+	}
+
+	// parse วันที่
+	const layout = "2006-01-02"
+	im, err := time.Parse(layout, req.ImportDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "รูปแบบวันที่นำเข้าไม่ถูกต้อง (ควรเป็น YYYY-MM-DD)"})
+		return
+	}
+	ex, err := time.Parse(layout, req.ExpiryDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "รูปแบบวันหมดอายุไม่ถูกต้อง (ควรเป็น YYYY-MM-DD)"})
+		return
+	}
+
+	s := entity.Supply{
+		Code:       req.Code,
+		Name:       req.Name,
+		Category:   req.Category,
+		Quantity:   req.Quantity,
+		Unit:       req.Unit,
+		ImportDate: im,
+		ExpiryDate: ex,
+	}
+
+	if err := configs.DB.Create(&s).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "บันทึกข้อมูลไม่สำเร็จ: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, s)
+}
 
 
 

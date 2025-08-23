@@ -85,3 +85,26 @@ export async function deleteSupply(id: number) {
   const res = await fetch(`${BASE_URL}/api/supplies/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error(await res.text()); // พอแล้ว ไม่ต้องเช็ก 204 เพิ่ม
 }
+
+//create supply
+export async function createSupply(payload: {
+  code: string;
+  name: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  import_date: string; // "YYYY-MM-DD"
+  expiry_date: string; // "YYYY-MM-DD"
+}) {
+  const res = await fetch(`${BASE_URL}/api/supplies`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+  return await res.json();
+}
+

@@ -28,6 +28,7 @@ func main() {
 	{
 		// ---------- Supplies API ----------
 		api.GET("/supplies", controllers.ListSupplies)   // ค้นหา/กรอง/แบ่งหน้า/เรียง
+		api.POST("/supplies", controllers.CreateSupply) //เพิ่มข้อมูล
 		api.DELETE("/supplies/:id", controllers.DeleteSupply) // ✅ เรียกจาก controllers
 		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
 	}
