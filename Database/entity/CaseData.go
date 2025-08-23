@@ -10,13 +10,13 @@ type CaseData struct{
 	Note string
 	
 	PersonalDataID uint
-	PersonalData PersonalData `gorm:"foreignKey"`
+	PersonalData PersonalData `gorm:"foreignKey:PerdonalDataID;references:ID"`
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient Patient `gorm:"foreignKey:PatientID;references:ID"`
 
 	TreatmentToothID uint
-	TreatmentTooth TreatmentTooth `gorm:"foreignKey"`
+	TreatmentTooth TreatmentTooth `gorm:"foreignKey:TreatmentToothID;references:ID"`
 }
 
 type ToothNumber struct{
@@ -24,7 +24,7 @@ type ToothNumber struct{
 	Number int
 }
 
-type ToothPodition struct{
+type ToothPosition struct{
 	gorm.Model
 	Position string
 }
@@ -40,12 +40,12 @@ type TreatmentTooth struct{
 	gorm.Model
 	TreatmentDate time.Time
 
-	ToothPoditionID uint
-	ToothPodition ToothPodition `gorm:"foreignKey"`
+	ToothPositionID uint
+	ToothPosition ToothPosition `gorm:"foreignKey:ToothPositionID;references:ID"`
 
 	ToothNumberID uint
-	ToothNumber ToothNumber `gorm:"foreignKey"`
+	ToothNumber ToothNumber `gorm:"foreignKey:ToothNumberID;references:ID"`
 
 	TreatmentID uint
-	Treatment Treatment `gorm:"foreignKey"`
+	Treatment Treatment `gorm:"foreignKey:TreatmentID;references:ID"`
 }

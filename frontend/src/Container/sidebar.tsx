@@ -1,5 +1,6 @@
 import React from "react";
-import { Layout, Menu } from "antd";
+import Layout from "antd/es/layout";
+import Menu from "antd/es/menu";
 import logo from "../assets/logo.png";
 import { menuItems } from "../components/menuItems";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +18,9 @@ const Sidebar: React.FC = () => {
     }
   };
 
+  const displayItems = menuItems.map(({ key, icon, label }) => ({ key, icon, label }));
 
+  
   return (
     <Sider
       style={{
@@ -53,9 +56,8 @@ const Sidebar: React.FC = () => {
           backgroundColor: "#8E55D9",
           margin: "12px 16px 16px 16px",
         }}
-      />
-      
-      <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]} items={menuItems} onClick={handleMenuClick} />
+      />      
+      <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]} items={displayItems} onClick={handleMenuClick} />
     </Sider>
   );
 };

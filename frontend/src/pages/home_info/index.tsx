@@ -1,10 +1,13 @@
 import React from "react";
+import FullLayout from "../../layout/FullLayout";
 
 const HomeInfoPage = () => {
   return (
-  <div className="container"> Home Information Page
+    <FullLayout>
+      <div className="container"> Home Information Page
 
-  </div>
+      </div>
+    </FullLayout>
   );
 };
 

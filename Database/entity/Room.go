@@ -18,8 +18,8 @@ type RoomReservation struct{
 	StatusRoom string
 	
 	RoomID uint
-	Room Room `gorm:"foreignKey"`
+	Room Room
 
 	DentistMenagementID uint
-	DentistMenagement DentistMenagement `gorm:"foreignKey"`
+	DentistMenagement DentistMenagement
 }
