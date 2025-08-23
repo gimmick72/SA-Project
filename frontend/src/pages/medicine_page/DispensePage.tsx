@@ -1,5 +1,5 @@
 // src/pages/medicine_page/DispensePage.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -14,6 +14,10 @@ import {
   Space,
 } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
+import type { ColumnsType } from "antd/es/table";
+
+// ✅ ดึงบริการจริงจาก services
+import { fetchSupplyOptions, createDispense } from "../../services/supply";
 
 const { Option } = Select;
 
@@ -26,51 +30,63 @@ type DispenseItem = {
   quantity: number;
 };
 
-const mockSupplies: SupplyOption[] = [
-  { code: "MED001", name: "ยาแก้ปวดพาราเซตามอล", category: "ยาเม็ด" },
-  { code: "MED002", name: "แอลกอฮอล์ล้างแผล", category: "ของเหลว" },
-  { code: "MED003", name: "พลาสเตอร์ปิดแผล", category: "อุปกรณ์ทำแผล" },
-];
-
 const DispensePage: React.FC = () => {
   const [form] = Form.useForm();
   const [dispenseList, setDispenseList] = useState<DispenseItem[]>([]);
+  const [options, setOptions] = useState<SupplyOption[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // โหลดรายการรหัสเวชภัณฑ์จาก backend
+  useEffect(() => {
+    const load = async () => {
+      setLoadingOptions(true);
+      try {
+        const opts = await fetchSupplyOptions(); // ต้องมีใน services/supply.ts
+        setOptions(opts);
+      } catch (e: any) {
+        message.error(e?.message || "โหลดรหัสเวชภัณฑ์ไม่สำเร็จ");
+      } finally {
+        setLoadingOptions(false);
+      }
+    };
+    load();
+  }, []);
 
   const handleSupplyChange = (value: string) => {
-    const selectedSupply = mockSupplies.find((item) => item.code === value);
+    const selectedSupply = options.find((item) => item.code === value);
     if (selectedSupply) {
       form.setFieldsValue({
         supplyName: selectedSupply.name,
         supplyCategory: selectedSupply.category,
       });
+    } else {
+      form.setFieldsValue({ supplyName: "", supplyCategory: "" });
     }
   };
 
-  const handleAddToList = () => {
-    form
-      .validateFields(["caseCode", "supplyCode", "quantity"])
-      .then((values) => {
-        const selectedSupply = mockSupplies.find(
-          (item) => item.code === values.supplyCode
-        );
-        if (!selectedSupply) return;
-        const newItem: DispenseItem = {
-          key: `${values.caseCode}-${values.supplyCode}-${dispenseList.length}`,
-          caseCode: values.caseCode,
-          supplyCode: selectedSupply.code,
-          supplyName: selectedSupply.name,
-          quantity: values.quantity,
-        };
-        setDispenseList((prev) => [...prev, newItem]);
-        message.success("เพิ่มรายการเบิกสำเร็จ!");
-        form.resetFields([
-          "supplyCode",
-          "supplyName",
-          "supplyCategory",
-          "quantity",
-        ]);
-      })
-      .catch(() => {});
+  const handleAddToList = async () => {
+    try {
+      const values = await form.validateFields(["caseCode", "supplyCode", "quantity"]);
+      const selectedSupply = options.find((item) => item.code === values.supplyCode);
+      if (!selectedSupply) {
+        message.warning("ไม่พบรหัสเวชภัณฑ์ที่เลือก");
+        return;
+      }
+      const newItem: DispenseItem = {
+        key: `${values.caseCode}-${values.supplyCode}-${dispenseList.length}`,
+        caseCode: values.caseCode,
+        supplyCode: selectedSupply.code,
+        supplyName: selectedSupply.name,
+        quantity: values.quantity,
+      };
+      setDispenseList((prev) => [...prev, newItem]);
+      message.success("เพิ่มรายการเบิกสำเร็จ!");
+      form.resetFields(["supplyCode", "supplyName", "supplyCategory", "quantity"]);
+      window.dispatchEvent(new Event("suppliesUpdated"));
+    } catch {
+      // validation ไม่ผ่าน — ไม่ต้องทำอะไร
+    }
   };
 
   const handleDeleteItem = (key: string) => {
@@ -78,11 +94,40 @@ const DispensePage: React.FC = () => {
     message.success("ลบรายการสำเร็จ!");
   };
 
-  const handleConfirmDispense = () => {
-    console.log("รายการที่เบิกจ่ายทั้งหมด:", dispenseList);
-    message.success("ยืนยันการเบิกจ่ายสำเร็จ!");
-    setDispenseList([]);
-    form.resetFields();
+  const handleConfirmDispense = async () => {
+    if (!dispenseList.length) {
+      message.warning("ยังไม่มีรายการเบิก");
+      return;
+    }
+    const dispenser = form.getFieldValue("dispenser") || "";
+    if (!dispenser) {
+      message.warning("กรุณากรอกผู้เบิก/หน่วยงาน");
+      return;
+    }
+    // ใช้รหัสเคสจากแถวแรก (แบบฟอร์มกำหนดให้เคสเดียวกัน)
+    const caseCode = dispenseList[0].caseCode;
+
+    const payload = {
+      case_code: caseCode,
+      dispenser,
+      items: dispenseList.map((it) => ({
+        supply_code: it.supplyCode,
+        quantity: it.quantity,
+      })),
+    };
+
+    try {
+      if (submitting) return;
+      setSubmitting(true);
+      await createDispense(payload); // ต้องมีใน services/supply.ts
+      message.success("บันทึกการเบิกสำเร็จ");
+      setDispenseList([]);
+      form.resetFields();
+    } catch (e: any) {
+      message.error(e?.message || "บันทึกไม่สำเร็จ");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCancelDispense = () => {
@@ -91,19 +136,14 @@ const DispensePage: React.FC = () => {
     message.info("ยกเลิกการเบิกจ่าย");
   };
 
-  const columns = [
+  const columns: ColumnsType<DispenseItem> = [
     { title: "ชื่อเวชภัณฑ์", dataIndex: "supplyName", key: "supplyName" },
-    {
-      title: "จำนวน",
-      dataIndex: "quantity",
-      key: "quantity",
-      align: "right" as const,
-    },
+    { title: "จำนวน", dataIndex: "quantity", key: "quantity", align: "right" },
     {
       title: "ลบ",
       key: "action",
       width: 70,
-      render: (_: any, record: DispenseItem) => (
+      render: (_, record) => (
         <Button
           type="text"
           danger
@@ -125,13 +165,19 @@ const DispensePage: React.FC = () => {
         width: "1325px",
         height: "475px",
       }}
-      bodyStyle={{ background: "#ffffffff", borderRadius: 8,border: "2px solid #ffffffff",width: "1300px",height: "425px"}}
+      bodyStyle={{
+        background: "#ffffffff",
+        borderRadius: 8,
+        border: "2px solid #ffffffff",
+        width: "1300px",
+        height: "425px",
+      }}
     >
       <Row gutter={32}>
         {/* ฟอร์มซ้าย */}
         <Col span={12}>
           <Form form={form} layout="vertical" name="dispense_form">
-            {/* ✅ รหัสเคส + รหัสเวชภัณฑ์ */}
+            {/* รหัสเคส + รหัสเวชภัณฑ์ */}
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -152,8 +198,12 @@ const DispensePage: React.FC = () => {
                     placeholder="เลือกรหัสเวชภัณฑ์"
                     onChange={handleSupplyChange}
                     showSearch
+                    loading={loadingOptions}
+                    filterOption={(input, option) =>
+                      (option?.value as string)?.toLowerCase().includes(input.toLowerCase())
+                    }
                   >
-                    {mockSupplies.map((s) => (
+                    {options.map((s) => (
                       <Option key={s.code} value={s.code}>
                         {s.code}
                       </Option>
@@ -163,7 +213,7 @@ const DispensePage: React.FC = () => {
               </Col>
             </Row>
 
-            {/* ✅ ชื่อเวชภัณฑ์ + ประเภท */}
+            {/* ชื่อเวชภัณฑ์ + ประเภท */}
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="supplyName" label="ชื่อเวชภัณฑ์">
@@ -177,7 +227,7 @@ const DispensePage: React.FC = () => {
               </Col>
             </Row>
 
-            {/* ✅ จำนวน + ผู้เบิก/หน่วยงาน */}
+            {/* จำนวน + ผู้เบิก/หน่วยงาน */}
             <Form.Item label="จำนวน / ผู้เบิก">
               <Row gutter={16}>
                 <Col span={8}>
@@ -186,11 +236,7 @@ const DispensePage: React.FC = () => {
                     noStyle
                     rules={[{ required: true, message: "กรุณากรอกจำนวน!" }]}
                   >
-                    <InputNumber
-                      min={1}
-                      style={{ width: "100%" }}
-                      placeholder="จำนวน"
-                    />
+                    <InputNumber min={1} style={{ width: "100%" }} placeholder="จำนวน" />
                   </Form.Item>
                 </Col>
                 <Col span={16}>
@@ -225,7 +271,12 @@ const DispensePage: React.FC = () => {
             />
             <div style={{ textAlign: "right" }}>
               <Space>
-                <Button type="primary" onClick={handleConfirmDispense}>
+                <Button
+                  type="primary"
+                  onClick={handleConfirmDispense}
+                  loading={submitting}
+                  disabled={!dispenseList.length}
+                >
                   ตกลง
                 </Button>
                 <Button onClick={handleCancelDispense}>ยกเลิก</Button>

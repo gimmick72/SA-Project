@@ -108,3 +108,33 @@ export async function createSupply(payload: {
   return await res.json();
 }
 
+//Dispense supply
+// โหลดตัวเลือกเวชภัณฑ์จาก backend (หน้า AllSupplies ใช้อยู่แล้ว)
+export async function fetchSupplyOptions() {
+  const res = await fetch(`${BASE_URL}/api/supplies?page=1&page_size=100`);
+  if (!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  const items = Array.isArray(data) ? data : data.items || [];
+  return items.map((it: any) => ({
+    code: it.code ?? it.Code,
+    name: it.name ?? it.Name,
+    category: it.category ?? it.Category,
+  }));
+}
+
+// สร้างรายการเบิกจ่าย
+export async function createDispense(payload: {
+  case_code: string;
+  dispenser: string;
+  items: { supply_code: string; quantity: number }[];
+}) {
+  const res = await fetch(`${BASE_URL}/api/dispenses`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  try { return JSON.parse(text); } catch { return text; }
+}
+

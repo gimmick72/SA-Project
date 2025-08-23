@@ -1,5 +1,4 @@
 // src/pages/medicine_page/AddSupplyPage.tsx
-
 import React from 'react';
 import { Form, Input, Button, InputNumber, Select, DatePicker, message, Card, Space, Row, Col } from 'antd';
 import dayjs from 'dayjs';
@@ -7,26 +6,29 @@ import { createSupply } from '../../services/supply';
 
 const { Option } = Select;
 
-const AddSupplyPage = () => {
+const AddSupplyPage: React.FC = () => {
   const [form] = Form.useForm();
+  const [submitting, setSubmitting] = React.useState(false); // ✅ ใช้ useState
 
   const onFinish = async (values: any) => {
+    if (submitting) return; // กันกดรัว
     try {
       setSubmitting(true);
       const payload = {
-        code: values.code,
-        name: values.name,
+        code: values.code?.trim(),
+        name: values.name?.trim(),
         category: values.category,
         quantity: Number(values.quantity),
-        unit: values.unit,
-        import_date: values.importDate ? dayjs(values.importDate).format("YYYY-MM-DD") : "",
-        expiry_date: values.expiryDate ? dayjs(values.expiryDate).format("YYYY-MM-DD") : "",
+        unit: values.unit?.trim(),
+        import_date: values.importDate ? dayjs(values.importDate).format('YYYY-MM-DD') : '',
+        expiry_date: values.expiryDate ? dayjs(values.expiryDate).format('YYYY-MM-DD') : '',
       };
       await createSupply(payload);
       message.success('เพิ่มเวชภัณฑ์สำเร็จ!');
       form.resetFields();
+      window.dispatchEvent(new Event("suppliesUpdated"));
     } catch (e: any) {
-      message.error(e?.message || "บันทึกไม่สำเร็จ");
+      message.error(e?.message || 'บันทึกไม่สำเร็จ');
     } finally {
       setSubmitting(false);
     }
@@ -40,7 +42,7 @@ const AddSupplyPage = () => {
   const categories = ['ยาเม็ด', 'ของเหลว', 'อุปกรณ์ทำแผล'];
 
   return (
-    <Card title="แบบฟอร์มเพิ่มเวชภัณฑ์" bordered style={{ width: "1300px",height: "475px",borderRadius: '12px' }}>
+    <Card title="แบบฟอร์มเพิ่มเวชภัณฑ์" bordered style={{ width: '1300px', height: '475px', borderRadius: '12px' }}>
       <Form
         form={form}
         layout="vertical"
@@ -62,9 +64,11 @@ const AddSupplyPage = () => {
           </Col>
           <Col span={12}>
             <Form.Item name="category" label="หมวดหมู่" rules={[{ required: true, message: 'กรุณาเลือกหมวดหมู่!' }]}>
-              <Select placeholder="เลือกหมวดหมู่">
+              <Select placeholder="เลือกหมวดหมู่" allowClear>
                 {categories.map((category) => (
-                  <Option key={category} value={category}>{category}</Option>
+                  <Option key={category} value={category}>
+                    {category}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
@@ -90,10 +94,14 @@ const AddSupplyPage = () => {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item style={{ marginTop: '0.5px' }}>
+        <Form.Item style={{ marginTop: 4 }}>
           <Space>
-            <Button type="primary" htmlType="submit">เพิ่มเวชภัณฑ์</Button>
-            <Button htmlType="button" onClick={onReset}>ล้างข้อมูล</Button>
+            <Button type="primary" htmlType="submit" loading={submitting}>
+              เพิ่มเวชภัณฑ์
+            </Button>
+            <Button htmlType="button" onClick={onReset} disabled={submitting}>
+              ล้างข้อมูล
+            </Button>
           </Space>
         </Form.Item>
       </Form>
@@ -102,7 +110,3 @@ const AddSupplyPage = () => {
 };
 
 export default AddSupplyPage;
-
-function setSubmitting(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}

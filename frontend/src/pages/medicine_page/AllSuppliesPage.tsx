@@ -99,6 +99,12 @@ const AllSuppliesPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+
+    const handler = () => fetchData();
+  window.addEventListener("suppliesUpdated", handler);
+
+  return () => window.removeEventListener("suppliesUpdated", handler);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.page, query.pageSize, query.sortBy, query.order, query.q, query.category, query.importDate, query.expiryDate]);
 
