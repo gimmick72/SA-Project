@@ -7,11 +7,6 @@ import "./design/history.css";
 import { Flex } from "antd";
 import Navigate from "./component_patient/header_navigate";
 
-interface DataType {
-  key: string;
-  visitDate: string;
-  service: string;
-}
 
 const HistoryPage: React.FC = () => {
   return (
