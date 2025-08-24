@@ -1,0 +1,51 @@
+.wrapper {
+    padding: 0;
+    max-width: 100%;        
+    /* border: 1px solid #ccc; */
+    width: 100vw;
+    height: 100vh; /* ใช้ความสูงเต็มหน้าจอ */
+  }
+
+  .header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-weight: semi-bold;
+    margin-bottom: 1rem;
+    color: black;
+}
+
+.header-element {
+    border-left: 2px solid black; /* สร้างเส้นแนวตั้งสีดำ หนา 2px */
+    margin-left: 0.5rem; /* ระยะห่างจากขอบซ้าย */
+}
+
+.row {
+    display: flex;
+    gap: 2rem; /* ระยะห่างระหว่างคอลัมน์ */
+    margin-bottom: 1.5rem;
+}
+
+.search-input{
+    width: 250px;
+    padding: 0.5rem;
+    border: 1px solid gray;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 1rem;
+    position: absolute;
+    top: 10rem;
+    right: 15rem;
+}
+
+.add-button {
+    position: absolute;
+    top: 10rem;
+    right: 5rem;
+    padding: 0.5rem 1rem;
+    background-color: #CFF7D3; /* สีเขียว */
+    color: black;
+    border: 1px solid black; 
+    border-radius: 8px;
+    cursor: pointer;
+}

@@ -1,0 +1,45 @@
+/*select_category*/
+.select_category {
+    width: 200px;
+    height: 25px;
+}
+
+
+/* table */
+.table-container {
+    margin: 0px;
+    width: 1200px;
+    height: 450px;
+    border: solid 2px #f20909;
+}
+
+.item-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+.item-table th,
+.item-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.item-table input {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+.actions button {
+    margin-right: 8px;
+}
+
+.edit {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    border: 2px solid #ff2020;
+
+}
