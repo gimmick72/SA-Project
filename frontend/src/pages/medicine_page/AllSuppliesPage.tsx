@@ -1,18 +1,6 @@
 // src/pages/medicine_page/AllSuppliesPage.tsx
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  Input,
-  Table,
-  Button,
-  Space,
-  Select,
-  DatePicker,
-  Tag,
-  Tooltip,
-  message,
-  Popconfirm,
-  Drawer,
-} from "antd";
+import {Input,Table,Button,Space,Select,DatePicker,Tag,Tooltip,message,Popconfirm,Drawer,} from "antd";
 import { SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import type { ColumnsType } from "antd/es/table";
@@ -161,6 +149,7 @@ const AllSuppliesPage: React.FC = () => {
       msg.error(e?.message || "ลบไม่สำเร็จ");
     }
   };
+
 
   const columns: ColumnsType<Supply> = useMemo(
     () => [
@@ -341,9 +330,9 @@ const AllSuppliesPage: React.FC = () => {
   };
 
   return (
-    <div style={{ marginTop: 24 }}>
+    <div style={{ marginTop: 24, border: "2px solid #ffffffff",width:"1550px",height:"600px" }}>
       {ctx}
-      <div style={{ marginBottom: 24, display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
+      <div style={{ marginBottom: 24, display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center"}}>
         <Space size="middle">
           <Search
             placeholder="ค้นหาเวชภัณฑ์ (ชื่อ/รหัส)"
@@ -451,6 +440,7 @@ const AllSuppliesPage: React.FC = () => {
             showSizeChanger: true,
           }}
           onChange={onReportTableChange}
+      
         />
       </Drawer>
     </div>

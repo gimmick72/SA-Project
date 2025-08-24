@@ -1,21 +1,24 @@
 // src/pages/queue_info/types.ts
 
-export type PatientType = "walkin" | "appointment";
-
-export interface Patient {
+export type Patient = {
   id: string;
   name: string;
-  type: PatientType;
-}
+  type: "appointment" | "walkin";
+  caseCode?: string;     // ✅ ใช้แสดงใน chip/tooltip
+  note?: string;         // ✅ หัตถการ/หมายเหตุ (tooltip)
+  durationMin?: number;  // ✅ ระยะเวลาหัตถการ (tooltip)
+};
 
-export interface TimeSlot {
-  time: string; // เช่น "10:00", "10:30"
+export type TimeSlot = {
+  time: string;          // "10:00"
   patient: Patient | null;
-}
+};
 
-export interface RoomScheduleData {
+export type RoomScheduleData = {
   roomId: string;
   roomName: string;
-  assignedDoctor: string | null;
+  assignedDoctor?: string | null;
   timeSlots: TimeSlot[];
-}
+};
+
+

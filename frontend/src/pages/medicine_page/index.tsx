@@ -6,6 +6,7 @@ import { MedicineBoxOutlined } from '@ant-design/icons';
 import AllSuppliesPage from './AllSuppliesPage';
 import AddSupplyPage from './AddSupplyPage';
 import DispensePage from './DispensePage';
+import FullLayout from '../../layout/FullLayout';
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
@@ -32,7 +33,8 @@ const MedicinePage = () => {
   };
 
   return (
-    <div style={{ padding: '0px' }}>
+    <FullLayout>
+    <div style={{ padding: '0px'}}>
       <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center' }}>
         <Title level={2} style={{ margin: 0 }}>
           เวชภัณฑ์
@@ -40,7 +42,7 @@ const MedicinePage = () => {
       </div>
 
       <Card
-        style={{ borderRadius: '12px', marginTop: '24px' }}
+        style={{ borderRadius: '12px', marginTop: '24px' , border: "2px solid #ffffffff",width:"1605px",height:"660px"}}
         bodyStyle={{ padding: '0 24px 24px 24px' }}
       >
         <Tabs
@@ -70,7 +72,10 @@ const MedicinePage = () => {
         </Tabs>
       </Card>
     </div>
+    </FullLayout>
   );
+  
 };
+
 
 export default MedicinePage;

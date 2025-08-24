@@ -27,15 +27,18 @@ func main() {
 	api := r.Group("/api")
 	{
 		// ---------- Supplies API ----------
-		api.GET("/supplies", controllers.ListSupplies)   // ค้นหา/กรอง/แบ่งหน้า/เรียง
-		api.POST("/supplies", controllers.CreateSupply) //เพิ่มข้อมูล
+		api.GET("/supplies", controllers.ListSupplies)        // ค้นหา/กรอง/แบ่งหน้า/เรียง
+		api.POST("/supplies", controllers.CreateSupply)       //เพิ่มข้อมูล
 		api.DELETE("/supplies/:id", controllers.DeleteSupply) // ✅ เรียกจาก controllers
-		api.POST("/dispenses", controllers.CreateDispense) //เบิกจ่าย
-		api.GET("/dispenses", controllers.ListDispenses)//รายงานการเบิกจ่าย
+		api.POST("/dispenses", controllers.CreateDispense)    //เบิกจ่าย
+		api.GET("/dispenses", controllers.ListDispenses)      //รายงานการเบิกจ่าย
+		api.GET("/schedule", controllers.GetSchedule)         //ตารางคิว/นัด
+		api.POST("/schedule/assign", controllers.AssignSchedule)
+
 		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
 	}
 
-  port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
@@ -56,6 +59,9 @@ func migrateAll() {
 	))
 	must(configs.DB.AutoMigrate(&entity.RecordSupply{}))
 
+	must(configs.DB.AutoMigrate(
+		&entity.Appointment{},
+	))
 
 	log.Println("✅ AutoMigrate done")
 }
