@@ -31,6 +31,7 @@ func main() {
 		api.POST("/supplies", controllers.CreateSupply) //เพิ่มข้อมูล
 		api.DELETE("/supplies/:id", controllers.DeleteSupply) // ✅ เรียกจาก controllers
 		api.POST("/dispenses", controllers.CreateDispense) //เบิกจ่าย
+		api.GET("/dispenses", controllers.ListDispenses)//รายงานการเบิกจ่าย
 		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
 	}
 

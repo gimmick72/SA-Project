@@ -4,7 +4,8 @@ package controllers
 import (
 	"net/http"
 	"time"
-
+	"strconv"
+	"strings"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
@@ -81,4 +82,108 @@ func CreateDispense(c *gin.Context) {
 		Success: true,
 		Message: "บันทึกการเบิกสำเร็จ",
 	})
+}
+
+type DispenseReportItem struct {
+    ID          uint      `json:"id"`
+    RecordedAt  time.Time `json:"recorded_at"`
+    Action      string    `json:"action"`
+    SupplyID    uint      `json:"supply_id"`
+    SupplyCode  string    `json:"supply_code"`
+    SupplyName  string    `json:"supply_name"`
+    Category    string    `json:"category"`
+    Quantity    int       `json:"quantity"`
+    CaseCode    string    `json:"case_code"`
+    Dispenser   string    `json:"dispenser"`
+}
+
+type DispenseReportPage struct {
+    Items    []DispenseReportItem `json:"items"`
+    Total    int64                `json:"total"`
+    Page     int                  `json:"page"`
+    PageSize int                  `json:"page_size"`
+}
+
+func ListDispenses(c *gin.Context) {
+    q := strings.TrimSpace(c.Query("q")) // ค้นหา code/name/case/dispenser
+    dateFrom := c.Query("date_from")     // YYYY-MM-DD (optional)
+    dateTo := c.Query("date_to")         // YYYY-MM-DD (optional)
+
+    page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+    if page < 1 { page = 1 }
+    pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+    if pageSize < 1 { pageSize = 10 }
+
+    sortBy := strings.ToLower(c.DefaultQuery("sort_by", "recorded_at")) // recorded_at|supply_code|supply_name|quantity|dispenser|case_code
+    order := strings.ToLower(c.DefaultQuery("order", "desc"))
+    if order != "asc" && order != "desc" { order = "desc" }
+
+    // map column ปลอดภัย
+    allowed := map[string]string{
+        "recorded_at": "record_supplies.recorded_at",
+        "supply_code": "supplies.code",
+        "supply_name": "supplies.name",
+        "quantity":    "record_supplies.quantity",
+        "dispenser":   "record_supplies.dispenser",
+        "case_code":   "record_supplies.case_code",
+    }
+    col, ok := allowed[sortBy]
+    if !ok { col = "record_supplies.recorded_at" }
+
+    // join record_supplies กับ supplies
+    tx := configs.DB.Table("record_supplies").
+        Select(`
+            record_supplies.id AS id,
+            record_supplies.recorded_at,
+            record_supplies.action,
+            record_supplies.supply_id,
+            supplies.code AS supply_code,
+            supplies.name AS supply_name,
+            supplies.category AS category,
+            record_supplies.quantity,
+            record_supplies.case_code,
+            record_supplies.dispenser
+        `).
+        Joins("LEFT JOIN supplies ON supplies.id = record_supplies.supply_id")
+
+    if q != "" {
+        like := "%" + q + "%"
+        tx = tx.Where(`
+            supplies.code LIKE ? OR
+            supplies.name LIKE ? OR
+            record_supplies.case_code LIKE ? OR
+            record_supplies.dispenser LIKE ?
+        `, like, like, like, like)
+    }
+
+    // ช่วงวันที่ (เทียบเฉพาะวัน)
+    if dateFrom != "" {
+        tx = tx.Where("date(record_supplies.recorded_at) >= date(?)", dateFrom)
+    }
+    if dateTo != "" {
+        tx = tx.Where("date(record_supplies.recorded_at) <= date(?)", dateTo)
+    }
+
+    var total int64
+    if err := tx.Count(&total).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    var rows []DispenseReportItem
+    if err := tx.
+        Order(col + " " + order).
+        Offset((page-1)*pageSize).
+        Limit(pageSize).
+        Scan(&rows).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, DispenseReportPage{
+        Items:    rows,
+        Total:    total,
+        Page:     page,
+        PageSize: pageSize,
+    })
 }

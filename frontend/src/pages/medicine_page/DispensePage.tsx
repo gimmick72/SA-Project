@@ -82,8 +82,9 @@ const DispensePage: React.FC = () => {
       };
       setDispenseList((prev) => [...prev, newItem]);
       message.success("เพิ่มรายการเบิกสำเร็จ!");
-      form.resetFields(["supplyCode", "supplyName", "supplyCategory", "quantity"]);
       window.dispatchEvent(new Event("suppliesUpdated"));
+      form.resetFields(["supplyCode", "supplyName", "supplyCategory", "quantity"]);
+      ;
     } catch {
       // validation ไม่ผ่าน — ไม่ต้องทำอะไร
     }

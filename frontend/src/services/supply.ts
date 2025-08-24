@@ -138,3 +138,42 @@ export async function createDispense(payload: {
   try { return JSON.parse(text); } catch { return text; }
 }
 
+export type DispenseItem = {
+  id: number;
+  recorded_at: string;
+  action: string;
+  supply_id: number;
+  supply_code: string;
+  supply_name: string;
+  category: string;
+  quantity: number;
+  case_code: string;
+  dispenser: string;
+};
+
+export type DispensePage = {
+  items: DispenseItem[];
+  total: number;
+  page: number;
+  page_size: number;
+};
+
+export async function fetchDispenses(params: {
+  q?: string;
+  date_from?: string; // YYYY-MM-DD
+  date_to?: string;   // YYYY-MM-DD
+  page?: number;
+  page_size?: number;
+  sort_by?: string;   // recorded_at|supply_code|supply_name|quantity|dispenser|case_code
+  order?: "asc" | "desc";
+}): Promise<DispensePage> {
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== "") qs.append(k, String(v));
+  });
+  const res = await fetch(`${BASE_URL}/api/dispenses?` + qs.toString());
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json() as DispensePage;
+}
+
+
