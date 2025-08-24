@@ -1,11 +1,17 @@
 import { lazy } from "react";
 import type { RouteObject } from "react-router-dom";
 import Loadable from "../components/third-patry/Loadable";
-import FullLayout from "../layout/FullLayout";
 
-const IndexPage = Loadable(lazy(() => import("../pages/index_page/index")));
 const HomeInfoPage = Loadable(lazy(() => import("../pages/home_info/index")));
+
+//patient info
 const PatientInfoPage = Loadable(lazy(() => import("../pages/patient_info/index"))); 
+const PatientListPage = Loadable(lazy(() => import("../pages/patient_info/PatientList")));
+const PatientDetailPage = Loadable(lazy(() => import("../pages/patient_info/PatientDetailPage")));
+const InitialSymptoms = Loadable(lazy(() => import("../pages/patient_info/InitialPage")));
+const HistoryPage = Loadable(lazy(() => import("../pages/patient_info/HistoryPage")));
+const ContactPage = Loadable(lazy(() => import("../pages/patient_info/ContactPage")));
+
 const TreatmentInfoPage = Loadable(lazy(() => import("../pages/treatment_info/index")));
 const ScheduleInfoPage = Loadable(lazy(() => import("../pages/schedule_info/index")));
 const MedicineInfoPage = Loadable(lazy(() => import("../pages/medicine_page/index")));
@@ -15,28 +21,22 @@ const PaymentInfoPage = Loadable(lazy(() => import("../pages/payment_info/index"
 const AttendanceInfoPage = Loadable(lazy(() => import("../pages/attendance_info/index")));
 const ServiceInfoPage = Loadable(lazy(() => import("../pages/service_info/index")));
 
-//patient routes
-const AddPatient = Loadable(lazy(() => import("../pages/patient_info/AddPatientPage")));
-const InitialSymptoms = Loadable(lazy(() => import("../pages/patient_info/InitialPage")));
-const PatienTable = Loadable(lazy(() => import("../pages/patient_info/component_patient/table")));
-
-
-const AdminRoutes: RouteObject[] = [
+const StaffRoute: RouteObject[] = [
   {
     path: "/home",
     element: <HomeInfoPage />,
   },
   {
-    path: "/patient",       // แสดงตารางคนไข้
-    element: <PatientInfoPage />,
-  },
-  {
-    path: "/patient/add",   // แสดงฟอร์มเพิ่ม
-    element: <AddPatient />,
-  },
-  {
-    path: "/patient/initial", // แสดงฟอร์มอาการเบื้องต้น
-    element: <InitialSymptoms />,
+    path: "/patient",
+    element: <PatientInfoPage />, // wrapper + layout
+    children: [
+      { index: true, element: <PatientListPage /> }, // default แสดงตาราง
+      { path: "add", element: <PatientDetailPage /> }, 
+      { path: "detail", element: <PatientDetailPage /> },
+      { path: "initial", element: <InitialSymptoms /> },
+      { path: "patient-history", element: <HistoryPage /> },
+      { path: "contact", element: <ContactPage /> },
+    ],
   },
   {
     path: "/treatment",
@@ -72,4 +72,4 @@ const AdminRoutes: RouteObject[] = [
   },
 ];
 
-export default AdminRoutes;
+export default StaffRoute;

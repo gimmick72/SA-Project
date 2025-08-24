@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
       <Menu
         theme="light"
         mode="inline"
-        selectedKeys={selectedKey ? [selectedKey] : []} // เปลี่ยนเป็น selectedKeys
+        selectedKeys={selectedKey ? [selectedKey] : []} 
         items={displayItems}
         onClick={handleMenuClick}
       />

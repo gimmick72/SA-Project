@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import "./design/contact.css";
 import FullLayout from "../../layout/FullLayout";
 
+
 const InitialPage = () => {
   return (
-    <FullLayout>
-
+   
     <div className="wrapper">
       <div className="header">
         <h2 style={{ fontWeight: "600" }}>อาการเบื้องต้น</h2>
@@ -196,7 +196,7 @@ const InitialPage = () => {
       </div>
     </div>
     </div>
-    </FullLayout>
+
   );
 };
 export default InitialPage;

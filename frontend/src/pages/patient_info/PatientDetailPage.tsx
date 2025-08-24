@@ -2,34 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./design/pateint.css";
 import FullLayout from "../../layout/FullLayout";
+import Navigate from "./component_patient/header_navigate";
 
 const AddPatientPage = () => {
   return (
-    <FullLayout>
 
     <div className="wrapper">
-      <div className="header">
-        <h2 style={{ fontWeight: "600" }}>ข้อมูลประจำตัว</h2>
-        <h3 className="header-element">
-          <Link to="/patient/contact">
-            <span
-              style={{ margin: "0.5rem", color: "black", fontWeight: "400" }}
-            >
-              ข้อมูลการติดต่อ{" "}
-            </span>
-          </Link>
-        </h3>
-        <h3 className="header-element">
-          <Link to="/patient/history">
-            <span
-              style={{ margin: "0.5rem", color: "black", fontWeight: "400" }}
-            >
-              ประวัติการรักษา
-            </span>
-          </Link>
-        </h3>
-      </div>
-
+     <Navigate />
+   
       <div style={{ paddingLeft: "3rem" }}>
         <div className="row1">
           <div>
@@ -237,7 +217,7 @@ const AddPatientPage = () => {
         </button>
       </div>
     </div>
-    </FullLayout>
+ 
   );
 };
 

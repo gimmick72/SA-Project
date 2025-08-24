@@ -61,6 +61,7 @@ const columns: ColumnsType<DataType> = [
           </button>
         </Link>
 
+        <Link to="/patient/detail">
         <button
           type="button"
           style={{
@@ -74,6 +75,8 @@ const columns: ColumnsType<DataType> = [
         >
           ดูรายละเอียด
         </button>
+        </Link>
+
         <FaRegEdit style={{ color: 'black', cursor: 'pointer' }} />
         <MdDeleteOutline style={{ color: 'red', cursor: 'pointer' }} />
       </div>
