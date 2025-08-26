@@ -4,10 +4,13 @@ import { Navigate } from "react-router-dom";
 import IndexLayout from "../layout/IndexLayout";
 import Loadable from "../components/third-patry/Loadable";
 
+//Authentication
+const LoginPage = Loadable(lazy(() => import("../pages/Authentication/LoginPage")));
+
+//HomePage
 const HomePage = Loadable(lazy(() => import("../pages/HomePage/index_page/index")));
 const BookingPage = Loadable(lazy(() => import("../pages/HomePage/index_page/booking_page/index")));
 const BookingQueue = Loadable(lazy(() => import("../pages/HomePage/index_page/booking_page/Booking")));
-
 const OurDentist = Loadable(lazy(() => import("../pages/HomePage/index_page/OurDentists/index")));
 const ContactUs = Loadable(lazy(() => import("../pages/HomePage/index_page/ContactUs/index")));
 const PriceGuide = Loadable(lazy(() => import("../pages/HomePage/index_page/PriceGuide/index")));
@@ -15,17 +18,18 @@ const ServicePage = Loadable(lazy(() => import("../pages/HomePage/index_page/Ser
 
 const IndexRoutes: RouteObject[] = [
   {
+
     path: "/",                         // 👉 root
     element: <IndexLayout />,          // layout
     children: [
-      // {
-      //   index: true,                   // 👉 default ของ "/"
-      //   element: <Navigate to="/home" replace />, // redirect ไป /home
-      // },
-      // {
-      //   path: "home",                  
-      //   element: <HomePage />,
-      // },
+        {
+         index: true,                   // 👉 default ของ "/"
+         element: <Navigate to="/home" replace />, // redirect ไป /home
+       },
+       {
+         path: "home",                  
+         element: <HomePage />,
+       },
       {
         path: "booking",
         element: <BookingPage />,
@@ -52,8 +56,15 @@ const IndexRoutes: RouteObject[] = [
         path: "services",
         element: <ServicePage />,
       },
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
     ],
+
+
   },
+  
 ];
 
 export default IndexRoutes;

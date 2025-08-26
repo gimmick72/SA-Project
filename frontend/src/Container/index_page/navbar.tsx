@@ -53,7 +53,7 @@ const HomePage: React.FC = () => {
 
       <div style={{ color: "#722ED1", fontWeight: 600, cursor: "pointer" }}>
         <UserOutlined style={{ marginRight: 6 }} />
-        ลงชื่อเข้าใช้
+        <Link to="/login">ลงชื่อเข้าใช้</Link>
       </div>
     </Header>
   );
