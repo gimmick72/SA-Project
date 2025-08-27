@@ -27,12 +27,18 @@ func main() {
 	api := r.Group("/api")
 	{
 		// ---------- Supplies API ----------
-		api.GET("/supplies", controllers.ListSupplies)   // ค้นหา/กรอง/แบ่งหน้า/เรียง
+		api.GET("/supplies", controllers.ListSupplies)        // ค้นหา/กรอง/แบ่งหน้า/เรียง
 		api.DELETE("/supplies/:id", controllers.DeleteSupply) // ✅ เรียกจาก controllers
 		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
+
+		//Patient
+		api.POST("/patient", controllers.AddNewPatient) // ✅ เพิ่มตรงนี้
+		api.GET("/patient", controllers.FindPatients)   // เอาไว้ดึงทั้งหมด
+		api.GET("/patient/:id", controllers.FindPatientById) // เอาไว้ดูรายคน
+		api.DELETE("patient/:id",controllers.DeletePatientById)
 	}
 
-  port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
@@ -50,6 +56,9 @@ func migrateAll() {
 	must(configs.DB.AutoMigrate(
 		&entity.Supply{},
 		&entity.RecordSupply{}, // ✅ ชื่อ struct ตรงกับ entity
+
+		//Gimmick
+		&entity.Patient{},
 	))
 
 	log.Println("✅ AutoMigrate done")

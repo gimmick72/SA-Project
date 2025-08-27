@@ -6,7 +6,7 @@ export interface PersonalInfomation{
     lastname: string;
     nickname: string;
     gender:"male"|"female";
-    birthdate: Date;
+    birthdate: string;
     age:number;
     ethnicity: string;
     nationality: string;

@@ -1,73 +1,74 @@
 package entity
-import (
-	"gorm.io/gorm"
-	"time"
-)
-		
 
-type Patient struct{
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
+type Patient struct {
 	gorm.Model
-	CitizenID string
-	Prefix string
-	FirstName string
-	LastName string
-	NickName string
-	Enthnicity string
-	Nationality string
+	
+	CitizenID        string
+	Prefix           string
+	FirstName        string
+	LastName         string
+	NickName         string
+	Enthnicity       string
+	Nationality      string
 	CongenitaDisease string
-	BloodType string
-	Gender string
-	BirthDay time.Time
-	PhoneNumber string
-	Age int
-	DrugAllergy string
+	BloodType        string
+	Gender           string
+	BirthDay         time.Time
+	PhoneNumber      string
+	Age              int
+	DrugAllergy      string
 }
 
-type ContactPerson struct{
+type ContactPerson struct {
 	gorm.Model
-	Relationship string
+	Relationship    string
 	ContactperPhone string
 
 	PatientID uint
-	Patient Patient
+	Patient   Patient
 }
 
-type Address struct{
+type Address struct {
 	gorm.Model
 	HouseNumber string
-	Moo string
+	Moo         string
 	Subdistrict string
-	District string
-	Provice string
-	Postcod string
+	District    string
+	Provice     string
+	Postcod     string
 
 	PatientID uint
-	Patient Patient
+	Patient   Patient
 }
 
-type InitialSymptomps struct{
+type InitialSymptomps struct {
 	gorm.Model
-	Symptomps string
+	Symptomps     string
 	BloodPressure string
-	Visit time.Time
-	HeartRate string
-	weight float64
-	Height float64
-	
+	Visit         time.Time
+	HeartRate     string
+	weight        float64
+	Height        float64
+
 	ServiceID uint
-	Service Service
+	Service   Service
 
 	PatientID uint
-	Patient Patient
+	Patient   Patient
 }
 
-type HistoryPatien struct{
+type HistoryPatient struct {
 	gorm.Model
-	
+
 	PatientID uint
-	Patient []Patient
+	Patient   []Patient
 
 	ServiceID uint
-	Service []Service
-
+	Service   []Service
 }

@@ -2,10 +2,12 @@ package configs
 
 import (
 	"Database/entity"
-	
+
+	"log"
+	"time"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"log"
 )
 
 // DB คือ global database connection
@@ -31,60 +33,80 @@ func ConnectDatabase() {
 func SetupDatabase() {
 
 	DB.AutoMigrate(
-        //CaseData
+		//CaseData
 		&entity.CaseData{},
-        &entity.ToothNumber{},
-        &entity.ToothPosition{},
-        &entity.Treatment{},
-        &entity.TreatmentTooth{},
-    
+		&entity.ToothNumber{},
+		&entity.ToothPosition{},
+		&entity.Treatment{},
+		&entity.TreatmentTooth{},
 
-        //DentistManagement
+		//DentistManagement
 		&entity.DentistMenagement{},
 
-        //Member
+		//Member
 		&entity.Member{},
-        &entity.Role{},
-        &entity.MemberRole{},
+		&entity.Role{},
+		&entity.MemberRole{},
 
-        //Patient
+		//Patient
 		&entity.Patient{},
-        &entity.ContactPerson{},
-        &entity.Address{},
-        &entity.InitialSymptomps{},
-        &entity.HistoryPatien{},
+		&entity.ContactPerson{},
+		&entity.Address{},
+		&entity.InitialSymptomps{},
+		&entity.HistoryPatient{},
 
-
-        //Payment
+		//Payment
 		&entity.CouterService{},
-        &entity.CashPayment{},
-        &entity.OnlinePayment{},
-        &entity.CreditCard{},
-        &entity.Transaction{},
+		&entity.CashPayment{},
+		&entity.OnlinePayment{},
+		&entity.CreditCard{},
+		&entity.Transaction{},
 
-        //PersonalData
+		//PersonalData
 		&entity.PersonalData{},
-        &entity.Department{},
+		&entity.Department{},
 
-        //Queue
+		//Queue
 		&entity.Queue{},
-        &entity.Timeslot{},
+		&entity.Timeslot{},
 
-        //Room
+		//Room
 		&entity.Room{},
-        &entity.RoomReservation{},
+		&entity.RoomReservation{},
 
-        //Service
+		//Service
 		&entity.Service{},
-        &entity.Promotion{},
-        &entity.ServicePromotion{},
+		&entity.Promotion{},
+		&entity.ServicePromotion{},
 
-        //StaffWorkTime
+		//StaffWorkTime
 		&entity.Shifts{},
-        &entity.Schedules{},
+		&entity.Schedules{},
 
-        //Supply
+		//Supply
 		&entity.Supply{},
-        &entity.RecordSupply{},
+		&entity.RecordSupply{},
 	)
+
+	//Patient
+	//Personal
+
+	birthDay, _ := time.Parse("02-01-2006", "19-05-2004")
+
+	DB.Model(&entity.Patient{}).Create(&entity.Patient{
+		CitizenID:        "1234567890123",
+		Gender:           "female",
+		Prefix:           "นางสาว",
+		FirstName:        "วริศรา",
+		LastName:         "มากมูล",
+		NickName:         "กิม",
+		Enthnicity:       "ไทย",
+		Nationality:      "ไทย",
+		BirthDay:         birthDay,
+		Age:              21,
+		CongenitaDisease: "ภูมิแพ้",
+		BloodType:        "B",
+		PhoneNumber:      "0808214256",
+		DrugAllergy:      "-",
+	})
 }
