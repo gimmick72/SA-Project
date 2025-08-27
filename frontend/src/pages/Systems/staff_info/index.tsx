@@ -1,12 +1,11 @@
 import React from "react";
-import FullLayout from "../../../layout/FullLayout";
 
 const StaffInfoPage = () => {
   return (
-
-  <div className="container"> Staff Information Page
-
-  </div>
+    <div className="container"> 
+      <h1>Staff Information Page</h1>
+      <p>Welcome to the staff management system!</p>
+    </div>
   );
 };
 

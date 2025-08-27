@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, Table, Button, Modal, Form, Input, DatePicker, TimePicker, Select, Space, Tag, Typography, Row, Col, Statistic } from "antd";
-import { PlusOutlined, ClockCircleOutlined, CalendarOutlined, UserOutlined } from "@ant-design/icons";
+import { PlusOutlined, ClockCircleOutlined, UserOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 
@@ -33,7 +33,7 @@ const AttendanceInfoPage = () => {
       staffId: 'ST001',
       staffName: 'นายสมชาย ใจดี',
       position: 'ทันตแพทย์',
-      date: '2024-08-26',
+      date: '2024-08-27',
       checkIn: '08:00',
       checkOut: '17:00',
       workHours: 9,
@@ -45,7 +45,7 @@ const AttendanceInfoPage = () => {
       staffId: 'ST002',
       staffName: 'นางสาวมาลี สวยงาม',
       position: 'พยาบาล',
-      date: '2024-08-26',
+      date: '2024-08-27',
       checkIn: '08:15',
       checkOut: '17:00',
       workHours: 8.75,
@@ -57,12 +57,24 @@ const AttendanceInfoPage = () => {
       staffId: 'ST003',
       staffName: 'นายวิชัย ขยันทำงาน',
       position: 'เจ้าหน้าที่',
-      date: '2024-08-26',
+      date: '2024-08-27',
       checkIn: '08:00',
       checkOut: '',
       workHours: 0,
       status: 'present',
       notes: 'ยังไม่ออกงาน'
+    },
+    {
+      id: '4',
+      staffId: 'ST004',
+      staffName: 'นางสาวจิรา รับผิดชอบ',
+      position: 'แม่บ้าน',
+      date: '2024-08-27',
+      checkIn: '09:00',
+      checkOut: '16:00',
+      workHours: 7,
+      status: 'present',
+      notes: ''
     }
   ]);
 
@@ -137,14 +149,25 @@ const AttendanceInfoPage = () => {
     {
       title: 'จัดการ',
       key: 'action',
-      width: 100,
+      width: 120,
       render: (_, record) => (
-        <Button 
-          type="link" 
-          onClick={() => handleEdit(record)}
-        >
-          แก้ไข
-        </Button>
+        <Space>
+          <Button 
+            type="link" 
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+          >
+            แก้ไข
+          </Button>
+          <Button 
+            type="link" 
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+          >
+            ลบ
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -164,6 +187,19 @@ const AttendanceInfoPage = () => {
       checkOut: record.checkOut ? dayjs(record.checkOut, 'HH:mm') : null,
     });
     setIsModalVisible(true);
+  };
+
+  const handleDelete = (id: string) => {
+    Modal.confirm({
+      title: 'ยืนยันการลบ',
+      content: 'คุณต้องการลบข้อมูลการเข้างานนี้หรือไม่?',
+      okText: 'ลบ',
+      cancelText: 'ยกเลิก',
+      okType: 'danger',
+      onOk: () => {
+        setAttendanceData(prev => prev.filter(item => item.id !== id));
+      },
+    });
   };
 
   const handleSubmit = async (values: any) => {
@@ -278,7 +314,7 @@ const AttendanceInfoPage = () => {
               showTotal: (total, range) => 
                 `${range[0]}-${range[1]} จาก ${total} รายการ`,
             }}
-            scroll={{ x: 1200 }}
+            scroll={{ x: 1300 }}
           />
         </Card>
 

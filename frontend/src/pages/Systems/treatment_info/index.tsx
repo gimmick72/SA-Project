@@ -1,12 +1,11 @@
 import React from "react";
-import FullLayout from "../../../layout/FullLayout";
 
 const TreatmentInfoPage = () => {
   return (
-
-  <div className="container"> Treatment Information Page
-
-  </div>
+    <div className="container"> 
+      <h1>Treatment Information Page</h1>
+      <p>Welcome to the treatment management system!</p>
+    </div>
   );
 };
 

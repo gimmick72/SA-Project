@@ -14,10 +14,7 @@ const PaymentInfoPage = Loadable(lazy(() => import("../pages/Systems/payment_inf
 const AttendanceInfoPage = Loadable(lazy(() => import("../pages/Systems/attendance_info/index")));
 const ServiceInfoPage = Loadable(lazy(() => import("../pages/Systems/service_info/index")));
 
-//patient routes
-const AddPatient = Loadable(lazy(() => import("../pages/Systems/patient_info/AddPatientPage")));
-const InitialSymptoms = Loadable(lazy(() => import("../pages/Systems/patient_info/InitialPage")));
-const PatienTable = Loadable(lazy(() => import("../pages/Systems/patient_info/component_patient/table")));
+// Removed unused patient route imports - files were deleted
 
 
 const AdminRoutes: RouteObject[] = [
@@ -30,16 +27,8 @@ const AdminRoutes: RouteObject[] = [
         element: <HomeInfoPage />,
       },
       {
-        path: "patient",       // แสดงตารางคนไข้
+        path: "patient",
         element: <PatientInfoPage />,
-      },
-      {
-        path: "patient/add",   // แสดงฟอร์มเพิ่ม
-        element: <AddPatient />,
-      },
-      {
-        path: "patient/initial", // แสดงฟอร์มอาการเบื้องต้น
-        element: <InitialSymptoms />,
       },
       {
         path: "treatment",

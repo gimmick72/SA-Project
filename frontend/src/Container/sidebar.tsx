@@ -36,7 +36,9 @@ const Sidebar: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           margin: "15px 0",
+          cursor: "pointer",
         }}
+        onClick={() => navigate("/")}
       >
         <img
           src={logo}
