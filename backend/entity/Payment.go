@@ -38,21 +38,24 @@ type CreditCard struct{
 
 type Transaction struct{
 	gorm.Model
-	Timesstamp time.Time
-	Amount float32
-	Currency string
-	PaymentMethod string
-	Status string
-
-	OnlinePaymentID uint
+	TransactionID string `gorm:"unique;not null"`
+	Timestamp time.Time
+	Amount float64
+	Currency string `gorm:"default:THB"`
+	PaymentMethod string // cash, promptpay, credit_card
+	Status string `gorm:"default:pending"` // pending, completed, failed, cancelled
+	Reference string // For PromptPay reference or transaction ref
+	
+	// Payment method specific IDs (nullable)
+	OnlinePaymentID *uint
 	OnlinePayment OnlinePayment
 
-	CreditCardID uint
+	CreditCardID *uint
 	CreditCard CreditCard
 
-	CashPaymentID uint
+	CashPaymentID *uint
 	CashPayment CashPayment
 
-	PatientID uint
+	PatientID *uint
 	Patient Patient
 }

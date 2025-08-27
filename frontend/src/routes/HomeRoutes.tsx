@@ -8,13 +8,12 @@ import Loadable from "../components/third-patry/Loadable";
 const LoginPage = Loadable(lazy(() => import("../pages/Authentication/LoginPage")));
 
 //HomePage
-const HomePage = Loadable(lazy(() => import("../pages/HomePage/index_page/index")));
-const BookingPage = Loadable(lazy(() => import("../pages/HomePage/index_page/booking_page/index")));
-const BookingQueue = Loadable(lazy(() => import("../pages/HomePage/index_page/booking_page/Booking")));
-const OurDentist = Loadable(lazy(() => import("../pages/HomePage/index_page/OurDentists/index")));
-const ContactUs = Loadable(lazy(() => import("../pages/HomePage/index_page/ContactUs/index")));
-const PriceGuide = Loadable(lazy(() => import("../pages/HomePage/index_page/PriceGuide/index")));
-const ServicePage = Loadable(lazy(() => import("../pages/HomePage/index_page/Services/index")));
+const HomePage = Loadable(lazy(() => import("../pages/Home_page/index")));
+const BookingPage = Loadable(lazy(() => import("../pages/Home_page/booking/index")));
+const OurDentist = Loadable(lazy(() => import("../pages/Home_page/ourDentists/index")));
+const ContactUs = Loadable(lazy(() => import("../pages/Home_page/contactUs/index")));
+const PriceGuide = Loadable(lazy(() => import("../pages/Home_page/priceGuide/index")));
+const ServicePage = Loadable(lazy(() => import("../pages/Home_page/services/index")));
 
 const IndexRoutes: RouteObject[] = [
   {
@@ -33,12 +32,6 @@ const IndexRoutes: RouteObject[] = [
       {
         path: "booking",
         element: <BookingPage />,
-        children: [
-          {
-            path: "queue",
-            element: <BookingQueue />,
-          },
-        ],
       },
       {
         path: "dentists",

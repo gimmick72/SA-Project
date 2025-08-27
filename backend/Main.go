@@ -30,6 +30,12 @@ func main() {
 		api.GET("/supplies", controllers.ListSupplies)   // ค้นหา/กรอง/แบ่งหน้า/เรียง
 		api.DELETE("/supplies/:id", controllers.DeleteSupply) // ✅ เรียกจาก controllers
 		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
+
+		// ---------- Payment API ----------
+		api.POST("/payments", controllers.ProcessPayment)           // Process payment
+		api.GET("/payments/:id", controllers.GetTransaction)        // Get transaction by ID
+		api.GET("/payments", controllers.ListTransactions)          // List all transactions
+		api.PUT("/payments/:id/status", controllers.UpdateTransactionStatus) // Update transaction status
 	}
 
   port := os.Getenv("PORT")
@@ -50,6 +56,15 @@ func migrateAll() {
 	must(configs.DB.AutoMigrate(
 		&entity.Supply{},
 		&entity.RecordSupply{}, // ✅ ชื่อ struct ตรงกับ entity
+	))
+
+	// Payment system
+	must(configs.DB.AutoMigrate(
+		&entity.CouterService{},
+		&entity.CashPayment{},
+		&entity.OnlinePayment{},
+		&entity.CreditCard{},
+		&entity.Transaction{},
 	))
 
 	log.Println("✅ AutoMigrate done")
