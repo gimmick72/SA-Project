@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import HistoryTable from "./component_patient/historyTable";
 import "./design/history.css";
 import { Flex } from "antd";
-import FullLayout from "../../layout/FullLayout";
+// FullLayout removed - now handled by route wrapper
 
 interface DataType {
   key: string;
@@ -47,7 +47,7 @@ const data: DataType[] = [
 
 const HistoryPage: React.FC = () => {
   return (
-    <FullLayout>
+    
 
     <div className="wrapper">
       <div className="header">
@@ -106,7 +106,7 @@ const HistoryPage: React.FC = () => {
         </div>
       </div>
     </div>
-    </FullLayout>
+    
   );
 };
 

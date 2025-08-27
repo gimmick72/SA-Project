@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload } from 'antd';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
-import ImgCrop from 'antd-img-crop';
+// import ImgCrop from 'antd-img-crop'; // Commented out due to React 19 compatibility
 import './addservice.css';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
@@ -36,18 +36,16 @@ const UploadPicture: React.FC = () => {
   };
 
   return (
-    <ImgCrop rotationSlider>
-      <Upload
-        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-        listType="picture-card"
-        fileList={fileList}
-        onChange={onChange}
-        onPreview={onPreview}
-        className="custom-upload"
-      >
-        {fileList.length < 1 && '+ Upload'}
-      </Upload>
-    </ImgCrop>
+    <Upload
+      action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+      listType="picture-card"
+      fileList={fileList}
+      onChange={onChange}
+      onPreview={onPreview}
+      className="custom-upload"
+    >
+      {fileList.length < 1 && '+ Upload'}
+    </Upload>
   );
 };
 

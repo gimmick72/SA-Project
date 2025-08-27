@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./design/contact.css";
-import FullLayout from "../../layout/FullLayout";
+// FullLayout removed - now handled by route wrapper
 
 const InitialPage = () => {
   return (
-    <FullLayout>
+    
 
     <div className="wrapper">
       <div className="header">
@@ -196,7 +196,7 @@ const InitialPage = () => {
       </div>
     </div>
     </div>
-    </FullLayout>
+    
   );
 };
 export default InitialPage;

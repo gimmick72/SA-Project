@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./design/pateint.css";
-import FullLayout from "../../layout/FullLayout";
+// FullLayout removed - now handled by route wrapper
 
 const AddPatientPage = () => {
   return (
-    <FullLayout>
+    
 
     <div className="wrapper">
       <div className="header">
@@ -237,7 +237,7 @@ const AddPatientPage = () => {
         </button>
       </div>
     </div>
-    </FullLayout>
+    
   );
 };
 

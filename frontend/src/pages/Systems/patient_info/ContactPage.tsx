@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./design/contact.css";
-import FullLayout from "../../layout/FullLayout";
+// FullLayout removed - now handled by route wrapper
 
 const ContactPage = () => {
   return (
-    <FullLayout>
+    
 
     <div className="wrapper">
       <div className="header">
@@ -180,7 +180,7 @@ const ContactPage = () => {
         </button>
       </div>
     </div>
-    </FullLayout>
+    
   );
 };
 export default ContactPage;

@@ -69,7 +69,7 @@ const RoomSchedule: React.FC<Props> = ({ room, onAssignPatient }) => {
     return (
       <div
         key={slot.time}
-        ref={(node) => drag(drop(node))}
+        ref={(node) => drag(drop(node)) as any}
         style={{
           height: 60,
           border: "1px solid #ccc",

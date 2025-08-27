@@ -19,7 +19,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ patient }) => {
   const getColor = () => (patient.type === "appointment" ? "#FAAD14" : "#722ED1");
 
   return (
-    <div ref={drag} style={{ opacity: isDragging ? 0.4 : 1 }}>
+    <div ref={drag as any} style={{ opacity: isDragging ? 0.4 : 1 }}>
       <Card
         size="small"
         bordered={false}

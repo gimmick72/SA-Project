@@ -1,14 +1,14 @@
 import React from "react";
-import FullLayout from "../../layout/FullLayout";
+// FullLayout removed - now handled by route wrapper
 
 const StaffInfoPage = () => {
   return (
-<FullLayout>
+
 
   <div className="container"> Staff Information Page
 
   </div>
-</FullLayout>
+
   );
 };
 
