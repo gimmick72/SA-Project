@@ -4,37 +4,31 @@ import { Navigate } from "react-router-dom";
 import IndexLayout from "../layout/IndexLayout";
 import Loadable from "../components/third-patry/Loadable";
 
-const HomePage = Loadable(lazy(() => import("../pages/index_page/index")));
-const BookingPage = Loadable(lazy(() => import("../pages/index_page/booking_page/index")));
-const BookingQueue = Loadable(lazy(() => import("../pages/index_page/booking_page/Booking")));
 
-const OurDentist = Loadable(lazy(() => import("../pages/index_page/OurDentists/index")));
-const ContactUs = Loadable(lazy(() => import("../pages/index_page/ContactUs/index")));
-const PriceGuide = Loadable(lazy(() => import("../pages/index_page/PriceGuide/index")));
-const ServicePage = Loadable(lazy(() => import("../pages/index_page/Services/index")));
+// HomePage
+const HomePage = Loadable(lazy(() => import("../pages/Home_page/index")));
+const BookingPage = Loadable(lazy(() => import("../pages/Home_page/booking/index")));
+const OurDentist = Loadable(lazy(() => import("../pages/Home_page/ourDentists/index")));
+const ContactUs = Loadable(lazy(() => import("../pages/Home_page/contactUs/index")));
+const PriceGuide = Loadable(lazy(() => import("../pages/Home_page/priceGuide/index")));
+const ServicePage = Loadable(lazy(() => import("../pages/Home_page/services/index")));
 
 const IndexRoutes: RouteObject[] = [
   {
     path: "/",                         // 👉 root
     element: <IndexLayout />,          // layout
     children: [
-      // {
-      //   index: true,                   // 👉 default ของ "/"
-      //   element: <Navigate to="/home" replace />, // redirect ไป /home
-      // },
-      // {
-      //   path: "home",                  
-      //   element: <HomePage />,
-      // },
+      {
+        index: true,                   // 👉 default ของ "/"
+        element: <Navigate to="/home" replace />, // redirect ไป /home
+      },
+      {
+        path: "home",                  
+        element: <HomePage />,
+      },
       {
         path: "booking",
         element: <BookingPage />,
-        children: [
-          {
-            path: "queue",
-            element: <BookingQueue />,
-          },
-        ],
       },
       {
         path: "dentists",

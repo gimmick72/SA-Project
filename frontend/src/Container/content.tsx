@@ -14,18 +14,7 @@ const ContentLayout: React.FC<ContentLayoutProps> = ({ children }) => {
 
   return (
     <Content style={{ margin: "30px", flexGrow: 1 }}>
-      <div
-        style={{
-          padding: 24,
-          height: "100%",
-          background: "#FFFFFF",
-          borderRadius: 20,
-          border: "0.5px solid #000000",
-          display: "block", 
-        }}
-      >
-        {children}
-      </div>
+      {children}
     </Content>
   );
 };

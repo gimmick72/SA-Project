@@ -1,0 +1,14 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Card, Button, Result, Typography } from "antd";
+import { CloseCircleOutlined, ReloadOutlined, HomeOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+const { Text } = Typography;
+const PaymentError = ({ errorMessage = "เกิดข้อผิดพลาดในการชำระเงิน กรุณาลองใหม่อีกครั้ง", errorCode = "ERR_PAYMENT_FAILED", onRetry }) => {
+    const navigate = useNavigate();
+    return (_jsx("div", { style: { padding: '24px', display: 'flex', justifyContent: 'center' }, children: _jsx(Card, { style: { maxWidth: 600, width: '100%' }, children: _jsx(Result, { icon: _jsx(CloseCircleOutlined, { style: { color: '#ff4d4f' } }), status: "error", title: "\u0E01\u0E32\u0E23\u0E0A\u0E33\u0E23\u0E30\u0E40\u0E07\u0E34\u0E19\u0E44\u0E21\u0E48\u0E2A\u0E33\u0E40\u0E23\u0E47\u0E08", subTitle: _jsxs("div", { children: [_jsx(Text, { children: errorMessage }), _jsx("br", {}), _jsxs(Text, { type: "secondary", children: ["\u0E23\u0E2B\u0E31\u0E2A\u0E02\u0E49\u0E2D\u0E1C\u0E34\u0E14\u0E1E\u0E25\u0E32\u0E14: ", errorCode] })] }), extra: [
+                    _jsx("div", { style: { marginBottom: '20px' }, children: _jsxs(Card, { size: "small", style: { backgroundColor: '#fff2f0' }, children: [_jsx(Text, { strong: true, style: { display: 'block', marginBottom: '8px' }, children: "\u0E41\u0E19\u0E27\u0E17\u0E32\u0E07\u0E41\u0E01\u0E49\u0E44\u0E02:" }), _jsxs("ul", { style: { margin: 0, paddingLeft: '20px' }, children: [_jsx("li", { children: "\u0E15\u0E23\u0E27\u0E08\u0E2A\u0E2D\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E01\u0E32\u0E23\u0E0A\u0E33\u0E23\u0E30\u0E40\u0E07\u0E34\u0E19\u0E43\u0E2B\u0E49\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07" }), _jsx("li", { children: "\u0E15\u0E23\u0E27\u0E08\u0E2A\u0E2D\u0E1A\u0E01\u0E32\u0E23\u0E40\u0E0A\u0E37\u0E48\u0E2D\u0E21\u0E15\u0E48\u0E2D\u0E2D\u0E34\u0E19\u0E40\u0E17\u0E2D\u0E23\u0E4C\u0E40\u0E19\u0E47\u0E15" }), _jsx("li", { children: "\u0E25\u0E2D\u0E07\u0E43\u0E0A\u0E49\u0E27\u0E34\u0E18\u0E35\u0E01\u0E32\u0E23\u0E0A\u0E33\u0E23\u0E30\u0E40\u0E07\u0E34\u0E19\u0E2D\u0E37\u0E48\u0E19" }), _jsx("li", { children: "\u0E15\u0E34\u0E14\u0E15\u0E48\u0E2D\u0E40\u0E08\u0E49\u0E32\u0E2B\u0E19\u0E49\u0E32\u0E17\u0E35\u0E48\u0E2B\u0E32\u0E01\u0E1B\u0E31\u0E0D\u0E2B\u0E32\u0E22\u0E31\u0E07\u0E04\u0E07\u0E2D\u0E22\u0E39\u0E48" })] })] }) }, "suggestions"),
+                    _jsx(Button, { type: "primary", icon: _jsx(ReloadOutlined, {}), onClick: onRetry || (() => window.location.reload()), size: "large", children: "\u0E25\u0E2D\u0E07\u0E43\u0E2B\u0E21\u0E48" }, "retry"),
+                    _jsx(Button, { icon: _jsx(HomeOutlined, {}), onClick: () => navigate('/admin'), size: "large", children: "\u0E01\u0E25\u0E31\u0E1A\u0E2B\u0E19\u0E49\u0E32\u0E2B\u0E25\u0E31\u0E01" }, "home")
+                ] }) }) }));
+};
+export default PaymentError;

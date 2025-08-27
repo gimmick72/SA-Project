@@ -11,12 +11,11 @@ const { Header } = Layout;
 const { Title } = Typography;
 
 const items = [
-  { key: "home", label: <Link to="/">หน้าแรก</Link> },
+  { key: "home", label: <Link to="/home">หน้าแรก</Link> },
   { key: "dentists", label: <Link to="/dentists">ทันตแพทย์ของเรา</Link> },
   { key: "services", label: <Link to="/services">บริการ</Link> },
   { key: "contact", label: <Link to="/contact">ติดต่อเรา</Link> },
   { key: "booking", label: <Link to="/booking">จองคิว</Link> }
-
 ];
 
 const HomePage: React.FC = () => {
@@ -51,10 +50,10 @@ const HomePage: React.FC = () => {
         items={items}
       />
 
-      <div style={{ color: "#722ED1", fontWeight: 600, cursor: "pointer" }}>
+      <Link to="/auth/login" style={{ color: "#722ED1", fontWeight: 600, textDecoration: "none" }}>
         <UserOutlined style={{ marginRight: 6 }} />
         ลงชื่อเข้าใช้
-      </div>
+      </Link>
     </Header>
   );
 };
