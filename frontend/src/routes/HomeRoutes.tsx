@@ -15,11 +15,11 @@ const ServicePage = Loadable(lazy(() => import("../pages/Home_page/services/inde
 
 const IndexRoutes: RouteObject[] = [
   {
-    path: "/",                         // 👉 root
-    element: <IndexLayout />,          // layout
+    path: "/",                         
+    element: <IndexLayout />,          
     children: [
       {
-        index: true,                   // 👉 default ของ "/"
+        index: true,                   
         element: <Navigate to="/home" replace />, // redirect ไป /home
       },
       {
