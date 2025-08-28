@@ -1,7 +1,7 @@
 // src/pages/staff_info/index.tsx
 import React, { useState, useEffect } from 'react';
 import { Card, Input, Button, Row, Col, Typography, message, Drawer, Spin } from 'antd'; // Import Spin
-import { SearchOutlined, RightOutlined } from '@ant-design/icons';
+import { SearchOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AddStaffForm from './staffAdd';
 
@@ -82,42 +82,42 @@ const StaffInfoPaeg: React.FC = () => {
       setStaffData(initialStaffData);
       setLoading(false);
     }, 1000); // 1-second delay
-    
+
     return () => clearTimeout(timer);
   }, []);
 
-const applySearchFilter = () => {
-  const trimmedText = searchText.trim();
-  const lowerCaseSearchText = trimmedText.toLowerCase();
-  const searchId = Number(trimmedText);
+  const applySearchFilter = () => {
+    const trimmedText = searchText.trim();
+    const lowerCaseSearchText = trimmedText.toLowerCase();
+    const searchId = Number(trimmedText);
 
-  if (!trimmedText) {
-    setFilteredStaff(staffData); // แสดงทั้งหมดถ้าไม่มีคำค้น
-    return;
-  }
-
-  // ถ้าเป็นตัวเลข → ตรวจสอบ Employee_ID ก่อน
-  if (!isNaN(searchId)) {
-    const exactMatch = staffData.find(staff => staff.Employee_ID === searchId);
-    if (exactMatch) {
-      setFilteredStaff([exactMatch]); // เจอ Employee_ID → แสดงเฉพาะคนเดียว
+    if (!trimmedText) {
+      setFilteredStaff(staffData); // แสดงทั้งหมดถ้าไม่มีคำค้น
       return;
     }
-  }
 
-  // ถ้าไม่ใช่ Employee_ID หรือไม่เจอ → ค้นหาด้วย string อื่น ๆ
-  const newFilteredStaff = staffData.filter(staff => {
-    return (
-      staff.firstName.toLowerCase().includes(lowerCaseSearchText) ||
-      staff.lastName.toLowerCase().includes(lowerCaseSearchText) ||
-      staff.position.toLowerCase().includes(lowerCaseSearchText) ||
-      staff.idCard.includes(lowerCaseSearchText) ||
-      staff.email.toLowerCase().includes(lowerCaseSearchText)
-    );
-  });
+    // ถ้าเป็นตัวเลข → ตรวจสอบ Employee_ID ก่อน
+    if (!isNaN(searchId)) {
+      const exactMatch = staffData.find(staff => staff.Employee_ID === searchId);
+      if (exactMatch) {
+        setFilteredStaff([exactMatch]); // เจอ Employee_ID → แสดงเฉพาะคนเดียว
+        return;
+      }
+    }
 
-  setFilteredStaff(newFilteredStaff);
-};
+    // ถ้าไม่ใช่ Employee_ID หรือไม่เจอ → ค้นหาด้วย string อื่น ๆ
+    const newFilteredStaff = staffData.filter(staff => {
+      return (
+        staff.firstName.toLowerCase().includes(lowerCaseSearchText) ||
+        staff.lastName.toLowerCase().includes(lowerCaseSearchText) ||
+        staff.position.toLowerCase().includes(lowerCaseSearchText) ||
+        staff.idCard.includes(lowerCaseSearchText) ||
+        staff.email.toLowerCase().includes(lowerCaseSearchText)
+      );
+    });
+
+    setFilteredStaff(newFilteredStaff);
+  };
 
 
   useEffect(() => {
@@ -131,20 +131,20 @@ const applySearchFilter = () => {
   const handleAddFormSubmit = (newStaff: NewStaffData) => {
     const newId = Math.max(...staffData.map(s => s.Employee_ID)) + 1;
     const newStaffWithId: Staff = {
-        Employee_ID: newId,
-        Title: newStaff.title,
-        firstName: newStaff.firstName,
-        lastName: newStaff.lastName,
-        position: newStaff.position,
-        phone: newStaff.phone,
-        gender: newStaff.gender,
-        startDate: newStaff.startDate,
-        age: newStaff.age,
-        idCard: newStaff.idCard,
-        address: `${newStaff.addressHouseNo}, ${newStaff.addressMoo ? 'Moo ' + newStaff.addressMoo + ', ' : ''}${newStaff.addressSubDistrict}, ${newStaff.addressDistrict}`,
-        email: newStaff.email,
-        employeeType: newStaff.employeeType,
-        licenseNumber: newStaff.licenseNumber || '',
+      Employee_ID: newId,
+      Title: newStaff.title,
+      firstName: newStaff.firstName,
+      lastName: newStaff.lastName,
+      position: newStaff.position,
+      phone: newStaff.phone,
+      gender: newStaff.gender,
+      startDate: newStaff.startDate,
+      age: newStaff.age,
+      idCard: newStaff.idCard,
+      address: `${newStaff.addressHouseNo}, ${newStaff.addressMoo ? 'Moo ' + newStaff.addressMoo + ', ' : ''}${newStaff.addressSubDistrict}, ${newStaff.addressDistrict}`,
+      email: newStaff.email,
+      employeeType: newStaff.employeeType,
+      licenseNumber: newStaff.licenseNumber || '',
     };
     setStaffData(prevData => [...prevData, newStaffWithId]);
     message.success('เพิ่มข้อมูลบุคลากรใหม่เรียบร้อย!');
@@ -157,77 +157,85 @@ const applySearchFilter = () => {
 
   return (
     <div style={{ padding: '16px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Title level={2} style={{ fontWeight: 'bold', marginBottom: '20px' }}>
+      {/* hide scrollbars but keep scrolling */}
+      <style>{`
+        .hide-scrollbar {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
+      `}</style>
+
+      <Title level={2} style={{ fontWeight: 'bold', marginBottom: '20px', marginTop: '0px' }}>
         บุคลากร
       </Title>
+      {/* Consolidated both Search and Button into a single Row */}
+      <Row justify="space-between" align="middle" style={{ marginBottom: 30 }}>
+        <Col>
+          <Input
+            placeholder="Search by ID, Name, Position, ID Card"
+            prefix={<SearchOutlined style={{ color: '#aaa' }} />}
+            size="large"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{
+              width: '300px',
+              borderRadius: '25px',
+            }}
+          />
+        </Col>
+        <Col>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            style={{
+              borderRadius: '25px',
+              backgroundColor: '#9c7ed3ff',
+              borderColor: '#9c7ed3ff',
+              color: 'white',
+            }}
+            onClick={handleAddStaffClick}
+          >
+            เพิ่มรายชื่อ
+          </Button>
+        </Col>
+      </Row>
+
+
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '10px 16px',
+        backgroundColor: '#f8f8f8',
+        borderRadius: '4px 4px 0 0',
+        borderBottom: '1px solid #e0e0e0',
+        fontWeight: 'bold',
+        color: '#555',
+        overflowX: 'auto',
+        whiteSpace: 'nowrap',
+      }}>
+        <span style={{ flex: '1 0 100px' }}>รหัสพนักงาน</span>
+        <span style={{ flex: '1 0 100px' }}>ตำแหน่งงาน</span>
+        <span style={{ flex: '1 0 100px' }}>คำนำหน้าชื่อ</span>
+        <span style={{ flex: '2 0 150px' }}>ชื่อ</span>
+        <span style={{ flex: '2 0 150px' }}>นามสกุล</span>
+        <span style={{ width: '30px', flexShrink: 0, visibility: 'hidden' }}></span>
+      </div>
 
       <Card
         style={{
-      borderRadius: 10,
-      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-    }}
-    bodyStyle={{
-      padding: '20px',
-      display: 'flex',
-      flexDirection: 'column',
-      flex: 1,
-      minHeight: 0,
-    }}
-      >
-        <Row align="middle" justify="space-between" gutter={16} style={{ marginBottom: 18, flexShrink: 0 }}>
-          <Col>
-            <Input
-              placeholder="Search by ID, Name, Position, ID Card"
-              prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-              size="large"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{
-                width: '300px',
-                borderRadius: '25px',
-              }}
-            />
-          </Col>
-          <Col>
-            <Button
-              type="primary"
-              style={{
-                borderRadius: '25px',
-                backgroundColor: '#9c7ed3ff',
-                borderColor: '#9c7ed3ff',
-                color: 'white',
-              }}
-              onClick={handleAddStaffClick}
-            >
-              + เพิ่มรายชื่อ
-            </Button>
-          </Col>
-        </Row>
-        <div style={{
+          borderRadius: 10,
+          boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+          flex: 1,
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '10px 16px',
-          backgroundColor: '#f8f8f8',
-          borderRadius: '4px 4px 0 0',
-          borderBottom: '1px solid #e0e0e0',
-          fontWeight: 'bold',
-          color: '#555',
-          overflowX: 'auto',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}>
-          <span style={{ flex: '1 0 100px' }}>รหัสพนักงาน</span>
-          <span style={{ flex: '1 0 100px' }}>ตำแหน่งงาน</span>
-          <span style={{ flex: '1 0 100px' }}>คำนำหน้าชื่อ</span>
-          <span style={{ flex: '2 0 150px' }}>ชื่อ</span>
-          <span style={{ flex: '2 0 150px' }}>นามสกุล</span>
-        </div>
-        <div style={{
+          flexDirection: 'column',
+          overflow: 'auto',
+        }}
+      >
+
+
+        <div className="hide-scrollbar" style={{
           flex: 1,
           border: '1px solid #f0f0f0',
           borderTop: 'none',
@@ -281,7 +289,7 @@ const applySearchFilter = () => {
         open={isAddDrawerVisible}
         onClose={handleAddFormCancel}
         height="85vh"
-        bodyStyle={{ paddingBottom: 80, overflowY: 'auto' }}
+
       >
         <AddStaffForm
           onFormSubmit={handleAddFormSubmit}

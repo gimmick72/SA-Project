@@ -1,30 +1,13 @@
 // TreatmentInfoPage.tsx
 import React, { useEffect, useState } from 'react';
-import {
-    Card,
-    Table,
-    Button,
-    Typography,
-    Modal,
-    Form,
-    Input,
-    message,
-    Popconfirm,
-    Row,
-    Col,
-    DatePicker,
-    Upload,
-    InputNumber,
-    Checkbox,
-} from 'antd';
+import { Card, Button, Typography, Modal, Form, Input, message, Popconfirm, Row, Col, DatePicker, Upload, InputNumber, Select } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/lib/upload/interface';
 import dayjs from 'dayjs';
-
 import { initialPatientData, initialTreatmentData } from './Data';
 
 const { Title } = Typography;
-const { Search, TextArea } = Input;
+const { TextArea } = Input;
 
 interface Patient {
     patientId: number;
@@ -50,37 +33,25 @@ interface Patient {
 }
 
 interface DynamicTreatment {
+    selected_teeth: string[];
     treatment_name: string;
     photo_upload?: UploadFile[];
     price: number;
-    notes?: string;
-    dentist_name?: string;
-    date?: dayjs.Dayjs | null;
-    scaling_stone?: boolean;
-    scaling_root?: boolean;
-    root_canal_detail?: string;
-    fake_teeth_detail?: string;
-    others_detail?: string;
 }
 
 interface Treatment {
+    [x: string]: any;
     id: number;
     patientId: number;
-    // other optional fields from your Data.tsx records:
     treatmentName?: string;
     description?: string;
     treatments?: DynamicTreatment[];
     dentist_name?: string;
     date?: dayjs.Dayjs | null;
     notes?: string;
-    appointment_date?: dayjs.Dayjs | null; // <-- top-level appointment
-    scaling_stone?: boolean;
-    scaling_root?: boolean;
-    root_canal_detail?: string;
-    fake_teeth_detail?: string;
+    appointment_date?: dayjs.Dayjs | null;
     others_detail?: string;
     photo_upload?: UploadFile[];
-    // optional "derived" name for table convenience
     patientName?: string;
 }
 
@@ -93,25 +64,32 @@ const getBase64 = (file: File): Promise<string> =>
         reader.onerror = (error) => reject(error);
     });
 
-const normFile = (e: any) => {
-    if (Array.isArray(e)) return e;
-    return e?.fileList;
-};
-
 const TreatmentInfoPage: React.FC = () => {
     const [treatments, setTreatments] = useState<Treatment[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [, setLoading] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [editingTreatment, setEditingTreatment] = useState<Treatment | null>(null);
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-    const [form] = Form.useForm();
-    const [previewVisible, setPreviewVisible] = useState(false);
+    const [form] = Form.useForm(); const [previewVisible, setPreviewVisible] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
     const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
-
-    // store fileLists per dynamic treatment index while editing
     const [dynamicFileLists, setDynamicFileLists] = useState<{ [key: string]: UploadFile[] }>({});
+    const [dynamicSelectedTeeth, setDynamicSelectedTeeth] = useState<{ [key: number]: string[] }>({});
+    const [searchText, setSearchText] = useState<string>('');
+    const [filteredTreatments, setFilteredTreatments] = useState<Treatment[]>([]);
+
+    const toggleTooth = (index: number, num: string) => {
+        setDynamicSelectedTeeth(prev => {
+            const current = prev[index] || [];
+            return {
+                ...prev,
+                [index]: current.includes(num)
+                    ? current.filter(n => n !== num)
+                    : [...current, num]
+            };
+        });
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -132,6 +110,7 @@ const TreatmentInfoPage: React.FC = () => {
     // when selectedPatient changes, set readonly display fields in the form
     useEffect(() => {
         if (selectedPatient) {
+            // Line 118
             form.setFieldsValue({
                 fullName: `${selectedPatient.title} ${selectedPatient.firstName} ${selectedPatient.lastName}`,
                 age: selectedPatient.age,
@@ -182,23 +161,26 @@ const TreatmentInfoPage: React.FC = () => {
             preExistingConditions: patient?.preExistingConditions,
             phone: patient?.phone,
             allergyHistory: patient?.allergyHistory,
-            // convert top-level appointment_date/date to dayjs for DatePicker form items if present
+            // convert appointment_date/date to dayjs for DatePicker form items if present
             appointment_date: record.appointment_date ? dayjs(record.appointment_date) : null,
             date: record.date ? dayjs(record.date) : null,
-            // ensure treatments list in the form is in shape with per-item fields (but NO per-item appointment_date)
-            treatments: (record.treatments || []).map((t: DynamicTreatment, idx: number) => ({
+            // ensure treatments list in the form is in shape with all optional fields
+            treatments: (record.treatments || []).map((t: DynamicTreatment, _idx: number) => ({
                 treatment_name: t.treatment_name,
                 price: t.price,
-                scaling_stone: t.scaling_stone || false,
-                scaling_root: t.scaling_root || false,
-                root_canal_detail: t.root_canal_detail || '',
-                fake_teeth_detail: t.fake_teeth_detail || '',
-                others_detail: t.others_detail || '',
-                notes: t.notes || undefined,
-                dentist_name: t.dentist_name || undefined,
-                date: t.date ? dayjs(t.date) : null,
-                // photo_upload is restored via dynamicFileLists below
+                scaling_stone: record.scaling_stone,
+                scaling_root: record.scaling_root,
+                root_canal_detail: record.root_canal_detail,
+                fake_teeth_detail: record.fake_teeth_detail,
+                others_detail: record.others_detail,
+                notes: record.notes,
+                appointment_date: record.appointment_date,
+                dentist_name: record.dentist_name,
+                date: record.date,
             })),
+            // The following fields should not be at the top level
+            // dentist_name: record.dentist_name || undefined,
+            // notes: record.notes || undefined,
         };
 
         form.setFieldsValue(formValues);
@@ -207,28 +189,19 @@ const TreatmentInfoPage: React.FC = () => {
         const newDynamicFileLists: { [key: string]: UploadFile[] } = {};
         (record.treatments || []).forEach((t, idx) => {
             if (t.photo_upload && t.photo_upload.length) {
-                // if stored as UploadFile-like objects already, keep; if strings, convert
-                const arr = t.photo_upload.map((f: any, i: number) => {
-                    if (typeof f === 'string') {
-                        return {
-                            uid: `remote-${idx}-${i}`,
-                            name: f.split('/').pop(),
-                            status: 'done',
-                            url: f,
-                        } as UploadFile;
-                    } else {
-                        return {
-                            uid: f.uid ?? `remote-${idx}-${i}`,
-                            name: f.name ?? (f.url ? f.url.split('/').pop() : `file-${i}`),
-                            status: (f.status as any) || 'done',
-                            url: f.url || f.thumbUrl || undefined,
-                        } as UploadFile;
-                    }
-                });
-                newDynamicFileLists[`treatments_${idx}`] = arr;
+                newDynamicFileLists[`treatments_${idx}`] = t.photo_upload;
             }
         });
         setDynamicFileLists(newDynamicFileLists);
+
+        // restore dynamic selected teeth per treatment
+        const newDynamicSelectedTeeth: { [key: number]: string[] } = {};
+        (record.treatments || []).forEach((t, idx) => {
+            if (t.selected_teeth && Array.isArray(t.selected_teeth)) {
+                newDynamicSelectedTeeth[idx] = t.selected_teeth;
+            }
+        });
+        setDynamicSelectedTeeth(newDynamicSelectedTeeth);
 
         setIsModalVisible(true);
     };
@@ -240,49 +213,54 @@ const TreatmentInfoPage: React.FC = () => {
 
     const handleFormSubmit = async (values: any) => {
         try {
-            // either selectedPatient (from NationalID) or try to find from form NationalID
             let patient = selectedPatient;
             if (!patient && values.NationalID) {
                 patient = initialPatientData.find(p => p.NationalID === values.NationalID) || null;
             }
-
             if (!patient) {
                 message.error('ไม่พบข้อมูลผู้ป่วย กรุณาตรวจสอบเลขบัตรประชาชน');
                 return;
             }
 
-            // map dynamic treatments and attach file lists (photo_upload from dynamicFileLists)
-            const mappedDyn: DynamicTreatment[] = (values.treatments || []).map((t: any, idx: number) => ({
-                treatment_name: t.treatment_name,
-                price: Number(t.price) || 0,
-                photo_upload: dynamicFileLists[`treatments_${idx}`] || [],
-                notes: t.notes,
-                dentist_name: t.dentist_name,
-                date: t.date ? dayjs(t.date) : null,
-                scaling_stone: !!t.scaling_stone,
-                scaling_root: !!t.scaling_root,
-                root_canal_detail: t.root_canal_detail || '',
-                fake_teeth_detail: t.fake_teeth_detail || '',
-                others_detail: t.others_detail || '',
-            }));
+            // Process dynamic treatments
+            const mappedDyn: DynamicTreatment[] = await Promise.all(
+                (values.treatments || []).map(async (t: any, idx: number) => {
+                    const fileList = dynamicFileLists[`treatments_${idx}`] || [];
+                    // convert to base64 if needed
+                    const filesWithBase64 = await Promise.all(
+                        fileList.map(async (file) => ({
+                            ...file,
+                            base64: file.originFileObj ? await getBase64(file.originFileObj as File) : undefined,
+                        }))
+                    );
+                    return {
+                        treatment_name: t.treatment_name,
+                        price: Number(t.price) || 0,
+                        photo_upload: filesWithBase64,
+                        selected_teeth: dynamicSelectedTeeth[idx] || [],
+                        notes: t.notes,
+                        appointment_date: t.appointment_date,
+                        dentist_name: t.dentist_name,
+                        date: t.date,
+                    } as DynamicTreatment;
+                })
+            );
 
-            // read the top-level appointment_date (moved out from per-item)
-            const topAppointment = values.appointment_date ?? null;
-
+            const firstTreatmentItem = values.treatments ? values.treatments[0] : {};
             const newRecord: Treatment = {
                 id: editingTreatment ? editingTreatment.id : Math.max(0, ...treatments.map(x => x.id)) + 1,
                 patientId: patient.patientId,
                 patientName: `${patient.firstName} ${patient.lastName}`,
                 treatments: mappedDyn,
-                dentist_name: values.dentist_name || '',
-                date: values.date ?? null,
-                notes: values.notes || '',
-                appointment_date: topAppointment,
-                scaling_stone: values.scaling_stone || false,
-                scaling_root: values.scaling_root || false,
-                root_canal_detail: values.root_canal_detail || '',
-                fake_teeth_detail: values.fake_teeth_detail || '',
-                others_detail: values.others_detail || '',
+                dentist_name: firstTreatmentItem.dentist_name || '',
+                date: firstTreatmentItem.date ?? null,
+                notes: firstTreatmentItem.notes || '',
+                appointment_date: firstTreatmentItem.appointment_date ?? null,
+                scaling_stone: firstTreatmentItem.scaling_stone || false,
+                scaling_root: firstTreatmentItem.scaling_root || false,
+                root_canal_detail: firstTreatmentItem.root_canal_detail || '',
+                fake_teeth_detail: firstTreatmentItem.fake_teeth_detail || '',
+                others_detail: firstTreatmentItem.others_detail || '',
             };
 
             if (editingTreatment) {
@@ -292,10 +270,6 @@ const TreatmentInfoPage: React.FC = () => {
             }
 
             setIsModalVisible(false);
-            form.resetFields();
-            setDynamicFileLists({});
-            setSelectedPatient(null);
-            setEditingTreatment(null);
             message.success('บันทึกข้อมูลสำเร็จ');
         } catch (err) {
             console.error(err);
@@ -320,95 +294,150 @@ const TreatmentInfoPage: React.FC = () => {
         setDynamicFileLists(prev => ({ ...prev, [`treatments_${index}`]: fileList }));
     };
 
-    const columns = [
-        {
-            title: 'รหัสการรักษา',
-            dataIndex: 'id',
-            key: 'id',
-            sorter: (a: Treatment, b: Treatment) => a.id - b.id,
-        },
-        {
-            title: 'รหัสบัตรประชาชน',
-            key: 'NationalID',
-            render: (_: any, record: Treatment) => {
-                const p = initialPatientData.find(pp => pp.patientId === record.patientId);
-                return p?.NationalID ?? '';
-            },
-            sorter: (a: Treatment, b: Treatment) => {
-                const pa = initialPatientData.find(pp => pp.patientId === a.patientId);
-                const pb = initialPatientData.find(pp => pp.patientId === b.patientId);
-                return (pa?.NationalID || '').localeCompare(pb?.NationalID || '');
-            },
-        },
-        {
-            title: 'ชื่อ-นามสกุล',
-            key: 'patientName',
-            render: (_: any, record: Treatment) => {
-                const p = initialPatientData.find(pp => pp.patientId === record.patientId);
-                return p ? `${p.firstName} ${p.lastName}` : record.patientName || '-';
-            },
-            sorter: (a: Treatment, b: Treatment) => {
-                const pa = initialPatientData.find(pp => pp.patientId === a.patientId);
-                const pb = initialPatientData.find(pp => pp.patientId === b.patientId);
-                return (pa?.firstName || '').localeCompare(pb?.firstName || '');
-            },
-        },
-        {
-            title: 'นัดหมายครั้งถัดไป',
-            dataIndex: 'appointment_date',
-            key: 'appointment_date',
-            render: (date: any) => (date ? dayjs(date).format('DD/MM/YYYY') : 'ไม่มี'),
-        },
-        {
-            title: 'ราคา',
-            key: 'totalPrice',
-            render: (_: any, record: Treatment) => {
-                const totalPrice = record.treatments?.reduce((sum, cur) => sum + (cur.price || 0), 0) || 0;
-                return `${totalPrice.toLocaleString()} บาท`;
-            },
-            sorter: (a: Treatment, b: Treatment) => {
-                const pa = a.treatments?.reduce((sum, cur) => sum + (cur.price || 0), 0) || 0;
-                const pb = b.treatments?.reduce((sum, cur) => sum + (cur.price || 0), 0) || 0;
-                return pa - pb;
-            },
-        },
-    ];
+    // Search/filter logic
+    const applySearchFilter = () => {
+        const trimmedText = searchText.trim();
+        const lowerCaseSearchText = trimmedText.toLowerCase();
+        const searchId = Number(trimmedText);
+
+        if (!trimmedText) {
+            setFilteredTreatments(treatments);
+            return;
+        }
+
+        // If numeric, check for treatment ID
+        if (!isNaN(searchId)) {
+            const exactMatch = treatments.find(t => t.id === searchId);
+            if (exactMatch) {
+                setFilteredTreatments([exactMatch]);
+                return;
+            }
+        }
+
+        // Otherwise, filter by patient name, NationalID, or treatment name
+        const newFiltered = treatments.filter(t => {
+            const patient = initialPatientData.find(p => p.patientId === t.patientId);
+            const patientName = patient ? `${patient.firstName} ${patient.lastName}` : '';
+            const nationalId = patient?.NationalID || '';
+            const treatmentNames = (t.treatments || []).map(tr => tr.treatment_name).join(' ');
+            return (
+                patientName.toLowerCase().includes(lowerCaseSearchText) ||
+                nationalId.includes(lowerCaseSearchText) ||
+                treatmentNames.toLowerCase().includes(lowerCaseSearchText)
+            );
+        });
+
+        setFilteredTreatments(newFiltered);
+    };
+
+    useEffect(() => {
+        applySearchFilter();
+    }, [searchText, treatments]);
+
 
     return (
-        <div style={{ padding: 16 }}>
-            <Title level={2}>ข้อมูลการรักษา</Title>
-
-            <Card style={{ borderRadius: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                    <Search placeholder="ค้นหาชื่อการรักษา" allowClear style={{ width: 300 }} />
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={handleAddClick}
-                        style={{
-                            backgroundColor: '#B19CD9',
-                            borderColor: '#B19CD9',
-                            color: 'white',
-                            borderRadius: 25,
-                        }}
-                    >
-                        เพิ่มการรักษา
-                    </Button>
-                </div>
-
-                <Table
-                    columns={columns}
-                    dataSource={treatments}
-                    loading={loading}
-                    rowKey="id"
-                    pagination={{ pageSize: 10 }}
-                    onRow={(record) => ({
-                        onClick: () => handleEditClick(record),
-                    })}
-                    scroll={{ y: 500, x: 'max-content' }}
+        <div style={{ padding: '16px', height: '95%', display: 'flex', flexDirection: 'column' }}>
+            <Title level={2} style={{ fontWeight: 'bold', marginBottom: '20px', marginTop: '0px' }}>
+                ข้อมูลการรักษา
+            </Title>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 30 }}>
+                <Input
+                    placeholder="ค้นหาด้วยรหัสการรักษา, ชื่อผู้ป่วย, เลขบัตรประชาชน, หรือชื่อการรักษา"
+                    value={searchText}
+                    onChange={e => setSearchText(e.target.value)}
+                    style={{ width: 300, borderRadius: 25 }}
+                    allowClear
                 />
+                <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={handleAddClick}
+                    style={{
+                        backgroundColor: '#B19CD9',
+                        borderColor: '#B19CD9',
+                        color: 'white',
+                        borderRadius: 25,
+                    }}
+                >
+                    เพิ่มการรักษา
+                </Button>
+            </div>
+            {/* Custom table header row */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '10px 16px',
+                backgroundColor: '#f8f8f8',
+                borderRadius: '4px 4px 0 0',
+                borderBottom: '1px solid #e0e0e0',
+                fontWeight: 'bold',
+                color: '#555',
+                overflowX: 'auto',
+                whiteSpace: 'nowrap',
+            }}>
+                <span style={{ flex: '1 0 120px' }}>รหัสการรักษา</span>
+                <span style={{ flex: '1 0 180px' }}>รหัสบัตรประชาชน</span>
+                <span style={{ flex: '2 0 200px' }}>ชื่อ-นามสกุล</span>
+                <span style={{ flex: '1 0 160px' }}>นัดหมายครั้งถัดไป</span>
+                <span style={{ flex: '1 0 120px' }}>ราคา</span>
+            </div>
+            <Card
+                style={{
+                    borderRadius: 10,
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'auto',
+                }}
+            >
+                <div style={{
+                    flex: 1,
+                    border: '1px solid #f0f0f0',
+                    borderTop: 'none',
+                    borderRadius: '0 0 4px 4px',
+                    overflowY: 'auto',
+                    overflowX: 'auto',
+                    maxHeight: 10000,
+                }}>
+                    {filteredTreatments.length > 0 ? (
+                        filteredTreatments.map((treatment) => {
+                            const patient = initialPatientData.find(p => p.patientId === treatment.patientId);
+                            const patientName = patient ? `${patient.firstName} ${patient.lastName}` : treatment.patientName || '-';
+                            const nationalId = patient?.NationalID ?? '';
+                            const appointmentDate = treatment.appointment_date ? dayjs(treatment.appointment_date).format('DD/MM/YYYY') : 'ไม่มี';
+                            const totalPrice = treatment.treatments?.reduce((sum, cur) => sum + (cur.price || 0), 0) || 0;
+                            return (
+                                <div
+                                    key={treatment.id}
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '10px 16px',
+                                        borderBottom: '1px dotted #eee',
+                                        cursor: 'pointer',
+                                        backgroundColor: '#fff',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                    onClick={() => handleEditClick(treatment)}
+                                >
+                                    <span style={{ flex: '1 0 120px' }}>{treatment.id}</span>
+                                    <span style={{ flex: '1 0 180px' }}>{nationalId}</span>
+                                    <span style={{ flex: '2 0 200px' }}>{patientName}</span>
+                                    <span style={{ flex: '1 0 160px' }}>{appointmentDate}</span>
+                                    <span style={{ flex: '1 0 120px' }}>{totalPrice.toLocaleString()} บาท</span>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
+                            ไม่พบข้อมูลการรักษาที่ตรงกับเงื่อนไข
+                        </div>
+                    )}
+                </div>
             </Card>
-
             <Modal
                 title="การรักษา/ข้อมูลผู้รับบริการ"
                 open={isModalVisible}
@@ -437,7 +466,7 @@ const TreatmentInfoPage: React.FC = () => {
                         บันทึกข้อมูล
                     </Button>,
                 ]}
-                width={900}
+                width={800}
             >
                 <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
                     {/* Patient Info */}
@@ -464,11 +493,59 @@ const TreatmentInfoPage: React.FC = () => {
                                 <Form.Item
                                     name="NationalID"
                                     label="เลขบัตรประชาชน"
-                                    rules={[{ required: true, message: 'กรุณากรอกเลขบัตรประชาชน' }]}
+                                    rules={[
+                                        { required: true, message: 'กรุณากรอกเลขบัตรประชาชน' },
+                                        {
+                                            validator: (_, value) => {
+                                                if (!value) return Promise.resolve();
+
+                                                // ตรวจสอบว่ามีใน initialPatientData ไหม
+                                                const foundPatient = initialPatientData.find(
+                                                    (p) => p.NationalID === value
+                                                );
+
+                                                if (!foundPatient) {
+                                                    return Promise.reject(
+                                                        new Error('ไม่พบหมายเลขดังกล่าว')
+                                                    );
+                                                }
+
+                                                // ตรวจสอบว่ามีซ้ำกับคนอื่นไหม (เฉพาะใน treatments table)
+                                                const isDuplicate = treatments.some(
+                                                    (t) => {
+                                                        const patient = initialPatientData.find(p => p.patientId === t.patientId);
+                                                        return patient?.NationalID === value &&
+                                                            t.patientId !== (editingTreatment?.patientId ?? null);
+                                                    }
+                                                );
+
+                                                if (isDuplicate) {
+                                                    return Promise.reject(
+                                                        new Error('เลขบัตรประชาชนนี้มีอยู่แล้วในข้อมูลการรักษา')
+                                                    );
+                                                }
+
+                                                // ตรวจสอบความยาว
+                                                if (value.length !== 13) {
+                                                    return Promise.reject(
+                                                        new Error('เลขบัตรประชาชนต้องมีความยาว 13 หลัก')
+                                                    );
+                                                }
+
+                                                return Promise.resolve();
+                                            },
+                                        },
+                                    ]}
                                 >
-                                    <Input onChange={handleNationalIdChange} />
+                                    <Input
+                                        maxLength={13}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        onChange={handleNationalIdChange}
+                                    />
                                 </Form.Item>
                             </Col>
+
                             <Col span={8}>
                                 <Form.Item label="เบอร์โทรศัพท์" name="phone">
                                     <Input disabled />
@@ -482,18 +559,10 @@ const TreatmentInfoPage: React.FC = () => {
                         </Row>
                     </div>
 
-                    {/* Treatment Plan (top-level appointment_date moved here) */}
+                    {/* Treatment Plan and Dynamic List */}
                     <div style={{ border: '1px solid #d9d9d9', borderRadius: 8, padding: 16, marginBottom: 24 }}>
                         <Title level={4}>แผนการรักษา</Title>
 
-                        {/* top-level appointment date now */}
-                        <Row gutter={16} style={{ marginBottom: 12 }}>
-                            <Col span={7}>
-                                <Form.Item name="appointment_date" label="กรณีมีนัดหมายต่อเนื่อง">
-                                    <DatePicker style={{ width: '100%' }} />
-                                </Form.Item>
-                            </Col>
-                        </Row>
 
                         <Form.List name="treatments">
                             {(fields, { add, remove }) => (
@@ -502,8 +571,25 @@ const TreatmentInfoPage: React.FC = () => {
                                         <div key={key} style={{ border: '1px dashed #d9d9d9', padding: 16, marginBottom: 16 }}>
                                             <Row gutter={16}>
                                                 <Col span={10}>
-                                                    <Form.Item {...restField} name={[name, 'treatment_name']} label="ชื่อการรักษา" rules={[{ required: true, message: 'กรุณาใส่ชื่อการรักษา' }]}>
-                                                        <Input placeholder="ชื่อการรักษา" />
+                                                    <Form.Item
+                                                        {...restField}
+                                                        name={[name, 'treatment_name']}
+                                                        label="ชื่อการรักษา"
+                                                        rules={[{ required: true, message: 'กรุณาเลือกชื่อการรักษา' }]}
+                                                    >
+                                                        <Select
+                                                            placeholder="เลือกชื่อการรักษา"
+                                                            options={[
+                                                                { label: "อุดฟัน", value: "อุดฟัน" },
+                                                                { label: "ถอนฟัน", value: "ถอนฟัน" },
+                                                                { label: "ขูดหินน้ำลาย", value: "ขูดหินน้ำลาย" },
+                                                                { label: "เกลารากฟัน", value: "เกลารากฟัน" },
+                                                                { label: "รักษารากฟัน", value: "รักษารากฟัน" },
+                                                                { label: "ใส่ฟันเทียมทดแทน", value: "ใส่ฟันเทียมทดแทน" },
+                                                                { label: "อื่นๆ", value: "อื่นๆ" },
+                                                            ]}
+                                                            style={{ width: '100%' }}
+                                                        />
                                                     </Form.Item>
                                                 </Col>
                                                 <Col span={10}>
@@ -516,13 +602,11 @@ const TreatmentInfoPage: React.FC = () => {
                                                         <InputNumber
                                                             style={{ width: '100%' }}
                                                             min={0}
-                                                            // formatter: show commas for thousands (must return string)
                                                             formatter={(value?: number | string) =>
                                                                 value === undefined || value === null || value === ''
                                                                     ? ''
                                                                     : String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                                                             }
-                                                            // parser: remove commas and return a number (must return number)
                                                             parser={(displayValue?: string) => {
                                                                 if (!displayValue) return 0;
                                                                 const cleaned = displayValue.toString().replace(/,/g, '');
@@ -546,57 +630,109 @@ const TreatmentInfoPage: React.FC = () => {
                                                     />
                                                 </Col>
                                             </Row>
+                                            {/* 4 Quadrants for อุดฟัน/ถอนฟัน */}
                                             <Row gutter={16}>
-                                                <Col span={12}>
-                                                    <Form.Item {...restField} name={[name, 'scaling_stone']} valuePropName="checked">
-                                                        <Checkbox>ขูดหินน้ำลาย</Checkbox>
-                                                    </Form.Item>
-                                                    <Form.Item {...restField} name={[name, 'scaling_root']} valuePropName="checked">
-                                                        <Checkbox>เกรารากฟัน</Checkbox>
-                                                    </Form.Item>
-                                                    <Form.Item {...restField} name={[name, 'root_canal_detail']} label="รักษารากฟัน(ระบุ)">
-                                                        <Input />
-                                                    </Form.Item>
-                                                    <Form.Item {...restField} name={[name, 'fake_teeth_detail']} label="ใส่ฟันเทียมทดแทน">
-                                                        <Input />
-                                                    </Form.Item>
-                                                    <Form.Item {...restField} name={[name, 'others_detail']} label="อื่นๆ">
-                                                        <Input />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={12}>
-                                                    <div style={{ border: '1px solid #d9d9d9', borderRadius: 5, padding: 10, marginTop: 80 }}>
-                                                        {/* Visual tooth grids (kept as static in your layout) */}
-                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                            <span style={{ fontWeight: 'bold', marginRight: 16 }}>ถอนฟัน</span>
-                                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                <div style={{ display: 'flex' }}>
-                                                                    <span style={{ borderBottom: '1px solid #d9d9d9', borderRight: '1px solid #d9d9d9', padding: '0 8px 4px 0' }}>8 7 6 5 4 3 2 1</span>
-                                                                    <span style={{ borderBottom: '1px solid #d9d9d9', padding: '0 0 4px 8px' }}>1 2 3 4 5 6 7 8</span>
-                                                                </div>
-                                                                <div style={{ display: 'flex' }}>
-                                                                    <span style={{ borderRight: '1px solid #d9d9d9', padding: '4px 8px 0 0' }}>8 7 6 5 4 3 2 1</span>
-                                                                    <span style={{ padding: '4px 0 0 8px' }}>1 2 3 4 5 6 7 8</span>
-                                                                </div>
+                                                <Col span={24}>
+                                                    <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 12 }}>
+                                                        {/* ซ้ายบน */}
+                                                        <div style={{ flex: "1 1 45%", border: "1px solid #d9d9d9", borderRadius: 8, padding: 8 }}>
+                                                            <div style={{ fontWeight: "bold", marginBottom: 4 }}>ซ้ายบน</div>
+                                                            <div style={{ display: "flex", justifyContent: "center" }}>
+                                                                {["8", "7", "6", "5", "4", "3", "2", "1"].map((num) => (
+                                                                    <span
+                                                                        key={`LU-${num}`}
+                                                                        onClick={() => toggleTooth(index, `LU-${num}`)}
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                            padding: "4px 8px",
+                                                                            margin: "0 2px",
+                                                                            border: "1px solid #d9d9d9",
+                                                                            borderRadius: 4,
+                                                                            background: (dynamicSelectedTeeth[index] || []).includes(`LU-${num}`) ? "#B19CD9" : "white",
+                                                                            color: (dynamicSelectedTeeth[index] || []).includes(`LU-${num}`) ? "white" : "black",
+                                                                            userSelect: "none",
+                                                                        }}
+                                                                    >
+                                                                        {num}
+                                                                    </span>
+                                                                ))}
                                                             </div>
                                                         </div>
-                                                        <div style={{ display: 'flex', alignItems: 'center', marginTop: 40 }}>
-                                                            <span style={{ fontWeight: 'bold', marginRight: 28 }}>อุดฟัน</span>
-                                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                                <div style={{ display: 'flex' }}>
-                                                                    <span style={{ borderBottom: '1px solid #d9d9d9', borderRight: '1px solid #d9d9d9', padding: '0 8px 4px 0' }}>8 7 6 5 4 3 2 1</span>
-                                                                    <span style={{ borderBottom: '1px solid #d9d9d9', padding: '0 0 4px 8px' }}>1 2 3 4 5 6 7 8</span>
-                                                                </div>
-                                                                <div style={{ display: 'flex' }}>
-                                                                    <span style={{ borderRight: '1px solid #d9d9d9', padding: '4px 8px 0 0' }}>8 7 6 5 4 3 2 1</span>
-                                                                    <span style={{ padding: '4px 0 0 8px' }}>1 2 3 4 5 6 7 8</span>
-                                                                </div>
+                                                        {/* ขวาบน */}
+                                                        <div style={{ flex: "1 1 45%", border: "1px solid #d9d9d9", borderRadius: 8, padding: 8 }}>
+                                                            <div style={{ fontWeight: "bold", marginBottom: 4 }}>ขวาบน</div>
+                                                            <div style={{ display: "flex", justifyContent: "center" }}>
+                                                                {["1", "2", "3", "4", "5", "6", "7", "8"].map((num) => (
+                                                                    <span
+                                                                        key={`RU-${num}`}
+                                                                        onClick={() => toggleTooth(index, `RU-${num}`)}
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                            padding: "4px 8px",
+                                                                            margin: "0 2px",
+                                                                            border: "1px solid #d9d9d9",
+                                                                            borderRadius: 4,
+                                                                            background: (dynamicSelectedTeeth[index] || []).includes(`RU-${num}`) ? "#B19CD9" : "white",
+                                                                            color: (dynamicSelectedTeeth[index] || []).includes(`RU-${num}`) ? "white" : "black",
+                                                                            userSelect: "none",
+                                                                        }}
+                                                                    >
+                                                                        {num}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        {/* ซ้ายล่าง */}
+                                                        <div style={{ flex: "1 1 45%", border: "1px solid #d9d9d9", borderRadius: 8, padding: 8 }}>
+                                                            <div style={{ fontWeight: "bold", marginBottom: 4 }}>ซ้ายล่าง</div>
+                                                            <div style={{ display: "flex", justifyContent: "center" }}>
+                                                                {["8", "7", "6", "5", "4", "3", "2", "1"].map((num) => (
+                                                                    <span
+                                                                        key={`LL-${num}`}
+                                                                        onClick={() => toggleTooth(index, `LL-${num}`)}
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                            padding: "4px 8px",
+                                                                            margin: "0 2px",
+                                                                            border: "1px solid #d9d9d9",
+                                                                            borderRadius: 4,
+                                                                            background: (dynamicSelectedTeeth[index] || []).includes(`LL-${num}`) ? "#B19CD9" : "white",
+                                                                            color: (dynamicSelectedTeeth[index] || []).includes(`LL-${num}`) ? "white" : "black",
+                                                                            userSelect: "none",
+                                                                        }}
+                                                                    >
+                                                                        {num}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        {/* ขวาล่าง */}
+                                                        <div style={{ flex: "1 1 45%", border: "1px solid #d9d9d9", borderRadius: 8, padding: 8 }}>
+                                                            <div style={{ fontWeight: "bold", marginBottom: 4 }}>ขวาล่าง</div>
+                                                            <div style={{ display: "flex", justifyContent: "center" }}>
+                                                                {["1", "2", "3", "4", "5", "6", "7", "8"].map((num) => (
+                                                                    <span
+                                                                        key={`LR-${num}`}
+                                                                        onClick={() => toggleTooth(index, `LR-${num}`)}
+                                                                        style={{
+                                                                            cursor: "pointer",
+                                                                            padding: "4px 8px",
+                                                                            margin: "0 2px",
+                                                                            border: "1px solid #d9d9d9",
+                                                                            borderRadius: 4,
+                                                                            background: (dynamicSelectedTeeth[index] || []).includes(`LR-${num}`) ? "#B19CD9" : "white",
+                                                                            color: (dynamicSelectedTeeth[index] || []).includes(`LR-${num}`) ? "white" : "black",
+                                                                            userSelect: "none",
+                                                                        }}
+                                                                    >
+                                                                        {num}
+                                                                    </span>
+                                                                ))}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </Col>
                                             </Row>
-
                                             <Row gutter={10}>
                                                 <Col span={23}>
                                                     <Form.Item {...restField} name={[name, 'notes']} label="หมายเหตุ">
@@ -604,7 +740,13 @@ const TreatmentInfoPage: React.FC = () => {
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-
+                                            <Row gutter={16}>
+                                                <Col span={7}>
+                                                    <Form.Item {...restField} name={[name, 'appointment_date']} label="กรณีมีนัดหมายต่อเนื่อง">
+                                                        <DatePicker style={{ width: '100%' }} />
+                                                    </Form.Item>
+                                                </Col>
+                                            </Row>
                                             <Row gutter={16} style={{ marginTop: -10 }}>
                                                 <Col span={10}>
                                                     <Form.Item {...restField} name={[name, 'dentist_name']} label="ลงชื่อทันตแพทย์">
@@ -612,7 +754,6 @@ const TreatmentInfoPage: React.FC = () => {
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-
                                             <Row gutter={16} style={{ marginTop: -10 }}>
                                                 <Col span={10}>
                                                     <Form.Item {...restField} name={[name, 'date']} label="วันที่ลงชื่อ">
@@ -620,8 +761,7 @@ const TreatmentInfoPage: React.FC = () => {
                                                     </Form.Item>
                                                 </Col>
                                             </Row>
-
-                                            <Form.Item {...restField} name={[name, 'photo_upload']} label="อัปโหลดรูปภาพ" valuePropName="fileList" getValueFromEvent={normFile}>
+                                            <Form.Item label="อัปโหลดรูปภาพ">
                                                 <Upload
                                                     listType="picture-card"
                                                     fileList={dynamicFileLists[`treatments_${index}`] || []}
@@ -641,6 +781,8 @@ const TreatmentInfoPage: React.FC = () => {
                                                     )}
                                                 </Upload>
                                             </Form.Item>
+
+
                                         </div>
                                     ))}
 
@@ -649,16 +791,19 @@ const TreatmentInfoPage: React.FC = () => {
                                     </Form.Item>
                                 </>
                             )}
+
+
                         </Form.List>
                     </div>
+
+
                 </Form>
             </Modal>
-
             <Modal open={previewVisible} title={previewTitle} footer={null} onCancel={() => setPreviewVisible(false)}>
                 <img alt="preview" style={{ width: '100%' }} src={previewImage} />
             </Modal>
         </div>
-    );
+    ); 0
 };
 
 export default TreatmentInfoPage;

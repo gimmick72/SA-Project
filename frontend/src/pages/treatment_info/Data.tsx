@@ -32,6 +32,7 @@ interface DynamicTreatment {
     treatment_name: string;
     photo_upload?: UploadFile[];
     price: number;
+    selected_teeth?: string[];
 }
 
 // 3. Treatment Interface - โครงสร้างข้อมูลการรักษาหลัก
@@ -44,11 +45,6 @@ interface Treatment {
     date: dayjs.Dayjs | null;
     notes: string;
     appointment_date: dayjs.Dayjs | null;
-    scaling_stone: boolean;
-    scaling_root: boolean;
-    root_canal_detail: string;
-    fake_teeth_detail: string;
-    others_detail: string;
     photo_upload?: UploadFile[];
 }
 
@@ -300,142 +296,162 @@ export const initialTreatmentData = [
     {
         id: 1,
         patientId: 1,
-        treatments: [{ treatment_name: 'อุดฟัน (Amalgam)', photo_upload: [], price: 800 }],
+        treatments: [
+            {
+                treatment_name: 'อุดฟัน',
+                photo_upload: [],
+                price: 800,
+                selected_teeth: ['LU-6', 'LU-7', 'RU-1']
+            }
+        ],
         dentist_name: 'หมอณเดชน์',
         date: dayjs(),
         notes: 'trenbolone',
         appointment_date: dayjs().add(7, 'day'),
-        scaling_stone: false,
-        scaling_root: true,
-        root_canal_detail: 'jubjub',
-        fake_teeth_detail: '',
-        others_detail: '',
     },
     {
         id: 2,
         patientId: 2,
-        treatments: [{ treatment_name: 'ขูดหินปูน', photo_upload: [], price: 1000 }],
+        treatments: [
+            {
+                treatment_name: 'ขูดหินน้ำลาย',
+                photo_upload: [],
+                price: 1000,
+                selected_teeth: ['LL-8', 'LL-7']
+            }
+        ],
         dentist_name: 'หมอยาย่า',
         date: dayjs(),
         notes: 'testosterone',
         appointment_date: null,
-        scaling_stone: false,
-        scaling_root: true,
-        root_canal_detail: '',
-        fake_teeth_detail: '',
-        others_detail: 'peaches',
     },
     {
         id: 3,
         patientId: 3,
-        treatments: [{ treatment_name: 'ถอนฟัน', photo_upload: [], price: 700 }],
+        treatments: [
+            {
+                treatment_name: 'ถอนฟัน',
+                photo_upload: [],
+                price: 700,
+                selected_teeth: ['LR-2']
+            }
+        ],
         dentist_name: 'หมอณเดชน์',
         date: dayjs(),
         notes: 'steroid',
         appointment_date: null,
-        scaling_stone: false,
-        scaling_root: true,
-        root_canal_detail: '',
-        fake_teeth_detail: 'eating',
-        others_detail: '',
     },
     {
         id: 4,
         patientId: 4,
-        treatments: [{ treatment_name: 'ฟอกสีฟัน', photo_upload: [], price: 5000 }],
+        treatments: [
+            {
+                treatment_name: 'ฟอกสีฟัน',
+                photo_upload: [],
+                price: 5000,
+                selected_teeth: []
+            }
+        ],
         dentist_name: 'หมอยาย่า',
         date: dayjs(),
         notes: 'penicillin',
         appointment_date: dayjs().add(14, 'day'),
-        scaling_stone: false,
-        scaling_root: true,
-        root_canal_detail: '',
-        fake_teeth_detail: '',
-        others_detail: 'god',
     },
     {
         id: 5,
         patientId: 5,
-        treatments: [{ treatment_name: 'รักษารากฟัน', photo_upload: [], price: 3000 }],
+        treatments: [
+            {
+                treatment_name: 'รักษารากฟัน',
+                photo_upload: [],
+                price: 3000,
+                selected_teeth: ['RU-3', 'RU-4']
+            }
+        ],
         dentist_name: 'หมอดารา',
         date: dayjs(),
         notes: 'deep canal',
         appointment_date: dayjs().add(5, 'day'),
-        scaling_stone: true,
-        scaling_root: false,
-        root_canal_detail: 'ลึกระดับ 3',
-        fake_teeth_detail: '',
-        others_detail: '',
     },
     {
         id: 6,
         patientId: 6,
-        treatments: [{ treatment_name: 'ฟันปลอมทั้งปากบน', photo_upload: [], price: 10000 }],
+        treatments: [
+            {
+                treatment_name: 'ใส่ฟันเทียมทดแทน',
+                photo_upload: [],
+                price: 10000,
+                selected_teeth: []
+            }
+        ],
         dentist_name: 'หมอบอล',
         date: dayjs(),
         notes: 'ไม่มีฟันกราม',
         appointment_date: dayjs().add(10, 'day'),
-        scaling_stone: false,
-        scaling_root: false,
-        root_canal_detail: '',
-        fake_teeth_detail: 'แบบถอดได้',
-        others_detail: '',
     },
     {
         id: 7,
         patientId: 7,
-        treatments: [{ treatment_name: 'ขูดหินน้ำลาย', photo_upload: [], price: 600 }],
+        treatments: [
+            {
+                treatment_name: 'ขูดหินน้ำลาย',
+                photo_upload: [],
+                price: 600,
+                selected_teeth: ['LL-1', 'LL-2']
+            }
+        ],
         dentist_name: 'หมอณเดชน์',
         date: dayjs(),
         notes: 'หินน้ำลายแข็งมาก',
         appointment_date: null,
-        scaling_stone: true,
-        scaling_root: false,
-        root_canal_detail: '',
-        fake_teeth_detail: '',
-        others_detail: '',
     },
     {
         id: 8,
         patientId: 8,
-        treatments: [{ treatment_name: 'เคลือบฟลูออไรด์', photo_upload: [], price: 400 }],
+        treatments: [
+            {
+                treatment_name: 'อื่นๆ',
+                photo_upload: [],
+                price: 400,
+                selected_teeth: []
+            }
+        ],
         dentist_name: 'หมอยาย่า',
         date: dayjs(),
         notes: 'รอเด็กนิ่งก่อนทำ',
         appointment_date: null,
-        scaling_stone: false,
-        scaling_root: false,
-        root_canal_detail: '',
-        fake_teeth_detail: '',
-        others_detail: '',
     },
     {
         id: 9,
         patientId: 9,
-        treatments: [{ treatment_name: 'อุดฟัน (Composite)', photo_upload: [], price: 1200 }],
+        treatments: [
+            {
+                treatment_name: 'อุดฟัน',
+                photo_upload: [],
+                price: 1200,
+                selected_teeth: ['RU-8']
+            }
+        ],
         dentist_name: 'หมอบอล',
         date: dayjs(),
         notes: 'ฟันหน้าซ้าย',
         appointment_date: dayjs().add(3, 'day'),
-        scaling_stone: false,
-        scaling_root: true,
-        root_canal_detail: '',
-        fake_teeth_detail: '',
-        others_detail: '',
     },
     {
         id: 10,
         patientId: 10,
-        treatments: [{ treatment_name: 'ตรวจสุขภาพฟัน', photo_upload: [], price: 300 }],
+        treatments: [
+            {
+                treatment_name: 'อื่นๆ',
+                photo_upload: [],
+                price: 300,
+                selected_teeth: []
+            }
+        ],
         dentist_name: 'หมอณเดชน์',
         date: dayjs(),
         notes: 'ไม่มีฟันผุ',
         appointment_date: null,
-        scaling_stone: false,
-        scaling_root: false,
-        root_canal_detail: '',
-        fake_teeth_detail: '',
-        others_detail: '',
     },
 ];
 
@@ -452,3 +468,4 @@ export const initialTreatmentDataWithPatientName: Treatment[] = initialTreatment
         patientName: patientName,
     };
 });
+//นี่คือข้อมูลที่ต้องใช้พิจารณา ใช้สำหรับเก็บ mock data
