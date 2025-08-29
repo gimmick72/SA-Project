@@ -30,7 +30,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET( "/", func(c *gin.Context) {
-		c.String(http.StatusOK, "API ไทม์เองอิอิ\nพิพม์ /staff เพื่อดูข้อมูลพนักงาน")
+		c.String(http.StatusOK, "API ไทม์เองอิอิ\nพิพม์ http://localhost:8080/staff เพื่อดูข้อมูลพนักงาน")
 	})
 
 	// CORS middleware
