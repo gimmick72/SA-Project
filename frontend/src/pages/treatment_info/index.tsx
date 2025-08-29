@@ -142,6 +142,7 @@ const TreatmentInfoPage: React.FC = () => {
         setSelectedPatient(null);
         form.resetFields();
         setDynamicFileLists({});
+        setDynamicSelectedTeeth({}); // <-- Reset tooth selection here
         setIsModalVisible(true);
         setIsSubmitDisabled(true);
     };

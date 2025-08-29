@@ -5,54 +5,61 @@ import (
 	"gorm.io/gorm"
 )
 
-type CouterService struct{
+type CouterService struct {
 	gorm.Model
 	FirstName string
-	LastName string
+	LastName  string
+
+	// One-to-Many: หนึ่ง CouterService มีได้หลาย CashPayment
+	CashPayments []CashPayment `gorm:"foreignKey:CouterServiceID"`
 }
 
-type CashPayment struct{
+type CashPayment struct {
 	gorm.Model
 	CashReceivesAmount int
-	ChangeGiven int
+	ChangeGiven        int
 
 	CouterServiceID uint
-	CouterService CouterService `gorm:"foreignKey"`
+	CouterService   CouterService `gorm:"foreignKey:CouterServiceID;references:ID"`
 }
 
-type OnlinePayment struct{
+type OnlinePayment struct {
 	gorm.Model
 	OnlinePaymentProvider string
-	BankkAccountNumber string
-	QRCodemageURL string
-	Bank string
+	BankAccountNumber     string
+	QRCodeImageURL        string
+	Bank                  string
+
+	Transactions []Transaction `gorm:"foreignKey:OnlinePaymentID"`
 }
 
-type CreditCard struct{
+type CreditCard struct {
 	gorm.Model
-	CardType string
+	CardType   string
 	Last4Digit string
 	ExpiryDate string
 	IssuerBank string
+
+	Transactions []Transaction `gorm:"foreignKey:CreditCardID"`
 }
 
-type Transaction struct{
+type Transaction struct {
 	gorm.Model
-	Timesstamp time.Time
-	Amount float32
-	Currency string
+	Timestamp     time.Time
+	Amount        float32
+	Currency      string
 	PaymentMethod string
-	Status string
+	Status        string
 
 	OnlinePaymentID uint
-	OnlinePayment OnlinePayment `gorm:"foreignKey"`
+	OnlinePayment   OnlinePayment `gorm:"foreignKey:OnlinePaymentID;references:ID"`
 
 	CreditCardID uint
-	CreditCard CreditCard `gorm:"foreignKey"`
+	CreditCard   CreditCard `gorm:"foreignKey:CreditCardID;references:ID"`
 
 	CashPaymentID uint
-	CashPayment CashPayment `gorm:"foreignKey"`
+	CashPayment   CashPayment `gorm:"foreignKey:CashPaymentID;references:ID"`
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient   Patient `gorm:"foreignKey:PatientID;references:ID"`
 }

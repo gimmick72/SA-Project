@@ -21,11 +21,11 @@ type Promotion struct{
 type ServicePromotion struct{
 	gorm.Model
 
-	ServiceID uint
-	Service Service `gorm:"foreignKey"`
+	ServiceID  uint
+    Service    Service   `gorm:"foreignKey:ServiceID;references:ID"`
 
-	PromotionID uint
-	Promotion Promotion `gorm:"foreignKey"`
+    PromotionID uint
+    Promotion   Promotion `gorm:"foreignKey:PromotionID;references:ID"`
 
 	StartDate time.Time
 	EndDate time.Time

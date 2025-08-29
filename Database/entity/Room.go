@@ -11,15 +11,15 @@ type Room struct{
 	RoomName string
 }
 
-type RoomReservation struct{
+type RoomReservation struct {
 	gorm.Model
-	Date time.Time
-	Time time.Time
+	Date       time.Time
+	Time       time.Time
 	StatusRoom string
-	
+
 	RoomID uint
-	Room Room `gorm:"foreignKey"`
+	Room   Room `gorm:"foreignKey:RoomID;references:ID"`
 
 	DentistMenagementID uint
-	DentistMenagement DentistMenagement `gorm:"foreignKey"`
+	DentistMenagement   DentistMenagement `gorm:"foreignKey:DentistMenagementID;references:ID"`
 }

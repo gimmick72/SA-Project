@@ -1,51 +1,46 @@
 package entity
+
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
-type CaseData struct{
+type CaseData struct {
 	gorm.Model
 	FollowUpDate time.Time
-	Note string
-	
+	Note         string
+
 	PersonalDataID uint
-	PersonalData PersonalData `gorm:"foreignKey"`
+	PersonalData   PersonalData `gorm:"foreignKey:PersonalDataID"`
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient   Patient `gorm:"foreignKey:PatientID"`
 
-	TreatmentToothID uint
-	TreatmentTooth TreatmentTooth `gorm:"foreignKey"`
+	// One case → many treatment records
+	TreatmentTeeth []TreatmentTooth `gorm:"foreignKey:CaseDataID"`
 }
 
-type ToothNumber struct{
+type TreatmentTooth struct {
+	gorm.Model
+	CaseDataID     uint
+	TreatmentDate  time.Time
+	TreatmentName  string
+	Price          float64 `gorm:"type:decimal(10,2)"`
+
+	ToothPositionID uint
+	ToothPosition   ToothPosition `gorm:"foreignKey:ToothPositionID"`
+
+	ToothNumberID uint
+	ToothNumber   ToothNumber `gorm:"foreignKey:ToothNumberID"`
+}
+
+type ToothNumber struct {
 	gorm.Model
 	Number int
 }
 
-type ToothPodition struct{
+type ToothPosition struct {
 	gorm.Model
 	Position string
-}
-
-type Treatment struct{
-	gorm.Model
-	TreatmentName string
-}
-
-
-//ระบุฟัน ชี่ไหน ทำอะไร
-type TreatmentTooth struct{
-	gorm.Model
-	TreatmentDate time.Time
-
-	ToothPoditionID uint
-	ToothPodition ToothPodition `gorm:"foreignKey"`
-
-	ToothNumberID uint
-	ToothNumber ToothNumber `gorm:"foreignKey"`
-
-	TreatmentID uint
-	Treatment Treatment `gorm:"foreignKey"`
 }

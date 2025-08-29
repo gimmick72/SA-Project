@@ -18,8 +18,8 @@ func main() {
 	//CaseData
 	db.AutoMigrate(&entity.CaseData{},
 		&entity.ToothNumber{},
-		&entity.ToothPodition{},
-		&entity.Treatment{},
+		&entity.ToothPosition{},
+		// &entity.Treatment{},
 		&entity.TreatmentTooth{},
 	)
 

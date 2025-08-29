@@ -14,14 +14,14 @@ type Shifts struct {
 	BreakDurationMinutes time.Time
 	StandardHours        int
 }
-
 type Schedules struct {
-	gorm.Model
-	SchedulesDate time.Time
+    gorm.Model          // จะสร้าง ID, CreatedAt, UpdatedAt, DeletedAt ให้อัตโนมัติ
+    SchedulesDate time.Time  // วันเวลาของตารางงาน
 
-	ShiftsID uint
-	Shifts   Shifts `gorm:"foreignKey"`
+    ShiftsID uint        // FK ชี้ไปยัง Shifts
+    Shifts   Shifts `gorm:"foreignKey:ShiftsID"`  // ระบุ FK ชัดเจน
 
-	PersonalDataID uint
-	PersonalData   PersonalData `gorm:"foreignKey"`
+    PersonalDataID uint        // FK ชี้ไปยัง PersonalData
+    PersonalData PersonalData `gorm:"foreignKey:PersonalDataID"` // ระบุ FK ชัดเจน
 }
+

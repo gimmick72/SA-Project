@@ -22,51 +22,50 @@ type Patient struct{
 	Age int
 	DrugAllergy string
 }
-
-type ContactPerson struct{
+type ContactPerson struct {
 	gorm.Model
-	Relationship string
+	Relationship   string
 	ContactperPhone string
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"` 
+	Patient   Patient `gorm:"foreignKey:PatientID;references:ID"`
 }
 
-type Address struct{
+type Address struct {
 	gorm.Model
 	HouseNumber string
-	Moo string
+	Moo         string
 	Subdistrict string
-	District string
-	Provice string
-	Postcod string
+	District    string
+	Provice     string
+	Postcod     string
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient   Patient `gorm:"foreignKey:PatientID;references:ID"`
 }
 
-type InitialSymptomps struct{
+type InitialSymptomps struct {
 	gorm.Model
-	Symptomps string
+	Symptomps     string
 	BloodPressure string
-	Visit time.Time
-	HeartRate string
-	weight float64
-	Height float64
-	
+	Visit         time.Time
+	HeartRate     string
+	Weight        float64
+	Height        float64
+
 	ServiceID uint
-	Service Service `gorm:"foreignKey"`
+	Service   Service `gorm:"foreignKey:ServiceID;references:ID"`
 
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient   Patient `gorm:"foreignKey:PatientID;references:ID"`
 }
 
-type HistoryPatien struct{
+type HistoryPatien struct {
 	gorm.Model
-	
+
 	PatientID uint
-	Patient Patient `gorm:"foreignKey"`
+	Patient   Patient `gorm:"foreignKey:PatientID;references:ID"`
 
 	ServiceID uint
-	Service Service `gorm:"foreignKey"`
+	Service   Service `gorm:"foreignKey:ServiceID;references:ID"`
 }

@@ -31,5 +31,5 @@ type Department struct{
 	StartDate time.Time
 
 	PersonalDataID uint
-	PersonalData PersonalData `gorm:"foreignKey"`
+	PersonalData   PersonalData `gorm:"foreignKey:PersonalDataID;references:ID"`
 }
