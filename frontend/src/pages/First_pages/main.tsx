@@ -1,0 +1,14 @@
+
+// import ReactDOM from "react-dom/client";
+// import { BrowserRouter } from "react-router-dom";
+// import App from "./App";
+
+// const FirstPages: React.FC= () => {
+//   return (
+//     <div style={{}}>
+//       <App />
+//     </div>
+//   );
+// };
+
+// export default FirstPages;

@@ -5,6 +5,7 @@ import RoomSchedule from "./RoomSchedule";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Patient, RoomScheduleData } from "./types";
+import FullLayout from "../../../layout/FullLayout";
 
 const { Content } = Layout;
 
@@ -52,6 +53,7 @@ const QueuePage: React.FC = () => {
   };
 
   return (
+    <FullLayout>
     <div style={{ display:"flex",width: "1400px", height: "620px", border: "2px solid #FFF", overflow: "hidden", }}>
       <DndProvider backend={HTML5Backend}>
         <Layout style={{ padding: "24px", height: "620px", backgroundColor: "#FFF" }}>
@@ -94,6 +96,7 @@ const QueuePage: React.FC = () => {
         </Layout>
       </DndProvider>
     </div>
+    </FullLayout>
   );
 };
 

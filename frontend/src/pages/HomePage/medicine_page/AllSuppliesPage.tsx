@@ -6,7 +6,7 @@ import dayjs, { Dayjs } from "dayjs";
 import type { ColumnsType } from "antd/es/table";
 import type { SorterResult } from "antd/es/table/interface";
 import type { TableProps } from "antd";
-import { fetchSupplies, deleteSupply } from "../../services/supply";
+import { fetchSupplies, deleteSupply } from "../../../services/supply";
 
 const { Search } = Input;
 const { Option } = Select;
