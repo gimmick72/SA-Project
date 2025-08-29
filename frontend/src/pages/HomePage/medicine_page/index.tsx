@@ -4,7 +4,7 @@ import { MedicineBoxOutlined } from '@ant-design/icons';
 import AllSuppliesPage from './AllSuppliesPage';
 import AddSupplyPage from './AddSupplyPage';
 import DispensePage from './DispensePage';
-import FullLayout from '../../layout/FullLayout';
+import FullLayout from '../../../layout/FullLayout';
 
 const { TabPane } = Tabs;
 const { Title } = Typography;

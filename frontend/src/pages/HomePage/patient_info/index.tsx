@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./design/index.css";
 import PatienTable from "./component_patient/table";
-import FullLayout from "../../layout/FullLayout";
+import FullLayout from "../../../layout/FullLayout";
 
 const PatientInfoPage = () => {
   return (

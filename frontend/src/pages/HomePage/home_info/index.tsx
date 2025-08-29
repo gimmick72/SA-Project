@@ -1,5 +1,5 @@
 import React from "react";
-import FullLayout from "../../layout/FullLayout";
+import FullLayout from "../../../layout/FullLayout";
 
 const HomeInfoPage = () => {
   return (

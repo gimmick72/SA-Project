@@ -1,6 +1,6 @@
 import React from "react";
 import MyCalendar from "./calendar";
-import FullLayout from "../../layout/FullLayout";
+import FullLayout from "../../../layout/FullLayout";
 
 
 const ScheduleInfoPage = () => {

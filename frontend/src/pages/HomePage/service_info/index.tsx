@@ -1,7 +1,7 @@
 import React from "react";
 import './service/service'
 import AddService from "./service/service";
-import FullLayout from './../../layout/FullLayout';
+import FullLayout from '../../../layout/FullLayout';
 
 const ServiceInfoPage = () => {
   return (
