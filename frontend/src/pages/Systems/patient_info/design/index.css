@@ -1,51 +1,105 @@
-.wrapper {
-    padding: 0;
-    max-width: 100%;        
-    /* border: 1px solid #ccc; */
-    width: 100vw;
-    height: 100vh; /* ใช้ความสูงเต็มหน้าจอ */
+/* โครงหน้าหลัก */
+.page {
+    box-sizing: border-box;
+    /* กรอบเนื้อหาอ่านง่ายและอยู่กึ่งกลางหน้า */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: clamp(12px, 2vw, 24px);
+    min-height: 100dvh; /* ใช้ dynamic viewport height ที่ปลอดภัยกว่า */
   }
-
-  .header{
+  
+  /* ส่วนหัว */
+  .page-header {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    font-weight: semi-bold;
+    gap: 0.75rem;
     margin-bottom: 1rem;
     color: black;
-}
-
-.header-element {
-    border-left: 2px solid black; /* สร้างเส้นแนวตั้งสีดำ หนา 2px */
-    margin-left: 0.5rem; /* ระยะห่างจากขอบซ้าย */
-}
-
-.row {
+  }
+  .page-header h2 {
+    font-weight: 600;
+    margin: 0;
+  }
+  .header-element {
+    border-left: 2px solid black;
+    padding-left: 0.5rem;
+  }
+  
+  /* แถบเครื่องมือด้านบนของตาราง */
+  .toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;  /* ซ้าย-ขวา */
+    align-items: center;
+    gap: 12px;
+    margin-bottom: clamp(16px, 3vw, 28px);
+  }
+  
+  /* กลุ่มปุ่ม/ค้นหา ด้านขวา */
+  .actions {
     display: flex;
-    gap: 2rem; /* ระยะห่างระหว่างคอลัมน์ */
-    margin-bottom: 1.5rem;
-}
-
-.search-input{
-    width: 250px;
-    padding: 0.5rem;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  /* ช่องค้นหา: ยืดหยุ่นและไม่ล้น */
+  .search-input {
+    width: min(320px, 60vw);
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
     border: 1px solid gray;
     border-radius: 8px;
-    font-size: 12px;
-    margin-bottom: 1rem;
-    position: absolute;
-    top: 10rem;
-    right: 15rem;
-}
-
-.add-button {
-    position: absolute;
-    top: 10rem;
-    right: 5rem;
+    font-size: 14px;
+    outline: none;
+  }
+  .search-input:focus {
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2);
+  }
+  
+  /* ปุ่มเพิ่ม */
+  .add-button {
     padding: 0.5rem 1rem;
-    background-color: #CFF7D3; /* สีเขียว */
+    background-color: #CFF7D3;
     color: black;
-    border: 1px solid black; 
+    border: 1px solid black;
     border-radius: 8px;
     cursor: pointer;
-}
+    font-weight: 600;
+    white-space: nowrap;
+    transition: transform 0.06s ease, opacity 0.2s ease;
+  }
+  .add-button:active { transform: scale(0.98); }
+  .add-button:hover { opacity: 0.9; }
+  
+  /* พื้นที่ตาราง: ไม่ล้นหน้าจอ และเลื่อนแนวนอนได้เมื่อคอลัมน์เยอะ */
+  .table-wrap {
+    background: #fff;
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
+    padding: clamp(8px, 1.2vw, 16px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    overflow-x: auto;
+  }
+  
+  /* layout แถวทั่วไป (ถ้าคุณใช้) */
+  .row {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Responsive: จอเล็กให้ซ้อนเป็นคอลัมน์ */
+  @media (max-width: 640px) {
+    .toolbar {
+      grid-template-columns: 1fr; /* ซ้อนเป็นแนวตั้ง */
+    }
+    .actions {
+      justify-content: flex-start; /* ปุ่มอยู่ใต้ช่องค้นหา */
+      flex-wrap: wrap;
+    }
+    .search-input {
+      width: 100%;
+    }
+  }
+  
+  

@@ -8,28 +8,28 @@ const PatientListPage = Loadable(lazy(() => import("../../pages/Systems/patient_
 const PatientDetailPage = Loadable(lazy(() => import("../../pages/Systems/patient_info/PatientDetailPage")));
 const InitialSymptoms = Loadable(lazy(() => import("../../pages/Systems/patient_info/InitialPage")));
 const HistoryPage = Loadable(lazy(() => import("../../pages/Systems/patient_info/HistoryPage")));
-const ContactPage = Loadable(lazy(() => import("../../pages/Systems/patient_info/ContactPage")));
+const AddPatientPage = Loadable(lazy(() => import("../../pages/Systems/patient_info/AddPatientPage")));
 
 const PatientInfoPageRoute: RouteObject[] = [
   {
-    index: true,   // default page under /admin/patient
+    index: true,
     element: React.createElement(PatientListPage),
   },
   {
-    path: "detail/:id",  // ex. /admin/patient/detail/123
+    path: "detail",
     element: React.createElement(PatientDetailPage),
   },
   {
-    path: "initial", // ex. /admin/patient/initial
+    path: "initial",
     element: React.createElement(InitialSymptoms),
   },
   {
-    path: "history/:id", // ex. /admin/patient/history/123
+    path: "patient-history",
     element: React.createElement(HistoryPage),
   },
   {
-    path: "contact/:id", // ex. /admin/patient/contact/123
-    element: React.createElement(ContactPage),
+    path: "add-patient",
+    element: React.createElement(AddPatientPage),
   },
 ];
 

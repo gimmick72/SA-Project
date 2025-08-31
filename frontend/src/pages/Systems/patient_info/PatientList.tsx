@@ -1,26 +1,29 @@
 import "./design/index.css";
+// import ".design/contact.css"
 import PatienTable from "./component_patient/table";
 import { useNavigate } from "react-router-dom";
 
 const PatientListPage = () => {
-
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
-    <div className="wrapper">
-      <div className="header">
-        <h2 style={{ fontWeight: "600" }}>รายชื่อคนไข้</h2>
+    <div className="page">
+      <div className="page-header">
+        <h2>รายชื่อคนไข้</h2>
       </div>
-      <div>
+
+      {/* แถบเครื่องมือ */}
+      <div className="toolbar">
         <input type="search" placeholder="Search" className="search-input" />
-   
-          <button 
-          onClick={() => navigate("/patient/detail")}   
-          className="add-button">เพิ่มประวัติ</button>
-    
+        <button onClick={() => navigate("add-patient")} className="add-button">
+          เพิ่มประวัติ
+        </button>
       </div>
-      <br />
-      <PatienTable />
+
+      {/* พื้นที่ตาราง */}
+      <div className="table-wrap">
+        <PatienTable />
+      </div>
     </div>
   );
 };

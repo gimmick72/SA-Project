@@ -125,4 +125,42 @@
 .button{
     align-items: end;
     margin-left:80% ;
+} 
+
+.contact-inputbox{
+    margin-top: 0.5rem;
+    width: 15%;
+    border: 1px solid gray;
+    border-radius: 8px;
+    font-size: 17px;
+    padding-left: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.2rem;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.address-row1{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.25rem;
+}
+.address-box{
+    margin-top: 0.5rem;
+    width: 150px;
+    border: 1px solid gray;
+    border-radius: 8px;
+    font-size: 17px;
+    padding-left: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.contact-row{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.25rem;
 }

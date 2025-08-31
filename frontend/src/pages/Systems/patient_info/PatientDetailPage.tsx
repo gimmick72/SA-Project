@@ -1,12 +1,13 @@
 import "./design/pateint.css";
+
 import Navigate from "./component_patient/header_navigate";
+import React, { useState } from "react";
 
 const AddPatientPage = () => {
   return (
-
     <div className="wrapper">
-     <Navigate />
-   
+      <Navigate />
+
       <div style={{ paddingLeft: "3rem" }}>
         <div className="row1">
           <div>
@@ -93,9 +94,7 @@ const AddPatientPage = () => {
             <div>อายุ (ปี)</div>
             <input className="inputbox" type="text" id="age" name="age" />
           </div>
-        </div>
 
-        <div className="row4">
           <div>
             <div>โรคประจำตัว</div>
             <input
@@ -180,6 +179,67 @@ const AddPatientPage = () => {
             />
           </div>
         </div>
+
+        <div style={{ width: "80px", fontWeight: "700", fontSize: "16px" }}>
+          ที่อยู่
+        </div>
+        <br />
+        <div className="address-row1">
+          <div>
+            <div>เลขที่</div>
+            <input
+              type="text"
+              id="house_number"
+              name="house_number"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>หมู่</div>
+            <input type="text" id="Moo" name="Moo" className="address-box" />
+          </div>
+
+          <div>
+            <div>ตำบล/แขวง</div>
+            <input
+              type="text"
+              id="subdistict"
+              name="subdistict"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>อำเภอ/เขต</div>
+            <input
+              type="text"
+              id="distict"
+              name="distict"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>จังหวัด</div>
+            <input
+              type="text"
+              id="province"
+              name="province"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>รหัสไปรษณีย์</div>
+            <input
+              type="text"
+              id="postcode"
+              name="postcode"
+              className="address-box"
+            />
+          </div>
+        </div>
       </div>
       <div className="button">
         <button type="submit" className="save-button">
@@ -188,13 +248,14 @@ const AddPatientPage = () => {
         <button
           type="button"
           className="cancel-button"
-          onClick={() => window.history.back()}
+          onClick={() => {
+            window.location.href = "/admin/patient";
+          }}
         >
           ยกเลิก
         </button>
       </div>
     </div>
- 
   );
 };
 

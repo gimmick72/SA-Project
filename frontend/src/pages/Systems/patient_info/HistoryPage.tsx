@@ -1,10 +1,7 @@
 import React from "react";
 import { Card, Button, Table } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import { Link } from "react-router-dom";
 import HistoryTable from "./component_patient/historyTable";
 import "./design/history.css";
-import { Flex } from "antd";
 import Navigate from "./component_patient/header_navigate";
 
 

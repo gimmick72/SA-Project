@@ -13,8 +13,15 @@ const PatienTable: React.FC = () => {
   const [data, setData] = useState<PersonalInfomation[]>([]);
 
   const fetchData = async () => {
-    const patients = await PatientAPI.getAll();
-    setData(patients as PersonalInfomation[]);
+    try {
+      const response = await PatientAPI.getAll();
+      // Extract data from the response
+      const patients = response?.data || [];
+      setData(patients as PersonalInfomation[]);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+      setData([]);
+    }
   };
 
   const handleDelete = async (id: number) => {

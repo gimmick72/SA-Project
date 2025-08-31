@@ -1,34 +1,16 @@
-import React from "react";
-import { Link } from "react-router-dom";
 import "./design/pateint.css";
 
+import Navigate from "./component_patient/header_navigate";
+import React, { useState } from "react";
 
 const AddPatientPage = () => {
   return (
-  
-
     <div className="wrapper">
-      <div className="header">
-        <h2 style={{ fontWeight: "600" }}>ข้อมูลประจำตัว</h2>
-        <h3 className="header-element">
-          <Link to="/patient/contact">
-            <span
-              style={{ margin: "0.5rem", color: "black", fontWeight: "400" }}
-            >
-              ข้อมูลการติดต่อ{" "}
-            </span>
-          </Link>
-        </h3>
-        <h3 className="header-element">
-          <Link to="/patient/history">
-            <span
-              style={{ margin: "0.5rem", color: "black", fontWeight: "400" }}
-            >
-              ประวัติการรักษา
-            </span>
-          </Link>
-        </h3>
-      </div>
+      <h2 
+      style={{ fontWeight: "600" }}
+
+      >ข้อมูลประจำตัว</h2>
+      
 
       <div style={{ paddingLeft: "3rem" }}>
         <div className="row1">
@@ -103,26 +85,6 @@ const AddPatientPage = () => {
 
         <div className="row3">
           <div>
-            <div>เชื้อชาติ</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="ethnicity"
-              name="ethnicity"
-            />
-          </div>
-
-          <div>
-            <div>สัญชาติ</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="nationality"
-              name="nationality"
-            />
-          </div>
-
-          <div>
             <div>วันเกิด</div>
             <input
               className="inputbox"
@@ -136,9 +98,7 @@ const AddPatientPage = () => {
             <div>อายุ (ปี)</div>
             <input className="inputbox" type="text" id="age" name="age" />
           </div>
-        </div>
 
-        <div className="row4">
           <div>
             <div>โรคประจำตัว</div>
             <input
@@ -223,6 +183,67 @@ const AddPatientPage = () => {
             />
           </div>
         </div>
+
+        <div style={{ width: "80px", fontWeight: "700", fontSize: "16px" }}>
+          ที่อยู่
+        </div>
+        <br />
+        <div className="address-row1">
+          <div>
+            <div>เลขที่</div>
+            <input
+              type="text"
+              id="house_number"
+              name="house_number"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>หมู่</div>
+            <input type="text" id="Moo" name="Moo" className="address-box" />
+          </div>
+
+          <div>
+            <div>ตำบล/แขวง</div>
+            <input
+              type="text"
+              id="subdistict"
+              name="subdistict"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>อำเภอ/เขต</div>
+            <input
+              type="text"
+              id="distict"
+              name="distict"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>จังหวัด</div>
+            <input
+              type="text"
+              id="province"
+              name="province"
+              className="address-box"
+            />
+          </div>
+
+          <div>
+            <div>รหัสไปรษณีย์</div>
+            <input
+              type="text"
+              id="postcode"
+              name="postcode"
+              className="address-box"
+            />
+          </div>
+        </div>
       </div>
       <div className="button">
         <button type="submit" className="save-button">
@@ -231,13 +252,14 @@ const AddPatientPage = () => {
         <button
           type="button"
           className="cancel-button"
-          onClick={() => window.history.back()}
+          onClick={() => {
+            window.location.href = "/admin/patient";
+          }}
         >
           ยกเลิก
         </button>
       </div>
     </div>
-
   );
 };
 

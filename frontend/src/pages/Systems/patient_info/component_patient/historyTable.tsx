@@ -20,23 +20,7 @@ const columns: TableColumnsType<DataType> = [
   },
 ];
 
-const data: DataType[] = [
-  {
-    key: '1',
-    visitDate: '2023-07-01',
-    service: 'ตรวจสุขภาพ',
-  },
-  {
-    key: '2',
-    visitDate: '2023-07-05',
-    service: 'ฉีดวัคซีน',
-  },
-  {
-    key: '3',
-    visitDate: '2023-07-10',
-    service: 'พบแพทย์',
-  },
-];
+
 
 const App: React.FC = () => {
   return (
@@ -44,7 +28,6 @@ const App: React.FC = () => {
       <Card style={{ width: 500, margin:"0" }}>
         <Table<DataType>
           columns={columns}
-          dataSource={data}
           pagination={false}
         />
       </Card>

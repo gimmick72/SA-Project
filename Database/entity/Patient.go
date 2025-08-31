@@ -1,73 +1,90 @@
 package entity
+
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
-		
 
-type Patient struct{
+type Patient struct {
 	gorm.Model
-	CitizenID string
-	Prefix string
-	FirstName string
-	LastName string
-	NickName string
-	Enthnicity string
-	Nationality string
-	CongenitaDisease string
-	BloodType string
-	Gender string
-	BirthDay time.Time
-	PhoneNumber string
-	Age int
-	DrugAllergy string
+	CitizenID        string    `gorm:"unique;not null;type:char(13)" json:"citizenID"`
+	Prefix           string    `gorm:"not null" json:"prefix"`
+	FirstName        string    `gorm:"not null" json:"firstname"`
+	LastName         string    `gorm:"not null" json:"lastname"`
+	NickName         string    `gorm:"not null" json:"nickname"`
+	CongenitaDisease string    `gorm:"not null" json:"congenitadisease"`
+	BloodType        string    `gorm:"not null" json:"blood_type"`
+	Gender           string    `gorm:"not null" json:"gender"`
+	BirthDay         time.Time `gorm:"not null" json:"birthday"`
+	PhoneNumber      string    `gorm:"not null" json:"phonenumber"`
+	Age              int       `gorm:"not null" json:"age"`
+	DrugAllergy      string    `gorm:"not null" json:"drugallergy"`
+
+	ContactPerson    *ContactPerson     `gorm:"foreignKey:PatientID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"contactperson,omitempty"`
+	Address          *Address           `gorm:"foreignKey:PatientID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"address,omitempty"`
+	InitialSymptomps []InitialSymptomps `gorm:"foreignKey:PatientID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"initialsymptomps,omitempty"`
+	Histories        []HistoryPatien    `gorm:"foreignKey:PatientID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"histories,omitempty"`
 }
 
-type ContactPerson struct{
+type ContactPerson struct {
 	gorm.Model
-	Relationship string
-	ContactperPhone string
-
-	PatientID uint
-	Patient Patient
+	Relationship       string   `gorm:"not null" json:"relationship"`
+	ContactpersonPhone string   `gorm:"not null" json:"contactpersonphone"`
+	PatientID          uint     `gorm:"not null;uniqueIndex" json:"patientID"`
+	Patient            *Patient `json:"patient,omitempty"`
 }
 
-type Address struct{
+type Address struct {
 	gorm.Model
-	HouseNumber string
-	Moo string
-	Subdistrict string
-	District string
-	Provice string
-	Postcod string
-
-	PatientID uint
-	Patient Patient
+	HouseNumber string   `gorm:"not null" json:"housenumber"`
+	Moo         string   `gorm:"not null" json:"moo"`
+	Subdistrict string   `gorm:"not null" json:"subdistrict"`
+	District    string   `gorm:"not null" json:"district"`
+	Provice     string   `gorm:"not null" json:"provice"`
+	Postcod     string   `gorm:"not null" json:"postcod"`
+	PatientID   uint     `gorm:"not null;uniqueIndex" json:"patientID"`
+	Patient     *Patient `json:"patient,omitempty"`
 }
 
-type InitialSymptomps struct{
+type InitialSymptomps struct {
 	gorm.Model
-	Symptomps string
-	BloodPressure string
-	Visit time.Time
-	HeartRate string
-	weight float64
-	Height float64
+	Symptomps     string    `gorm:"not null" json:"symptomps"`
+	BloodPressure string    `gorm:"not null" json:"bloodpressure"`
+	Visit         time.Time `gorm:"not null" json:"visit"`
+	HeartRate     string    `gorm:"not null" json:"heartrate"`
+	Weight        float64   `gorm:"not null" json:"weight"`
+	Height        float64   `gorm:"not null" json:"height"`
+
+	ServiceID uint     `gorm:"not null;index" json:"serviceID"`
 	
-	ServiceID uint
-	Service Service
-
-	PatientID uint
-	Patient Patient
+	PatientID uint     `gorm:"not null;index" json:"patientID"`
+	Patient   *Patient `json:"patient,omitempty"`
 }
 
-type HistoryPatien struct{
+type HistoryPatien struct {
 	gorm.Model
+	PatientID uint     `gorm:"not null;index" json:"patientID"`
+	Patient   *Patient `json:"patient,omitempty"`
+
+	ServiceID uint     `gorm:"not null;index" json:"serviceID"`
+	Service   *Service `json:"service,omitempty"`
+
+	CaseDataID uint      `json:"caseDataID"`
+	CaseData   *CaseRef  `json:"caseData,omitempty"`
+}
+
+type ExternalService struct {
+	ID    uint    `json:"id"`
+	Name  string  `json:"name"`
+	Price float64 `json:"price"`
 	
-	PatientID uint
-	Patient []Patient
+}
 
-	ServiceID uint
-	Service []Service
-
+type CaseRef struct {
+	ID       uint    `json:"id"`
+	Code     string  `json:"code"`
+	Title    string  `json:"title"`
+	Diagnosis string `json:"diagnosis"`
+	Price    float64 `json:"price"`
 }
