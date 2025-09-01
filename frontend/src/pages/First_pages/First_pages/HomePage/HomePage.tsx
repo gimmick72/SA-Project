@@ -12,7 +12,7 @@ import ServicesPage from "../Services/ServicesPage";
 import ContactPage from "../ContactUs/ContactUs";
 import PriceGuidePage from "../PriceGuide/PriceGuidePage";
 import SlideInTop from "../../Motion/SlideInTop";
-
+import BookingPage from "../Booking";
 
 
 const { Header, Content } = Layout;
@@ -40,7 +40,7 @@ const HomePage: React.FC = () => {
       >
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <Avatar src="src\assets\logo.png" shape="circle" size="large" style={{border: "solid 2px #8E55D9"}} />
+          <Avatar src="src\assets\logo.png" shape="circle" size="large" style={{ border: "solid 2px #8E55D9" }} />
           <Title level={3} style={{ margin: 0, color: "#722ED1" }}>
             TooThoot
           </Title>
@@ -70,7 +70,7 @@ const HomePage: React.FC = () => {
             <a href="#contact">ติดต่อเรา</a>
           </Menu.Item>
           <Menu.Item key="booking">
-            <a href="#booking">จองคิว</a>
+            <Link to="booking">จองคิว</Link>
           </Menu.Item>
         </Menu>
 
@@ -90,30 +90,30 @@ const HomePage: React.FC = () => {
         }}
       >
         <SlideInTop>
-        <Row justify="center">
-          <Col xs={24} md={20} lg={18}>
-            <Card
-              bordered={false}
-              style={{
-                borderRadius: 24,
-                padding: 24,
-                backgroundColor: "#fff",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
-            >
-              <Row gutter={24}>
-                <Col xs={24} md={12}>
-                  <ClinicPromo />
-                </Col>
-                <Col xs={24} md={12}>
-                  <PhotoPromo />
-                </Col>
-              </Row>
-            </Card>
-          </Col>
-        </Row>
+          <Row justify="center">
+            <Col xs={24} md={20} lg={18}>
+              <Card
+                bordered={false}
+                style={{
+                  borderRadius: 24,
+                  padding: 24,
+                  backgroundColor: "#fff",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              >
+                <Row gutter={24}>
+                  <Col xs={24} md={12}>
+                    <ClinicPromo />
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <PhotoPromo />
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+          </Row>
         </SlideInTop>
-        
+
         <div id="dentists" style={{ marginTop: "80px" }}>
           <OurDentistsPage />
         </div>
@@ -126,8 +126,7 @@ const HomePage: React.FC = () => {
         <div id="contact" style={{ marginTop: "80px" }}>
           <ContactPage />
         </div>
-
-
+        
 
       </Content>
     </Layout>
