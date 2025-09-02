@@ -3,42 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Button, Typography, Spin, Row, Col, Form, Input, Select, DatePicker, message, Popconfirm, Space } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { StaffController } from '../../controllers/staffController';
+import type { Staff } from './index'; // import type from your list file where Staff is defined
 
 const { Title } = Typography;
 const { Option } = Select;
 
-// Re-using the Staff interface and initialStaffData from your other files
-interface Staff {
-  Employee_ID: number;
-  Title: string;
-  firstName: string;
-  lastName: string;
-  position: string;
-  phone: string;
-  gender: string;
-  startDate: string;
-  age: number;
-  idCard: string;
-  address: string;
-  email: string;
-  employeeType: string;
-  licenseNumber: string;
-}
-
-const initialStaffData: Staff[] = [
-  { Employee_ID: 1, Title: "ทพ.", firstName: "Somsak", lastName: "Thongdee", position: "ทันตแพทย์", phone: "081-234-5678", gender: "ชาย", startDate: "2010-01-15", age: 45, idCard: "1234567890123", address: "123 Moo 1, T.Nongprue, A.Muang, N.Ratchasima", email: "somsak@clinic.com", employeeType: "Full-time", licenseNumber: "D12345", },
-  { Employee_ID: 2, Title: "ทพ.ญ.", firstName: "Suda", lastName: "Kanya", position: "ทันตแพทย์", phone: "089-111-2222", gender: "หญิง", startDate: "2015-03-01", age: 38, idCard: "9876543210987", address: "456 Sukhumvit Rd, BKK", email: "suda@clinic.com", employeeType: "Part-time", licenseNumber: "D54321", },
-  { Employee_ID: 3, Title: "นาย", firstName: "Anan", lastName: "Chaiyos", position: "ผู้ช่วย", phone: "089-555-1111", gender: "ชาย", startDate: "2021-09-10", age: 29, idCard: "1122334455667", address: "88 Rama 2 Rd, BKK", email: "anan@clinic.com", employeeType: "Full-time", licenseNumber: "A00002", },
-  { Employee_ID: 4, Title: "นางสาว", firstName: "Jiraporn", lastName: "Meechai", position: "เจ้าหน้าที่แผนกต้อนรับ", phone: "091-234-4567", gender: "หญิง", startDate: "2018-11-01", age: 32, idCard: "2233445566778", address: "12 Soi Latkrabang, BKK", email: "jiraporn@clinic.com", employeeType: "Full-time", licenseNumber: "", },
-  { Employee_ID: 5, Title: "ทพ.", firstName: "Nattapong", lastName: "Preecha", position: "ทันตแพทย์", phone: "080-999-0000", gender: "ชาย", startDate: "2013-06-25", age: 40, idCard: "3344556677889", address: "567 Moo 5, Chiang Mai", email: "nattapong@clinic.com", employeeType: "Full-time", licenseNumber: "D67890", },
-  { Employee_ID: 6, Title: "ทพ.ญ.", firstName: "Chanida", lastName: "Ruangroj", position: "ทันตแพทย์", phone: "083-456-7890", gender: "หญิง", startDate: "2019-04-10", age: 34, idCard: "5566778899001", address: "23 Rama 4 Rd, BKK", email: "chanida@clinic.com", employeeType: "Part-time", licenseNumber: "D09876", },
-  { Employee_ID: 7, Title: "นางสาว", firstName: "Sirilak", lastName: "Thongchai", position: "ผู้ช่วยทันตแพทย์", phone: "082-888-9999", gender: "หญิง", startDate: "2022-01-05", age: 26, idCard: "6655443322110", address: "101 Ratchada Rd, BKK", email: "sirilak@clinic.com", employeeType: "Full-time", licenseNumber: "A12345", },
-  { Employee_ID: 8, Title: "นาย", firstName: "Pongsak", lastName: "Dechmongkol", position: "เจ้าหน้าที่การเงิน", phone: "085-333-4444", gender: "ชาย", startDate: "2016-08-12", age: 36, idCard: "7788990011223", address: "66 Ladprao Rd, BKK", email: "pongsak@clinic.com", employeeType: "Full-time", licenseNumber: "", },
-  { Employee_ID: 9, Title: "ทพ.", firstName: "Kasem", lastName: "Prasert", position: "ทันตแพทย์", phone: "086-111-2222", gender: "ชาย", startDate: "2009-12-01", age: 50, idCard: "1122446688990", address: "234 Moo 3, A.Tha Muang, Kanchanaburi", email: "kasem@clinic.com", employeeType: "Full-time", licenseNumber: "D00123", },
-  { Employee_ID: 10, Title: "ทพ.ญ.", firstName: "Panida", lastName: "Srisuk", position: "ทันตแพทย์", phone: "084-777-8888", gender: "หญิง", startDate: "2023-06-10", age: 30, idCard: "9988776655443", address: "90 Huay Kwang, BKK", email: "panida@clinic.com", employeeType: "Part-time", licenseNumber: "D87654", },
-  { Employee_ID: 11, Title: "นางสาว", firstName: "Kamonwan", lastName: "Chalermchai", position: "เจ้าหน้าที่แผนกต้อนรับ", phone: "087-999-1122", gender: "หญิง", startDate: "2020-02-20", age: 27, idCard: "4455667788991", address: "19 Bangna-Trad Rd, BKK", email: "kamonwan@clinic.com", employeeType: "Full-time", licenseNumber: "", },
-  { Employee_ID: 12, Title: "นาย", firstName: "Arthit", lastName: "Krittayapong", position: "ช่างซ่อมบำรุง", phone: "088-123-4567", gender: "ชาย", startDate: "2017-10-15", age: 41, idCard: "3344667788992", address: "55 Moo 2, Nakhon Pathom", email: "arthit@clinic.com", employeeType: "Full-time", licenseNumber: "", },
-];
 
 const StaffDetails: React.FC = () => {
   const [staff, setStaff] = useState<Staff | null>(null);
@@ -47,43 +17,86 @@ const StaffDetails: React.FC = () => {
   const { Employee_ID } = useParams<{ Employee_ID: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  
 
-  useEffect(() => {
-    if (Employee_ID) {
-      setLoading(true);
-      const staffId = parseInt(Employee_ID, 10);
-      const foundStaff = initialStaffData.find(s => s.Employee_ID === staffId);
+useEffect(() => {
+  if (staff && isEditing) {
+    form.setFieldsValue({
+      ...staff,
+      startDate: staff.startDate ? dayjs(staff.startDate) : null,
+    });
+  }
+  // intentionally omit calling setFieldsValue when not editing (avoids warning)
+}, [staff, form, isEditing]);
 
-      if (foundStaff) {
-        setStaff(foundStaff);
+
+useEffect(() => {
+  setLoading(true);
+  StaffController.getAllStaff()
+    .then((data) => {
+      if (!Employee_ID) {
+        setStaff(null);
+        return;
       }
-      setLoading(false);
-    }
-  }, [Employee_ID]);
+      const id = Number(Employee_ID);
+      const found = data.find(s => s.Employee_ID === id);
+      if (found) {
+        setStaff(found);
+        // ถ้าอยู่ในโหมดแก้ไข ให้ set ค่าเข้า form (ป้องกัน warning)
+        if (isEditing) {
+          form.setFieldsValue({
+            ...found,
+            startDate: found.startDate ? dayjs(found.startDate) : null,
+          });
+        }
+      } else {
+        setStaff(null);
+      }
+    })
+    .catch((err) => {
+      console.error('Failed to load staff list', err);
+      setStaff(null);
+    })
+    .finally(() => setLoading(false));
+}, [Employee_ID, form, isEditing]);
 
-  // Use a second useEffect to set form values only when staff data is available and not in editing mode.
-  useEffect(() => {
-    if (staff && !isEditing) {
-      form.setFieldsValue({
+
+
+
+  const onFinish = async (values: any) => {
+    if (!staff) return;
+    try {
+      const updated = {
         ...staff,
-        startDate: dayjs(staff.startDate),
+        ...values,
+        startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : staff.startDate,
+      };
+
+      // NOTE: backend PUT /staff/:id in your main.go expects updating PersonalData or Department?
+      // Here we attempt to PUT to /staff/:id — adjust payload in backend if needed.
+      const res = await fetch(`http://localhost:8080/staff/${staff.Employee_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
       });
+
+      if (!res.ok) throw new Error('Update failed');
+
+      // If backend returns updated record in the same shape as StaffController mapping, set directly.
+      // Otherwise you may need to re-fetch:
+      // setStaff(respMapped)
+      message.success('แก้ไขข้อมูลเรียบร้อย!');
+      setIsEditing(false);
+
+      // safest: re-fetch the list + set this staff again (to keep in sync)
+      const fresh = await StaffController.getAllStaff();
+      const same = fresh.find(s => s.Employee_ID === staff.Employee_ID) || null;
+      setStaff(same);
+      if (same) form.setFieldsValue({ ...same, startDate: same.startDate ? dayjs(same.startDate) : null });
+    } catch (err) {
+      console.error(err);
+      message.error('เกิดข้อผิดพลาดในการอัปเดต');
     }
-  }, [staff, isEditing, form]);
-
-  const onFinish = (values: any) => {
-    // โค้ดส่วนนี้คือการจำลองการบันทึกข้อมูล
-    const updatedStaff: Staff = {
-      ...staff!, // ใช้ข้อมูลเดิม
-      ...values, // อัปเดตด้วยค่าใหม่จาก form
-      startDate: values.startDate.format('YYYY-MM-DD'), // จัด format วันที่
-    };
-
-    // อัปเดต state ของข้อมูลพนักงานในหน้าจอทันที
-    setStaff(updatedStaff);
-
-    message.success('แก้ไขข้อมูลเรียบร้อย!');
-    setIsEditing(false); // สลับกลับไปที่โหมดดูข้อมูล
   };
 
   const handleGoBack = () => {
@@ -105,14 +118,6 @@ const StaffDetails: React.FC = () => {
     }
   };
 
-  // New delete function
-  const handleDeleteStaff = () => {
-    // โค้ดส่วนนี้เป็นการจำลองการลบข้อมูล
-    // ในแอปพลิเคชันจริง คุณจะต้องเรียก API เพื่อลบข้อมูลออกจากฐานข้อมูล
-    // และแจ้งให้หน้ารายชื่อบุคลากร (StaffInfoPaeg) อัปเดตข้อมูลด้วย
-    message.success(`ลบข้อมูลบุคลากร รหัส ${String(staff?.Employee_ID).padStart(2, '0')} เรียบร้อยแล้ว`);
-    navigate('/staff');
-  };
 
   if (loading) {
     return (
@@ -121,6 +126,7 @@ const StaffDetails: React.FC = () => {
       </div>
     );
   }
+
 
   if (!staff) {
     return (
@@ -135,65 +141,67 @@ const StaffDetails: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '16px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto', }}>
-      <Row justify="space-between" align="middle" style={{ marginBottom: '20px' }}>
-        <Col>
-          <Title level={2} style={{ fontSize: 'clamp(1.25rem, 2vw + 1rem, 2rem)', fontWeight: 'bold', marginBottom: '20px', }}>
-            ข้อมูลส่วนตัวบุคลากร
-          </Title>
-        </Col>
-        <Col>
-          <Button onClick={handleGoBack} icon={<ArrowLeftOutlined />}>
-            กลับไปหน้ารายชื่อ
-          </Button>
-        </Col>
-      </Row>
 
-      <Card
-        title={isEditing ? `แก้ไขข้อมูล: ${staff.Title} ${staff.firstName} ${staff.lastName}` : `${staff.Title} ${staff.firstName} ${staff.lastName}`}
-        bordered={false}
-        style={{ borderRadius: 10, boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)" }}
-        bodyStyle={{ padding: 24 }}
-        extra={!isEditing && (
-          <Space>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={handleEditClick}
-              size="large"
-              style={{
-                backgroundColor: '#ffffffff',
-                borderColor: '#B19CD9',
-                color: '#B19CD9',
-                borderRadius: '20px',
-                padding: '8px 20px',
-              }}
-            >
-              แก้ไขข้อมูล
-            </Button>
-            <Popconfirm
-              title="คุณต้องการลบข้อมูลบุคลากรนี้หรือไม่?"
-              onConfirm={handleDeleteStaff}
-              okText="ใช่"
-              cancelText="ไม่"
-            >
+    <div style={{ marginTop: '0px', padding: '0px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto', }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 20 }}>
+        <Col>
+          <Title level={1}>{staff.title} {staff.firstName} {staff.lastName}</Title>
+        </Col>
+        <Col>
+          {!isEditing && (
+            <Space>
               <Button
                 type="primary"
-                icon={<DeleteOutlined />}
+                icon={<EditOutlined />}
+                onClick={handleEditClick}
                 size="large"
                 style={{
-                  backgroundColor: '#ff0000ff',
-                  borderColor: '#ff0000ff',
-                  color: 'white',
-                  borderRadius: '25px',
+                  backgroundColor: '#ffffffff',
+                  borderColor: '#B19CD9',
+                  color: '#B19CD9',
+                  borderRadius: '20px',
                   padding: '8px 20px',
                 }}
               >
-                ลบข้อมูล
+                แก้ไขข้อมูล
               </Button>
-            </Popconfirm>
-          </Space>
-        )}
+              <Popconfirm
+                title="คุณต้องการลบข้อมูลบุคลากรนี้หรือไม่?"
+                // onConfirm={handleDeleteStaff}
+                okText="ใช่"
+                cancelText="ไม่"
+              >
+                <Button 
+                  type="primary"
+                  icon={<DeleteOutlined />}
+                  size="large"
+                  style={{
+                    backgroundColor: '#ff0000ff',
+                    borderColor: '#ff0000ff',
+                    color: 'white',
+                    borderRadius: '25px',
+                    padding: '8px 20px',
+                  }}
+                >
+                  ลบข้อมูล
+                </Button>
+              </Popconfirm>
+            </Space>
+          )}
+
+        </Col>
+      </Row>
+
+
+      <Card
+        // title={isEditing ? `แก้ไขข้อมูล: ${staff.Title} ${staff.firstName} ${staff.lastName}` : `${staff.Title} ${staff.firstName} ${staff.lastName}`}
+        style={{
+          marginTop: '0px',    // ห่างด้านบน
+          marginBottom: '20px', // ห่างด้านล่าง
+          padding: '1px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto', maxHeight: '80vh'
+        }}
+
+
       >
         {!isEditing ? (
           // VIEW MODE
@@ -226,14 +234,14 @@ const StaffDetails: React.FC = () => {
             {/* ... (Form.Items are the same as before) ... */}
             <Row gutter={24}>
               <Col xs={24} sm={12} md={6}>
-                <Form.Item name="Title" label="คำนำหน้าชื่อ" rules={[{ required: true, message: 'กรุณาเลือกคำนำหน้าชื่อ' }]}>
+                <Form.Item name="title" label="คำนำหน้าชื่อ" rules={[{ required: true, message: 'กรุณาเลือกคำนำหน้าชื่อ' }]}>
                   <Select placeholder="คำนำหน้าชื่อ">
                     <Option value="นาย">นาย</Option>
                     <Option value="นาง">นาง</Option>
                     <Option value="นางสาว">นางสาว</Option>
                     <Option value="ทพ.">ทพ.</Option>
                     <Option value="ทพ.ญ.">ทพ.ญ.</Option>
-                  </Select>
+                  </Select> 
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -320,6 +328,8 @@ const StaffDetails: React.FC = () => {
           </Form>
         )}
       </Card>
+
+      <Button onClick={() => navigate('/staff')}>ย้อนกลับ</Button>
     </div>
   );
 };

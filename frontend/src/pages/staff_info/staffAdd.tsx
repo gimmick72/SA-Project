@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const { Option } = Select;
 // Interface for new staff data (adapt as per your backend/data model)
-interface NewStaffData {
+export interface NewStaffData {
   title: string;
   firstName: string;
   lastName: string;

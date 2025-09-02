@@ -4,7 +4,8 @@ export interface PersonalData {
     ID?: number;             // gorm.Model ID
     Title: string;
     FirstName: string;
-    LastName: string; Gender: string;
+    LastName: string; 
+    Gender: string;
     Email: string;
     Age: number;
     EmpNationalID: string;

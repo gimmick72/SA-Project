@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -27,24 +27,26 @@ func main() {
 	seedStaff(db)
 
 	// Initialize Gin
-	r := gin.Default()
+	 r := gin.Default()
+
+  r.Use(func(c *gin.Context) {
+  c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
+    c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+    c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, Accept")
+  c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+  if c.Request.Method == "OPTIONS" {
+    c.AbortWithStatus(204)
+    return
+  }
+  c.Next()
+})
+
 
 	r.GET( "/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API ไทม์เองอิอิ\nพิพม์ http://localhost:8080/staff เพื่อดูข้อมูลพนักงาน")
 	})
 
-	// CORS middleware
-	r.Use(func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-		c.Next()
-	})
-
+	
 	// Route: GET /staff
 	r.GET("/staff", func(c *gin.Context) {
 		var departments []entity.Department
@@ -54,15 +56,51 @@ func main() {
 		}
 		c.JSON(http.StatusOK, departments)
 	})
-
-	log.Println("Server running at http://localhost:8080")
-	r.Run(":8080")
+	
+	// CORS middleware
+	
 }
+
+
+func RegisterStaffRoutes(r *gin.Engine, db *gorm.DB) {
+	staff := r.Group("/staff")
+	{
+		// GET staff by id
+		staff.GET("/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			var person entity.PersonalData
+			if err := db.First(&person, id).Error; err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+				return
+			}
+			c.JSON(http.StatusOK, person)
+		})
+
+		// PUT update staff
+		staff.PUT("/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			var person entity.PersonalData
+			if err := db.First(&person, id).Error; err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+				return
+			}
+			if err := c.ShouldBindJSON(&person); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+			db.Save(&person)
+			c.JSON(http.StatusOK, person)
+		})
+
+		
+	}
+}
+
 
 // seedStaff inserts staff data if not exists
 func seedStaff(db *gorm.DB) {
 	staff := []struct {
-		Title, FullName, Gender, Email, EmpNationalID, Tel, Address, Position, EmpType, License string
+		Title, FullName, Gender, Email, EmpNationalID, Tel, Address, Position, EmpType, License ,string
 		Age                                                                                     int
 		StartDate                                                                               string
 	}{
@@ -115,7 +153,7 @@ func seedStaff(db *gorm.DB) {
 		db.Create(&d)
 	}
 
-	log.Println("✅ Seeded all staff successfully!")
+	
 
 	db.AutoMigrate(
 		&entity.CaseData{},
@@ -192,4 +230,5 @@ func seedStaff(db *gorm.DB) {
 	// 	Cost: 100.00,
 	// })
 
+	log.Println("✅ Seeded all staff successfully!")
 }
