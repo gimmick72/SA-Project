@@ -1,68 +1,80 @@
 // src/services/schedule.ts
-import dayjs, { Dayjs } from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek";
-dayjs.extend(isoWeek);
+import { Dayjs } from "dayjs";
+import { RoomScheduleData } from "../pages/queue_info/types";
 
-export const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+// ถ้าตั้ง Vite proxy ไว้ให้ /api วิ่งไป 8080 แล้ว ให้ตั้งเป็น "" ได้
+const BASE = "http://localhost:8080";
 
-export type ViewMode = "day" | "week";
-
-// 👉 ถ้ามี type ของ RoomScheduleData อยู่ที่ src/pages/queue_info/types
-// จะดีมากถ้าใส่ typing ให้ชัด
-export type RoomScheduleData = {
-  roomId: string;
-  roomName: string;
-  assignedDoctor: string | null;
-  timeSlots: { time: string; patient: null | {
-    id: string; name: string; type: "appointment" | "walkin";
-    caseCode?: string; note?: string; durationMin?: number;
-  }}[];
-};
-
-function makeWeekRange(d: Dayjs) {
-  // ใช้ ISO week เพื่อให้ตรงกับ UX ส่วนใหญ่ (จันทร์เริ่มสัปดาห์)
-  const start = d.startOf("isoWeek").format("YYYY-MM-DD");
-  const end   = d.endOf("isoWeek").format("YYYY-MM-DD");
-  return { start, end };
+function buildUrl(path: string, q?: Record<string, string>) {
+  const url = new URL(`${BASE}${path}`);
+  if (q) Object.entries(q).forEach(([k, v]) => url.searchParams.set(k, v));
+  return url.toString();
 }
 
-export async function fetchRoomsByDate(
-  mode: ViewMode,
-  date: Dayjs,
-  signal?: AbortSignal
-): Promise<RoomScheduleData[]> {
-  const qs =
-    mode === "day"
-      ? new URLSearchParams({ mode, date: date.format("YYYY-MM-DD") })
-      : new URLSearchParams({ mode, ...makeWeekRange(date) });
+export async function fetchRoomsByDate(date: Dayjs): Promise<RoomScheduleData[]> {
+  const d = date.format("YYYY-MM-DD");
+  const url = buildUrl("/api/schedule", { mode: "day", date: d }); // ชัดเจนตาม backend
+  console.debug("[fetchRoomsByDate] GET", url);
 
-  const res = await fetch(`${BASE_URL}/api/schedule?${qs.toString()}`, { signal });
-  if (!res.ok) throw new Error(await res.text());
-  return await res.json();
+  const res = await fetch(url);
+  const text = await res.text();
+
+  if (!res.ok) {
+    console.error("[fetchRoomsByDate] error", res.status, text);
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+
+  try {
+    const data = JSON.parse(text);
+    console.debug("[fetchRoomsByDate] rooms:", Array.isArray(data) ? data.length : 0);
+    return data;
+  } catch {
+    console.error("[fetchRoomsByDate] invalid JSON:", text);
+    throw new Error("Invalid JSON from /api/schedule");
+  }
 }
 
-export type AssignPayload = {
-  date: string;            // YYYY-MM-DD
-  roomId: string;
-  time: string;            // HH:mm
-  patientId: string | null;
-  fromRoomId?: string;
-  fromTime?: string;
+export async function assignPatientApi(payload: any) {
+  const url = `${BASE}/api/schedule/assign`;
+  console.debug("[assignPatientApi] POST", url, payload);
 
-  // ใช้ให้ backend ตัดสินใจ/แสดงผล
-  patientName?: string;
-  type?: "appointment" | "walkin";
-  caseCode?: string;
-  note?: string;
-  durationMin?: number;
-};
-
-export async function assignPatientApi(payload: AssignPayload) {
-  const res = await fetch(`${BASE_URL}/api/schedule/assign`, {
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(await res.text());
-  return await res.json();
+
+  const text = await res.text();
+  if (!res.ok) {
+    console.error("[assignPatientApi] error", res.status, text);
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    console.error("[assignPatientApi] invalid JSON:", text);
+    throw new Error("Invalid JSON from /api/schedule/assign");
+  }
+}
+
+/** โหลดรายชื่อคนไข้ให้ Sidebar (ถ้ายังไม่มีที่อื่น) */
+export async function fetchPatients() {
+  const url = `${BASE}/api/patients`;
+  console.debug("[fetchPatients] GET", url);
+
+  const res = await fetch(url);
+  const text = await res.text();
+  if (!res.ok) {
+    console.error("[fetchPatients] error", res.status, text);
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+  try {
+    const data = JSON.parse(text);
+    console.debug("[fetchPatients] patients:", Array.isArray(data) ? data.length : 0);
+    return data as Array<{ id: string; name: string; type: "appointment" | "walkin" }>;
+  } catch {
+    console.error("[fetchPatients] invalid JSON:", text);
+    throw new Error("Invalid JSON from /api/patients");
+  }
 }

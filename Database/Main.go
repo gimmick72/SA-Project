@@ -14,8 +14,6 @@ import (
 
 func main() {
 	configs.ConnectDatabase()
-
-	// AutoMigrate เฉพาะส่วนเวชภัณฑ์
 	migrateAll()
 
 	r := gin.Default()
@@ -26,16 +24,19 @@ func main() {
 
 	api := r.Group("/api")
 	{
-		// ---------- Supplies API ----------
-		api.GET("/supplies", controllers.ListSupplies)        // ค้นหา/กรอง/แบ่งหน้า/เรียง
-		api.POST("/supplies", controllers.CreateSupply)       //เพิ่มข้อมูล
-		api.DELETE("/supplies/:id", controllers.DeleteSupply) // ✅ เรียกจาก controllers
-		api.POST("/dispenses", controllers.CreateDispense)    //เบิกจ่าย
-		api.GET("/dispenses", controllers.ListDispenses)      //รายงานการเบิกจ่าย
-		api.GET("/schedule", controllers.GetSchedule)         //ตารางคิว/นัด
+		// Supplies
+		api.GET("/supplies", controllers.ListSupplies)
+		api.POST("/supplies", controllers.CreateSupply)
+		api.DELETE("/supplies/:id", controllers.DeleteSupply)
+		api.POST("/dispenses", controllers.CreateDispense)
+		api.GET("/dispenses", controllers.ListDispenses)
+
+		// Schedule / Queue
+		api.GET("/schedule", controllers.GetSchedule)
 		api.POST("/schedule/assign", controllers.AssignSchedule)
 
-		// TODO: เพิ่ม POST/PUT สำหรับสร้าง/แก้ไข หากต้องการ
+		// 🔧 FIX: อย่าเขียน /api ซ้ำ
+		api.GET("/patients", controllers.GetPatients)
 	}
 
 	port := os.Getenv("PORT")
@@ -55,13 +56,16 @@ func migrateAll() {
 	// เวชภัณฑ์
 	must(configs.DB.AutoMigrate(
 		&entity.Supply{},
-		&entity.RecordSupply{}, // ✅ ชื่อ struct ตรงกับ entity
+		&entity.RecordSupply{},
 	))
-	must(configs.DB.AutoMigrate(&entity.RecordSupply{}))
 
+	// ตารางคิว
 	must(configs.DB.AutoMigrate(
 		&entity.Appointment{},
 	))
+
+	// (ตัวเลือก) ถ้าจะใช้ตารางผู้ป่วยจริงด้านล่างนี้ ให้เปิดคอมเมนต์
+	// must(configs.DB.AutoMigrate(&entity.Patient{}, &entity.ContactPerson{}, &entity.Address{}, &entity.InitialSymptomps{}, &entity.HistoryPatien{}))
 
 	log.Println("✅ AutoMigrate done")
 }

@@ -1,24 +1,13 @@
-// src/pages/queue_info/types.ts
-
+export type ViewMode = "day" | "week";
 export type Patient = {
   id: string;
   name: string;
   type: "appointment" | "walkin";
-  caseCode?: string;     // ✅ ใช้แสดงใน chip/tooltip
-  note?: string;         // ✅ หัตถการ/หมายเหตุ (tooltip)
-  durationMin?: number;  // ✅ ระยะเวลาหัตถการ (tooltip)
+  caseCode?: string;
+  note?: string;
+  durationMin?: number;
 };
 
-export type TimeSlot = {
-  time: string;          // "10:00"
-  patient: Patient | null;
-};
-
-export type RoomScheduleData = {
-  roomId: string;
-  roomName: string;
-  assignedDoctor?: string | null;
-  timeSlots: TimeSlot[];
-};
-
+export type TimeSlot = { time: string; patient: Patient | null };
+export type RoomScheduleData = { roomId: string; roomName: string; timeSlots: TimeSlot[] };
 

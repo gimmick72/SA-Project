@@ -330,120 +330,168 @@ const AllSuppliesPage: React.FC = () => {
   };
 
   return (
-    <div style={{ marginTop: 24, border: "2px solid #ffffffff",width:"1550px",height:"600px" }}>
-      {ctx}
-      <div style={{ marginBottom: 24, display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center"}}>
-        <Space size="middle">
-          <Search
-            placeholder="ค้นหาเวชภัณฑ์ (ชื่อ/รหัส)"
-            allowClear
-            value={query.q}
-            onChange={(e) => setQuery((q) => ({ ...q, q: e.target.value }))}
-            onSearch={() => setQuery((q) => ({ ...q, page: 1 }))}
-            style={{ width: 260 }}
-            prefix={<SearchOutlined />}
-          />
-          <Select
-            style={{ width: 180 }}
-            value={query.category}
-            onChange={(v) => setQuery((q) => ({ ...q, category: v, page: 1 }))}
-          >
-            <Option value="all">หมวดหมู่ทั้งหมด</Option>
-            {Array.from(new Set(rows.map((r) => r.category).filter(Boolean))).map((c) => (
-              <Option key={c} value={c}>
-                {c}
-              </Option>
-            ))}
-          </Select>
-          <DatePicker
-            placeholder="วันที่นำเข้า"
-            value={query.importDate}
-            onChange={(d) => setQuery((q) => ({ ...q, importDate: d, page: 1 }))}
-            style={{ width: 150 }}
-          />
-          <DatePicker
-            placeholder="วันหมดอายุ"
-            value={query.expiryDate}
-            onChange={(d) => setQuery((q) => ({ ...q, expiryDate: d, page: 1 }))}
-            style={{ width: 150 }}
-          />
-          <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>
-            รีเซ็ต
-          </Button>
-        </Space>
-        <Space style={{ marginLeft: "auto" }}>
-          <Button type="primary" onClick={() => setReportOpen(true)}>
-            ดูรายงานการเบิก/จ่าย
-          </Button>
-        </Space>
-      </div>
+    <div
+  style={{
+    display: "flex",
+    flexDirection: "column",       // ✅ วางลูกในแนวตั้ง
+    gap: 16,                        // ✅ ระยะห่างระหว่างบล็อก
+    padding: 16,
+    border: "2px solid #ffffffff",
+    width: "100%",
+    maxWidth: 1350,  // ✅ จำกัดความกว้างสูงสุด แทนการ fix กว้างตายตัว
+    boxSizing: "border-box",
+    height: 500,  // ✅ ให้เต็มความสูงคอนเทนเนอร์
+  }}
+>
+  {ctx}
 
-      <Table
-        rowKey="id"
-        loading={loading}
-        dataSource={rows}
-        columns={columns}
-        bordered
-        scroll={{ x: 1200, y: 420 }}
-        pagination={{ current: query.page, pageSize: query.pageSize, total, showSizeChanger: true }}
-        onChange={onTableChange}
+  {/* แถวฟิลเตอร์ + ปุ่มรายงาน */}
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 16,
+      alignItems: "center",
+      // ไม่ควร fix width; ปล่อยให้ยืดตามคอนเทนเนอร์
+      marginTop: 8,
+      marginBottom: 8,
+      width: "100%",
+    }}
+  >
+    <Space size="middle" wrap>
+      <Search
+        placeholder="ค้นหาเวชภัณฑ์ (ชื่อ/รหัส)"
+        allowClear
+        value={query.q}
+        onChange={(e) => setQuery((q) => ({ ...q, q: e.target.value }))}
+        onSearch={() => setQuery((q) => ({ ...q, page: 1 }))}
+        style={{ width: 260 }}
+        prefix={<SearchOutlined />}
       />
 
-      {/* Drawer รายงานเบิก/จ่าย */}
-      <Drawer
-        title="รายงานการเบิก/จ่ายเวชภัณฑ์"
-        width={960}
-        open={reportOpen}
-        onClose={() => setReportOpen(false)}
-        destroyOnClose
+      <Select
+        style={{ width: 200 }}
+        value={query.category}
+        onChange={(v) => setQuery((q) => ({ ...q, category: v, page: 1 }))}
       >
-        <Space style={{ marginBottom: 16 }} wrap>
-          <Input
-            placeholder="ค้นหา (รหัส/ชื่อเวชภัณฑ์/รหัสเคส/ผู้เบิก)"
-            style={{ width: 280 }}
-            allowClear
-            value={reportQuery.q}
-            onChange={(e) => setReportQuery((q) => ({ ...q, q: e.target.value, page: 1 }))}
-            onPressEnter={() => loadReport()}
-          />
-          <RangePicker
-            onChange={(vals) =>
-              setReportQuery((q) => ({
-                ...q,
-                date_from: vals?.[0] ? vals[0].format("YYYY-MM-DD") : undefined,
-                date_to: vals?.[1] ? vals[1].format("YYYY-MM-DD") : undefined,
-                page: 1,
-              }))
-            }
-          />
-          <Button onClick={() => loadReport()}>ค้นหา</Button>
-          <Button
-            onClick={() =>
-              setReportQuery({ q: "", page: 1, page_size: 10, sort_by: "recorded_at", order: "desc" })
-            }
-          >
-            รีเซ็ต
-          </Button>
-        </Space>
+        <Select.Option value="all">หมวดหมู่ทั้งหมด</Select.Option>
+        {Array.from(new Set(rows.map((r) => r.category).filter(Boolean))).map(
+          (c) => (
+            <Select.Option key={c} value={c}>
+              {c}
+            </Select.Option>
+          )
+        )}
+      </Select>
 
-        <Table
-          rowKey="id"
-          loading={reportLoading}
-          dataSource={reportRows}
-          columns={reportColumns}
-          bordered
-          scroll={{ x: 900, y: 480 }}
-          pagination={{
-            current: reportQuery.page,
-            pageSize: reportQuery.page_size,
-            total: reportTotal,
-            showSizeChanger: true,
-          }}
-          onChange={onReportTableChange}
-      
-        />
-      </Drawer>
-    </div>
+      <DatePicker
+        placeholder="วันที่นำเข้า"
+        value={query.importDate}
+        onChange={(d) => setQuery((q) => ({ ...q, importDate: d, page: 1 }))}
+        style={{ width: 160 }}
+      />
+      <DatePicker
+        placeholder="วันหมดอายุ"
+        value={query.expiryDate}
+        onChange={(d) => setQuery((q) => ({ ...q, expiryDate: d, page: 1 }))}
+        style={{ width: 160 }}
+      />
+
+      <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>
+        รีเซ็ต
+      </Button>
+    </Space>
+
+    <Space style={{ marginLeft: "auto" }}>
+      <Button type="primary" onClick={() => setReportOpen(true)}>
+        ดูรายงานการเบิก/จ่าย
+      </Button>
+    </Space>
+  </div>
+
+  {/* ตารางหลัก */}
+  <div style={{ flex: "1 1 auto", minHeight: 0 }}>
+    <Table
+      rowKey="id"
+      loading={loading}
+      dataSource={rows}
+      columns={columns}
+      bordered
+      scroll={{ x: 1200, y: 300 }} // ✅ กำหนดความสูงให้ตาราง มี scroll bar
+      style={{ width: "100%" }}        // ✅ ให้โตตามคอนเทนเนอร์
+      pagination={{
+        current: query.page,
+        pageSize: query.pageSize,
+        total,
+        showSizeChanger: true,
+      }}
+      onChange={onTableChange}
+    />
+  </div>
+
+  {/* Drawer รายงานเบิก/จ่าย */}
+  <Drawer
+    title="รายงานการเบิก/จ่ายเวชภัณฑ์"
+    width={960}
+    open={reportOpen}
+    onClose={() => setReportOpen(false)}
+    destroyOnClose
+  >
+    <Space style={{ marginBottom: 16 }} wrap>
+      <Input
+        placeholder="ค้นหา (รหัส/ชื่อเวชภัณฑ์/รหัสเคส/ผู้เบิก)"
+        style={{ width: 280 }}
+        allowClear
+        value={reportQuery.q}
+        onChange={(e) =>
+          setReportQuery((q) => ({ ...q, q: e.target.value, page: 1 }))
+        }
+        onPressEnter={() => loadReport()}
+      />
+      <RangePicker
+        onChange={(vals) =>
+          setReportQuery((q) => ({
+            ...q,
+            date_from: vals?.[0] ? vals[0].format("YYYY-MM-DD") : undefined,
+            date_to: vals?.[1] ? vals[1].format("YYYY-MM-DD") : undefined,
+            page: 1,
+          }))
+        }
+      />
+      <Button onClick={() => loadReport()}>ค้นหา</Button>
+      <Button
+        onClick={() =>
+          setReportQuery({
+            q: "",
+            page: 1,
+            page_size: 10,
+            sort_by: "recorded_at",
+            order: "desc",
+          })
+        }
+      >
+        รีเซ็ต
+      </Button>
+    </Space>
+
+    <Table
+      rowKey="id"
+      loading={reportLoading}
+      dataSource={reportRows}
+      columns={reportColumns}
+      bordered
+      scroll={{ x: 900, y: 480 }}
+      pagination={{
+        current: reportQuery.page,
+        pageSize: reportQuery.page_size,
+        total: reportTotal,
+        showSizeChanger: true,
+      }}
+      onChange={onReportTableChange}
+    />
+  </Drawer>
+</div>
+
   );
 };
 
