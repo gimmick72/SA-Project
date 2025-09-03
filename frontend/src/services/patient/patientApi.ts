@@ -1,37 +1,26 @@
-// src/services/patient/patientApi.ts
 import axios from 'axios';
 import type { AxiosError, AxiosResponse } from 'axios';
-import type {
-  Patient,
-//   ContactPerson,
-//   Address,
-//   InitialSymptomps,
-//   ServiceRef,
-//   HistoryPatien,
-//   CaseRef
-} from '../../interface/patient';
+import type { Patient } from '../../interface/patient';
 
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+// 1) รวม /api ตั้งแต่ต้น
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/api';
 
 const http = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-//Patient API function
-
+// ===== common config =====
 const getCookie = (name: string): string | null => {
   const cookies = document.cookie.split('; ');
   const cookie = cookies.find((row) => row.startsWith(`${name}=`));
-
   if (cookie) {
     let AccessToken = decodeURIComponent(cookie.split("=")[1]);
     AccessToken = AccessToken.replace(/\\/g, "").replace(/"/g, "");
     return AccessToken ? AccessToken : null;
   }
   return null;
-}
+};
 
 const getConfig = () => ({
   withCredentials: true,
@@ -43,56 +32,40 @@ const getConfig = () => ({
 
 const getConfigWithOutAuth = () => ({
   withCredentials: false,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
-export const Post = async (
-  url: string,
-  data: any,
-  requireAuth: boolean = true
-): Promise<AxiosResponse | any> => {
+// ===== HTTP helpers (ใช้ BASE_URL แล้ว) =====
+export const Post = async (url: string, data: any, requireAuth = true): Promise<AxiosResponse | any> => {
   const config = requireAuth ? getConfig() : getConfigWithOutAuth();
   return await axios
-    .post(`${API_BASE_URL}${url}`, data, config)
+    .post(`${API_BASE_URL}${url}`, data, config)   // <<---- ไม่ต่อ /api ซ้ำ
     .then((response) => response)
     .catch((error: AxiosError) => {
-      if (error?.response?.status === 401) {
-        localStorage.clear();
-        window.location.reload();
-      }
-      
-      return error.response;
-    })
-}
-
-export const Get = async (
-  url: string,
-  data: any,
-  requireAuth: boolean = true
-): Promise<AxiosResponse | any> => {
-  const config = requireAuth ? getConfig() : getConfigWithOutAuth();
-  return await axios
-    .get(`${API_BASE_URL}${url}`,config)
-    .then((response) => response)
-    .catch((error: AxiosError) => {
-      if (error?.message === "Network Error") {
-        return error.response;
-      }
       if (error?.response?.status === 401) {
         localStorage.clear();
         window.location.reload();
       }
       return error.response;
     });
-}
+};
 
-export const Update = async (
-  url: string,
-  data: any,
-  requireAuth: boolean = true
-): Promise<AxiosResponse | any> => {
+export const Get = async (url: string, requireAuth = true): Promise<AxiosResponse | any> => {
+  const config = requireAuth ? getConfig() : getConfigWithOutAuth();
+  return await axios
+    .get(`${API_BASE_URL}${url}`, config)          // <<---- ใช้ BASE_URL ตรง ๆ
+    .then((response) => response)
+    .catch((error: AxiosError) => {
+      if (error?.message === "Network Error") return error.response;
+      if (error?.response?.status === 401) {
+        localStorage.clear();
+        window.location.reload();
+      }
+      return error.response;
+    });
+};
+
+export const Update = async (url: string, data: any, requireAuth = true): Promise<AxiosResponse | any> => {
   const config = requireAuth ? getConfig() : getConfigWithOutAuth();
   return await axios
     .put(`${API_BASE_URL}${url}`, data, config)
@@ -103,14 +76,10 @@ export const Update = async (
         window.location.reload();
       }
       return error.response;
-    })
-}
+    });
+};
 
-export const Delete = async (
-  url: string,
-  data: any,
-  requireAuth: boolean = true
-): Promise<AxiosResponse | any> => {
+export const Delete = async (url: string, requireAuth = true): Promise<AxiosResponse | any> => {
   const config = requireAuth ? getConfig() : getConfigWithOutAuth();
   return await axios
     .delete(`${API_BASE_URL}${url}`, config)
@@ -121,14 +90,14 @@ export const Delete = async (
         window.location.reload();
       }
       return error.response;
-    })
-}
+    });
+};
 
-//Patient API
+// ===== Patient API (อย่าใส่ /api ซ้ำ) =====
 export const PatientAPI = {
-  getAll: () => Get('/api/patient', {}),
-  getByID: (id: number) => Get(`/api/patient/${id}`, {}),
-  create: (data: Patient) => Post('/api/patient',data, false),
-  update: (id: number, data: Patient) => Update(`/api/patient/${id}`, data),
-  delete: (id: number) => Delete(`/api/patient/${id}`, {}),
-}
+  getAll:   () => Get('/patient'),
+  getByID:  (id: number) => Get(`/patient/${id}`),
+  create:   (data: Patient) => Post('/patient', data, false),
+  update:   (id: number, data: Patient) => Update(`/patient/${id}`, data),
+  delete:   (id: number) => Delete(`/patient/${id}`),
+};

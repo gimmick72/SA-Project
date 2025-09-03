@@ -1,309 +1,332 @@
 import "./design/pateint.css";
 import Navigate from "./component_patient/header_navigate";
 import React, { useEffect, useState } from "react";
-import { PatientAPI} from "../../../services/patient/patientApi";
+import { PatientAPI } from "../../../services/patient/patientApi";
 import { Patient } from "../../../interface/patient";
-import { message } from "antd";
+import { message, Form, Input, Radio, Select } from "antd";
 
-
+const { Option } = Select;
 
 const AddPatientPage: React.FC = () => {
-  const [patient,setPatient] = useState<Patient>({} as Patient); //เอาไว้เก็บข้อมูลที่จะบันทึก
-  const [loading, setLoading] = useState(true); //สำหรับโหลดแสดง ซ่อนแถบ
+  const [patient, setPatient] = useState<Patient>({} as Patient); //เอาไว้เก็บข้อมูลที่จะบันทึก
   const [messageApi, contextHolder] = message.useMessage(); //แสดงข้อความแจ้งเตือน
-
-  useEffect(() => {
-    fetchPatient();
-  },[]);
-
-  const fetchPatient = async () => {
-    try{ 
-      const response = await PatientAPI.getAll();
-      const result = response?.data;
-      setPatient(result);
-    }catch(error){
-      console.error("Error fetching Patient: ",error);
-    }
-  }
- 
+  const [submitting, setSubmitting] = useState(false); //สถานะการบันทึกข้อมูล
+  const [form] = Form.useForm<Patient>(); //ฟอร์มสำหรับจัดการข้อมูล
 
   //send data to backend
-  const submitAddToPatient = async (values: Patient) => {
+  const handleSubmit = async (values: Patient) => {
     try {
-      await PatientAPI.create(values);
-      messageApi.success("บันทึกสำเร็จ")
-      setPatient({} as Patient);
-    } catch(error){
+      setSubmitting(true);
+      const payload: Patient = {
+        ...values,
+        age: Number(values.age) || 0,
+      };
+      await PatientAPI.create(payload); // <<--- ใช้ payload
+      messageApi.success("บันทึกสำเร็จ");
+      form.resetFields();
+    } catch (error) {
       console.error(error);
-      messageApi.error("บันทึกไม่สำเร็จ")
+      messageApi.error("บันทึกไม่สำเร็จ");
+    } finally {
+      setSubmitting(false);
     }
-  }
-
-  const handleAddtoPatient = (p: Patient) => {
-    submitAddToPatient(p);
-  }
-
-
+  };
 
   return (
     <div className="wrapper">
-      <h2 
-      style={{ fontWeight: "600" }}
+      {contextHolder}
+      <h2 style={{ fontWeight: "600" }}>ข้อมูลประจำตัว</h2>
 
-      >ข้อมูลประจำตัว</h2>
-      
-
-      <div style={{ paddingLeft: "3rem" }}>
-        <div className="row1">
-          <div>
-            <div>รหัสคนไข้</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="patientID"
+      <Form
+        form={form}
+        layout="vertical"
+        style={{ paddingLeft: "3rem" }}
+        onFinish={handleSubmit}
+        initialValues={{
+          citizenID: "",
+          prefix: "",
+          firstname: "",
+          lastname: "",
+          nickname: "",
+          congenitadisease: "",
+          blood_type: "",
+          gender: "",
+          birthday: "", // ถ้าอยากใช้ DatePicker ให้เปลี่ยน type เป็น dayjs แล้วใส่ dayjs()
+          phonenumber: "",
+          age: 0,
+          drugallergy: "",
+        }}
+      >
+        <div>
+          <div className="row1">
+            {/* <div>
+            <Form.Item
               name="patientID"
-              required
-            />
+              label="รหัสคนไข้"
+              rules={[{ required: false, message: "กรุณากรอกรหัสคนไข้" }]}
+            >
+              <Input placeholder="รหัสคนไข้"></Input>
+            </Form.Item>
+          </div> */}
+
+            <div>
+              <Form.Item
+                name="citizenID"
+                label="เลขบัตรประชาชน"
+                rules={[
+                  { required: false, message: "กรุณากรอกเลขบัตรประชาชน" },
+                ]}
+              >
+                <Input placeholder="เลขบัตรประชาชน"></Input>
+              </Form.Item>
+            </div>
+
+            <Form.Item
+              label="เพศ"
+              name="gender"
+              rules={[{ required: true, message: "กรุณาเลือกเพศ" }]}
+            >
+              <Radio.Group className="gender-options">
+                <Radio value="male">ชาย</Radio>
+                <Radio value="female">หญิง</Radio>
+              </Radio.Group>
+            </Form.Item>
           </div>
 
-          <div>
-            <div>เลขบัตรประชาชน</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="citizenID"
-              name="citizenID"
-            />
+          <div className="row2">
+            <div>
+              <Form.Item
+                name="prefix"
+                label="คำนำหน้า"
+                rules={[{ required: false, message: "กรุณากรอกคำนำหน้า" }]}
+              >
+                {/* อย่าลืมเปลี่ยน value ใน Option เป็น value ที่ตรงกับฐานข้อมูล */}
+
+                <Select placeholder="เลือกคำนำหน้า">
+                  <Option value="นาย">นาย</Option>
+                  <Option value="นางสาว">นางสาว</Option>
+                  <Option value="นาง">นาง</Option>
+                </Select>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Form.Item
+                name="firstname"
+                label="ชื่อ"
+                rules={[{ required: false, message: "กรุณากรอกชื่อ" }]}
+              >
+                <Input placeholder="ชื่อ"></Input>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Form.Item
+                name="lastname"
+                label="นามสกุล"
+                rules={[{ required: false, message: "กรุณากรอกนามสกุล" }]}
+              >
+                <Input placeholder="นามสกุล"></Input>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Form.Item
+                name="nickname"
+                label="ชื่อเล่น"
+                rules={[{ required: false, message: "กรุณากรอกชื่อเล่น" }]}
+              >
+                <Input placeholder="ชื่อเล่น"></Input>
+              </Form.Item>
+            </div>
           </div>
 
-          <div>
-            <label>เพศ</label>
-            <div className="gender-options">
-              <input type="radio" id="male" name="gender" value="male" />
-              <label htmlFor="male">ชาย</label>
-              <input type="radio" id="female" name="gender" value="female" />
-              <label htmlFor="female">หญิง</label>
+          <div className="row3">
+            <div>
+              <div>วันเกิด</div>
+              <input
+                className="inputbox"
+                type="date"
+                id="birthdate"
+                name="birthdate"
+              />
+            </div>
+
+            <div>
+              <div>อายุ (ปี)</div>
+              <input className="inputbox" type="text" id="age" name="age" />
+            </div>
+
+            <div>
+              <Form.Item
+                name="underlying_disease"
+                label="โรคประจำตัว"
+                rules={[{ required: false, message: "กรุณากรอกโรคประจำตัว" }]}
+              >
+                <Input placeholder="โรคประจำตัว"></Input>
+              </Form.Item>
+            </div>
+
+            <div>
+              <div>
+                <Form.Item
+                  name="blood_type"
+                  label="หมู่เลือด"
+                  rules={[{ required: false, message: "กรุณากรอกหมู่เลือด" }]}
+                >
+                  <Select placeholder="เลือกหมู่เลือด">
+                    <Option value="A">A</Option>
+                    <Option value="B">B</Option>
+                    <Option value="AB">AB</Option>
+                    <Option value="O">O</Option>
+                    <Option value="none">ไม่ทราบ</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
+
+            <div>
+              <Form.Item
+                name="phonenumber"
+                label="หมายเลขโทรศัพท์"
+                rules={[{ required: false }]}
+              >
+                <Input placeholder="หมายเลขโทรศัพท์"></Input>
+              </Form.Item>
+            </div>
+          </div>
+
+          <div className="row5">
+            <div>
+              <span
+                style={{
+                  fontWeight: "700",
+                  width: "100px",
+                  marginRight: "3rem",
+                  fontSize: "16px",
+                }}
+              >
+                แพ้ยา
+              </span>
+              <input type="radio" id="drug_allergy" name="drug_allergy" />
+              <span className="drug-allergy-text">แพ้ยา</span>
+              <input
+                className="drug-allergy-input"
+                type="text"
+                id="drug_allergy"
+                name="drug_allergy"
+              />
+              <input type="radio" id="no_drug_allergy" name="no_drug_allergy" />
+              <label>ปฏิเสธการแพ้ยา</label>
+            </div>
+          </div>
+
+          <div className="row7">
+            <div>
+              <span
+                style={{ width: "80px", fontWeight: "700", fontSize: "16px" }}
+              >
+                ผู้ที่ติดต่อได้
+              </span>
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <Form.Item
+                  name="relationship"
+                  label="ความสัมพันธ์"
+                  rules={[{ required: false }]}
+                  style={{ flex: 1 }}
+                >
+                  <Input placeholder="ความสัมพันธ์" />
+                </Form.Item>
+
+                <Form.Item
+                  name="phonenumber_emergency"
+                  label="หมายเลขโทรศัพท์"
+                  rules={[{ required: false }]}
+                  style={{ flex: 1 }}
+                >
+                  <Input placeholder="หมายเลขโทรศัพท์" />
+                </Form.Item>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ width: "80px", fontWeight: "700", fontSize: "16px" }}>
+            ที่อยู่
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Form.Item
+              name="housenumber"
+              label="เลขที่"
+              rules={[{ required: false }]}
+            >
+              <Input placeholder="เลขที่"></Input>
+            </Form.Item>
+
+            <Form.Item name="moo" label="หมู่ที่" rules={[{ required: false }]}>
+              <Input placeholder="หมู่ที่"></Input>
+            </Form.Item>
+
+            <div>
+              <Form.Item
+                name="subdistrict"
+                label="ตำบล/แขวง"
+                rules={[{ required: false }]}
+              >
+                <Input placeholder="ตำบล/แขวง"></Input>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Form.Item
+                name="district"
+                label="อำเภอ/เขต"
+                rules={[{ required: false }]}
+              >
+                <Input placeholder="อำเภอ/เขต"></Input>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Form.Item
+                name="province"
+                label="จังหวัด"
+                rules={[{ required: false }]}
+              >
+                <Input placeholder="จังหวัด"></Input>
+              </Form.Item>
+            </div>
+
+            <div>
+              <Form.Item
+                name="postalcode"
+                label="รหัสไปรษณีย์"
+                rules={[{ required: false }]}
+              >
+                <Input placeholder="รหัสไปรษณีย์"></Input>
+              </Form.Item>
             </div>
           </div>
         </div>
+        <div className="button">
+          <button
+            type="button"
+            className="save-button"
+            onClick={() => form.submit()}
+          >
+            บันทึก
+          </button>
 
-        <div className="row2">
-          <div>
-            <div>คำนำหน้า</div>
-            <input className="inputbox" type="text" id="prefix" name="prefix" />
-          </div>
-
-          <div>
-            <div>ชื่อ</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="firstname"
-              name="firstname"
-            />
-          </div>
-
-          <div>
-            <div>นามสกุล</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="lastname"
-              name="lastname"
-            />
-          </div>
-
-          <div>
-            <div>ชื่อเล่น</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="nickname"
-              name="nickname"
-            />
-          </div>
+          <button
+            type="button"
+            className="cancel-button"
+            onClick={() => {
+              window.location.href = "/admin/patient";
+            }}
+          >
+            ยกเลิก
+          </button>
         </div>
-
-        <div className="row3">
-          <div>
-            <div>วันเกิด</div>
-            <input
-              className="inputbox"
-              type="date"
-              id="birthdate"
-              name="birthdate"
-            />
-          </div>
-
-          <div>
-            <div>อายุ (ปี)</div>
-            <input className="inputbox" type="text" id="age" name="age" />
-          </div>
-
-          <div>
-            <div>โรคประจำตัว</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="underlyingDisease"
-              name="underlyingDisease"
-            />
-          </div>
-
-          <div>
-            <div>หมู่เลือด</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="bloodtype"
-              name="bloodtype"
-            />
-          </div>
-
-          <div>
-            <div>เบอร์โทรศัพท์</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="phone_number"
-              name="phone_number"
-            />
-          </div>
-        </div>
-
-        <div className="row5">
-          <div>
-            <span
-              style={{
-                fontWeight: "700",
-                width: "100px",
-                marginRight: "3rem",
-                fontSize: "16px",
-              }}
-            >
-              แพ้ยา
-            </span>
-            <input type="radio" id="drug_allergy" name="drug_allergy" />
-            <span className="drug-allergy-text">แพ้ยา</span>
-            <input
-              className="drug-allergy-input"
-              type="text"
-              id="drug_allergy"
-              name="drug_allergy"
-            />
-            <input type="radio" id="no_drug_allergy" name="no_drug_allergy" />
-            <label>ปฏิเสธการแพ้ยา</label>
-          </div>
-        </div>
-
-        <div className="row7">
-          <div>
-            <span
-              style={{ width: "80px", fontWeight: "700", fontSize: "16px" }}
-            >
-              ผู้ที่ติดต่อได้
-            </span>
-            <span style={{ marginLeft: "2rem", marginRight: "1rem" }}>
-              ความสัมพันธ์
-            </span>
-            <input
-              className="contact-inputbox"
-              type="text"
-              id="relationship"
-              name="relationship"
-            />
-
-            <span style={{ marginLeft: "2rem", marginRight: "1rem" }}>
-              เบอร์โทรศัพท์
-            </span>
-            <input
-              className="contact-inputbox"
-              type="text"
-              id="emergency_phone"
-              name="emergency_phone"
-            />
-          </div>
-        </div>
-
-        <div style={{ width: "80px", fontWeight: "700", fontSize: "16px" }}>
-          ที่อยู่
-        </div>
-        <br />
-        <div className="address-row1">
-          <div>
-            <div>เลขที่</div>
-            <input
-              type="text"
-              id="house_number"
-              name="house_number"
-              className="address-box"
-            />
-          </div>
-
-          <div>
-            <div>หมู่</div>
-            <input type="text" id="Moo" name="Moo" className="address-box" />
-          </div>
-
-          <div>
-            <div>ตำบล/แขวง</div>
-            <input
-              type="text"
-              id="subdistict"
-              name="subdistict"
-              className="address-box"
-            />
-          </div>
-
-          <div>
-            <div>อำเภอ/เขต</div>
-            <input
-              type="text"
-              id="distict"
-              name="distict"
-              className="address-box"
-            />
-          </div>
-
-          <div>
-            <div>จังหวัด</div>
-            <input
-              type="text"
-              id="province"
-              name="province"
-              className="address-box"
-            />
-          </div>
-
-          <div>
-            <div>รหัสไปรษณีย์</div>
-            <input
-              type="text"
-              id="postcode"
-              name="postcode"
-              className="address-box"
-            />
-          </div>
-        </div>
-      </div>
-      <div className="button">
-
-        <button 
-          type="button" className="save-button"
-          onClick={() => handleAddtoPatient(patient)}>
-          บันทึก
-        </button>
-
-        <button
-          type="button"
-          className="cancel-button"
-          onClick={() => {
-            window.location.href = "/admin/patient";
-          }}
-        >
-          ยกเลิก
-        </button>
-      </div>
+      </Form>
     </div>
   );
 };

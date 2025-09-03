@@ -9,7 +9,7 @@ import (
 
 type Patient struct {
 	gorm.Model
-
+	 PatientID uint `gorm:"column:patient_id;primaryKey;autoIncrement"`
 	CitizenID        string    `json:"citizenID"`
 	Prefix           string    `json:"prefix"`
 	FirstName        string    `json:"firstname"`

@@ -1,6 +1,6 @@
 
 export interface Patient {
-  id: number;
+ 
   citizenID: string;
   prefix: string;
   firstname: string;

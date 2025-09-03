@@ -30,9 +30,9 @@ func SetupDatbase() {
 	DB.AutoMigrate(
 		//Patient
 		&patientEntity.Patient{},
-		&patientEntity.Address{},
-		&patientEntity.ContactPerson{},
-		&patientEntity.HistoryPatien{},
-		&patientEntity.InitialSymptomps{},
+		// &patientEntity.Address{},
+		// &patientEntity.ContactPerson{},
+		// &patientEntity.HistoryPatien{},
+		// &patientEntity.InitialSymptomps{},
 	)
 }
