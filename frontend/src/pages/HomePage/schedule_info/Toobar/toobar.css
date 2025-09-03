@@ -15,7 +15,7 @@
 
 .bottonday button{
   background-color: #ffffff;
-  border: solid 2px #8E55D9;
+  border: solid 2px #CBC6FF;
   border-radius: 15px;
   width: 50px;
   display: flex;
@@ -23,7 +23,7 @@
   align-items: center;
 }
 
-.dropdown_month_year select{
+/* .dropdown_month_year select{
   background-color: #ffffff;
   border: solid 2px #8E55D9;
   border-radius: 15px;
@@ -34,4 +34,4 @@
   border: solid 2px #8E55D9;
   border-radius: 15px;
 
-}
+} */

@@ -55,7 +55,7 @@ const MyCalendar: React.FC = () => {
     <div style={{
       height: 500, marginLeft: '10px', marginRight: '10px', marginTop: '20px'
     }}>
-      <Calendar
+      <Calendar 
         localizer={localizer}
         events={room}
         startAccessor="start"
@@ -68,7 +68,7 @@ const MyCalendar: React.FC = () => {
         onNavigate={(newDate) => setDate(newDate)}
         onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}
-        style={{ height: '100%' }}
+        style={{ height: '100%'}}
         components={{ toolbar: CustomToolbar }}
       />
 

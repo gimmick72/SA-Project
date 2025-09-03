@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import './service.css';
+import './promotion.css';
 import { Modal, Input, Button } from 'antd';
 
 interface Item {
@@ -7,25 +7,15 @@ interface Item {
     name: string;
     price: number;
     detail: string;
-    category: string;
 }
 
-// option select catagory service
-const categoryOptions = [
-    { value: "รักษาฮากแข่ว", label: "รักษาฮากแข่ว" },
-    { value: "จัดแข่ว", label: "จัดแข่ว" },
-    { value: "แข่วปลอม", label: "แข่วปลอม" },
-];
-
-const Service = () => {
+const Promotion = () => {
     const [items, setItems] = useState<Item[]>([]);
-    const [currentCategory, setCurrentCategory] = useState<string>("");
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [newItem, setNewItem] = useState<Omit<Item, 'id'>>({
         name: "",
         price: 0,
         detail: "",
-        category: "",
     });
 
     const [modal, setModal] = useState<{
@@ -40,10 +30,6 @@ const Service = () => {
         itemIndex: null,
     });
 
-    const filteredItems = currentCategory
-        ? items.filter(item => item.category === currentCategory)
-        : items;
-
     const handleChange = (field: keyof Item, value: any, index?: number) => {
         if (index === undefined) {
             setNewItem(prev => ({ ...prev, [field]: value }));
@@ -55,13 +41,12 @@ const Service = () => {
     };
 
     const handleAddItem = () => {
-        if (!newItem.name || isNaN(newItem.price) || !currentCategory) return;
+        if (!newItem.name || isNaN(newItem.price)) return;
         setItems([...items, {
             ...newItem,
             id: Date.now(),
-            category: currentCategory
         }]);
-        setNewItem({ name: '', price: 0, detail: '', category: '' });
+        setNewItem({ name: '', price: 0, detail: '' });
     };
 
     const handleDelete = (id: number) => {
@@ -98,7 +83,6 @@ const Service = () => {
     return (
         <div style={{
             width: '1220px',
-            height: '4693px',
             border: 'none 2px #facc',
             display: 'flex',
             flexDirection: 'column',
@@ -111,48 +95,29 @@ const Service = () => {
                 alignItems: 'center',
                 width: '1200px',
                 marginTop: '20px',
-                border: 'none 2px #ffffff',                
-            }}>
-                <div style={{
-                    display: 'flex',
-                    gap: '20px',
-                    justifyContent: 'center',
-                    border: 'none 2px #ffffff',
-                }}>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold' }}>หมวดหมู่</div>
-                    <select
-                        className="select_category"
-                        value={currentCategory}
-                        onChange={(e) => setCurrentCategory(e.target.value)}
-                    >
-                        <option value="">-- แสดงทั้งหมด --</option>
-                        {categoryOptions.map(cat => (
-                            <option key={cat.value} value={cat.value}>{cat.label}</option>
-                        ))}
-                    </select>
-                </div>
-            </div>
+                border: 'none 2px #ffffff',
+            }} />
+
             <div style={{
                 width: '1200px',
-                height: '381px',
-                margin: '0', border: 'solid 1px #b8b8b8ff',
+                margin: '0',
+                border: 'solid 1px #b8b8b8ff',
                 marginBottom: '30px',
-            }} >
+            }}>
                 <div style={{
                     width: '100%',
-                    height: '380px',
                     border: 'solid 2px #fff',
                     overflow: 'auto',
                     marginBottom: '30px',
                 }}>
                     <table className="item-table">
-                        <thead style={{ display: "flix"}}>
-                            <tr >
-                                <th style={{width:'30%'}}>ชื่อบริการ</th>
-                                <th style={{width:'20%'}}>ราคา</th>
-                                <th style={{width:'16%'}}>หมวดหมู่</th>
-                                <th style={{width:'16%'}}>รายละเอียด</th>
-                                <th style={{width:'16%'}}>การจัดการ</th>
+                        <thead>
+                            <tr>
+                                <th style={{ width: '20%' }}>ชื่อโปรโมชัน</th>
+                                <th style={{ width: '16%' }}>ราคา</th>
+                                <th style={{ width: '16%' }}>หมวดหมู่</th>
+                                <th style={{ width: '16%' }}>รายละเอียด</th>
+                                <th style={{ width: '16%' }}>การจัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -175,7 +140,6 @@ const Service = () => {
                                             />
                                         ) : item.price}
                                     </td>
-                                    <td>{item.category}</td>
                                     <td>
                                         <Button onClick={() => openModal('view', index)}>ดูรายละเอียด</Button>
                                     </td>
@@ -239,4 +203,4 @@ const Service = () => {
     );
 };
 
-export default Service;
+export default Promotion;
