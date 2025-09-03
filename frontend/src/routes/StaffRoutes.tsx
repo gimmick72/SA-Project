@@ -12,10 +12,13 @@ const StaffInfoPage = Loadable(lazy(() => import("../pages/Systems/staff_info/in
 const QueueInfoPage = Loadable(lazy(() => import("../pages/Systems/queue_info/index")));
 const PaymentInfoPage = Loadable(lazy(() => import("../pages/Systems/payment_info/index")));
 const AttendanceInfoPage = Loadable(lazy(() => import("../pages/Systems/attendance_info/index")));
-const ServiceInfoPage = Loadable(lazy(() => import("../pages/Systems/service_info/index")));
+
+const Admin = Loadable(lazy(() => import("../pages/Systems/admin/admin")));
+const Member= Loadable(lazy(() => import("../pages/Systems/member/member")));
+
 
 // Removed unused patient route imports - files were deleted
-import PatientInfoPageRoute from "./PatientRoute/patient_route";
+
 
 const AdminRoutes: RouteObject[] = [
   {
@@ -24,45 +27,14 @@ const AdminRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <HomeInfoPage />,
+        element: <Admin />,
       },
       {
-        path: "patient",
-        element: <PatientInfoPage />,
-        children: PatientInfoPageRoute
+        path: "member",
+        element: <Member/>,
       },
-      {
-        path: "treatment",
-        element: <TreatmentInfoPage />,
-      },
-      {
-        path: "schedule",
-        element: <ScheduleInfoPage />,
-      },
-      {
-        path: "medicine",
-        element: <MedicineInfoPage />,
-      },
-      {
-        path: "staff",
-        element: <StaffInfoPage />,
-      },
-      {
-        path: "queue",
-        element: <QueueInfoPage />,
-      },
-      {
-        path: "payment",
-        element: <PaymentInfoPage />,
-      },
-      {
-        path: "attendance",
-        element: <AttendanceInfoPage />,
-      },
-      {
-        path: "service",
-        element: <ServiceInfoPage />,
-      },
+    
+
     ],
   },
 ];
