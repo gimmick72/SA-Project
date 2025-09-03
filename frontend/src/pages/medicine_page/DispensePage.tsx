@@ -82,9 +82,8 @@ const DispensePage: React.FC = () => {
       };
       setDispenseList((prev) => [...prev, newItem]);
       message.success("เพิ่มรายการเบิกสำเร็จ!");
-      window.dispatchEvent(new Event("suppliesUpdated"));
       form.resetFields(["supplyCode", "supplyName", "supplyCategory", "quantity"]);
-      ;
+      window.dispatchEvent(new Event("suppliesUpdated"));
     } catch {
       // validation ไม่ผ่าน — ไม่ต้องทำอะไร
     }
@@ -249,11 +248,12 @@ const DispensePage: React.FC = () => {
             </Form.Item>
 
             <Form.Item>
-              <Space>
+              <Space style={{ float: "right" }}>
+                <Button onClick={() => form.resetFields()}>ล้างข้อมูล</Button>
                 <Button type="primary" onClick={handleAddToList}>
                   เพิ่ม
                 </Button>
-                <Button onClick={() => form.resetFields()}>ล้างข้อมูล</Button>
+                
               </Space>
             </Form.Item>
           </Form>
@@ -272,6 +272,7 @@ const DispensePage: React.FC = () => {
             />
             <div style={{ textAlign: "right" }}>
               <Space>
+                <Button onClick={handleCancelDispense}>ยกเลิก</Button>
                 <Button
                   type="primary"
                   onClick={handleConfirmDispense}
@@ -280,7 +281,7 @@ const DispensePage: React.FC = () => {
                 >
                   ตกลง
                 </Button>
-                <Button onClick={handleCancelDispense}>ยกเลิก</Button>
+
               </Space>
             </div>
           </Card>

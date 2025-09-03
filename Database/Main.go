@@ -30,6 +30,7 @@ func main() {
 		api.DELETE("/supplies/:id", controllers.DeleteSupply)
 		api.POST("/dispenses", controllers.CreateDispense)
 		api.GET("/dispenses", controllers.ListDispenses)
+		api.PUT("/supplies/:id", controllers.UpdateSupply)
 
 		// Schedule / Queue
 		api.GET("/schedule", controllers.GetSchedule)

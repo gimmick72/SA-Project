@@ -155,6 +155,58 @@ func CreateSupply(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, s)
 }
+// UpdateSupply อัปเดตข้อมูลเวชภัณฑ์
+type UpdateSupplyReq struct {
+	Code       string `json:"code"     binding:"required"`
+	Name       string `json:"name"     binding:"required"`
+	Category   string `json:"category" binding:"required"`
+	Quantity   int    `json:"quantity" binding:"required,min=0"`
+	Unit       string `json:"unit"     binding:"required"`
+	ImportDate string `json:"import_date"`
+	ExpiryDate string `json:"expiry_date"`
+}
+
+func UpdateSupply(c *gin.Context) {
+    id := c.Param("id")
+    var req UpdateSupplyReq
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request: " + err.Error()})
+        return
+    }
+
+    var s entity.Supply
+    if err := configs.DB.First(&s, id).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "supply not found"})
+        return
+    }
+
+    // parse วันที่
+    const layout = "2006-01-02"
+    if req.ImportDate != "" {
+        if t, err := time.Parse(layout, req.ImportDate); err == nil {
+            s.ImportDate = t
+        }
+    }
+    if req.ExpiryDate != "" {
+        if t, err := time.Parse(layout, req.ExpiryDate); err == nil {
+            s.ExpiryDate = t
+        }
+    }
+
+    s.Code = req.Code
+    s.Name = req.Name
+    s.Category = req.Category
+    s.Quantity = req.Quantity
+    s.Unit = req.Unit
+
+    if err := configs.DB.Save(&s).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, s)
+}
+
 
 
 

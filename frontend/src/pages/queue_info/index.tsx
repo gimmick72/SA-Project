@@ -171,7 +171,7 @@ const QueuePage: React.FC = () => {
                     height: "500px",
                     overflowY: "auto",
                     borderRadius: 12,
-                    background: "#ed1616ff",
+                    background: "#ffffffff",
                     paddingRight: 8,
                     border: "1px solid #ffffffff",
                   }}

@@ -94,14 +94,15 @@ const AddSupplyPage: React.FC = () => {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item style={{ marginTop: 4 }}>
+        <Form.Item style={{ marginTop: 4,marginRight: 8, textAlign: 'right' }}>
           <Space>
-            <Button type="primary" htmlType="submit" loading={submitting}>
-              เพิ่มเวชภัณฑ์
-            </Button>
             <Button htmlType="button" onClick={onReset} disabled={submitting}>
               ล้างข้อมูล
             </Button>
+            <Button type="primary" htmlType="submit" loading={submitting}>
+              เพิ่มเวชภัณฑ์
+            </Button>
+            
           </Space>
         </Form.Item>
       </Form>

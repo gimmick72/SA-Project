@@ -176,4 +176,17 @@ export async function fetchDispenses(params: {
   return await res.json() as DispensePage;
 }
 
+export async function updateSupply(id: number, payload: any) {
+  const res = await fetch(`${BASE_URL}/api/supplies/${id}`, {
+    method: "PUT", // หรือ PATCH ตาม backend
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(t || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
 
