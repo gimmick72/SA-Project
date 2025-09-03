@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Database/configs"
-	"Database/entity"
+	"Database/entity/patient"
 )
 
 // POST /patients
 func CreatePatient(c *gin.Context) {
 
-	var patient entity.Patient
+	var patient patientEntity.Patient
 	if err := c.ShouldBindJSON(&patient); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -21,14 +21,14 @@ func CreatePatient(c *gin.Context) {
 	DB := configs.DB
 
 	// ตรวจสอบเลขบัตรประชาชน
-	var citizenID entity.Patient
+	var citizenID patientEntity.Patient
 	if tx := DB.Where("citizen_id = ?", patient.CitizenID).First(&citizenID); tx.RowsAffected > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "คนไข้มีประวัติแล้ว"})
 		return
 	}
 
 	//บันทึกลงฐานข้อมูล
-	if err := DB.Model(&entity.Patient{}).Create(&patient).Error; err != nil {
+	if err := DB.Model(&patientEntity.Patient{}).Create(&patient).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -39,7 +39,7 @@ func CreatePatient(c *gin.Context) {
 func GetPatient(c *gin.Context) {
 	DB := configs.DB
 
-	var patients []entity.Patient
+	var patients []patientEntity.Patient
 	if err := DB.Find(&patients).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -1,7 +1,7 @@
 package configs
 
 import (
-	"Database/entity"
+	patientEntity "Database/entity/patient"
 	"log"
 
 	"gorm.io/driver/sqlite"
@@ -29,10 +29,10 @@ func SetupDatbase() {
 	//Migrate the schema
 	DB.AutoMigrate(
 		//Patient
-		&entity.Patient{},
-		&entity.Address{},
-		&entity.ContactPerson{},
-		&entity.HistoryPatien{},
-		&entity.InitialSymptomps{},
+		&patientEntity.Patient{},
+		&patientEntity.Address{},
+		&patientEntity.ContactPerson{},
+		&patientEntity.HistoryPatien{},
+		&patientEntity.InitialSymptomps{},
 	)
 }

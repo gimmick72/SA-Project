@@ -1,3 +1,3 @@
-export { PatientAPI } from "./patientApi";
-export type { Patient } from "./patientApi"; 
+export { PatientAPI } from "./patient/patientApi";
+
 

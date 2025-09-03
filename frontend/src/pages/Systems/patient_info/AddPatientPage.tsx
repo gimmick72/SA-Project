@@ -1,9 +1,50 @@
 import "./design/pateint.css";
-
 import Navigate from "./component_patient/header_navigate";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { PatientAPI} from "../../../services/patient/patientApi";
+import { Patient } from "../../../interface/patient";
+import { message } from "antd";
 
-const AddPatientPage = () => {
+
+
+const AddPatientPage: React.FC = () => {
+  const [patient,setPatient] = useState<Patient>({} as Patient); //เอาไว้เก็บข้อมูลที่จะบันทึก
+  const [loading, setLoading] = useState(true); //สำหรับโหลดแสดง ซ่อนแถบ
+  const [messageApi, contextHolder] = message.useMessage(); //แสดงข้อความแจ้งเตือน
+
+  useEffect(() => {
+    fetchPatient();
+  },[]);
+
+  const fetchPatient = async () => {
+    try{ 
+      const response = await PatientAPI.getAll();
+      const result = response?.data;
+      setPatient(result);
+    }catch(error){
+      console.error("Error fetching Patient: ",error);
+    }
+  }
+ 
+
+  //send data to backend
+  const submitAddToPatient = async (values: Patient) => {
+    try {
+      await PatientAPI.create(values);
+      messageApi.success("บันทึกสำเร็จ")
+      setPatient({} as Patient);
+    } catch(error){
+      console.error(error);
+      messageApi.error("บันทึกไม่สำเร็จ")
+    }
+  }
+
+  const handleAddtoPatient = (p: Patient) => {
+    submitAddToPatient(p);
+  }
+
+
+
   return (
     <div className="wrapper">
       <h2 
@@ -246,9 +287,13 @@ const AddPatientPage = () => {
         </div>
       </div>
       <div className="button">
-        <button type="submit" className="save-button">
+
+        <button 
+          type="button" className="save-button"
+          onClick={() => handleAddtoPatient(patient)}>
           บันทึก
         </button>
+
         <button
           type="button"
           className="cancel-button"
