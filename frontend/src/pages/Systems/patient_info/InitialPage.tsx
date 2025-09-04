@@ -21,7 +21,6 @@ const InitialPage = () => {
             >
               {/* ข้อมูลคนไข้ */}
               <section className="form-section">
-                <div className="section-title">ข้อมูลคนไข้</div>
                 <div className="grid-4">
                   <div className="input-group">
                     <label className="input-label required" htmlFor="patientID">
