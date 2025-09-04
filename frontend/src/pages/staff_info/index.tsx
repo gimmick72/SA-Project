@@ -5,7 +5,7 @@ import { SearchOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AddStaffForm from './staffAdd';
 import { StaffController } from '../../services/https/Staff';
-import type{ Department, NewStaffData, PersonalData , Staff } from '../../interface/types';
+import type{  NewStaffData, Staff } from '../../interface/types';
 const { Title } = Typography;
 
 
@@ -73,56 +73,17 @@ const StaffInfoPaeg: React.FC = () => {
 
     setFilteredStaff(newFilteredStaff);
   };
-
   //Search box
   useEffect(() => {
     applySearchFilter();
   }, [searchText, staffData]);
 
-  const handleAddStaffClick = () => {
-    setIsAddDrawerVisible(true);
-  };
-
-  const handleAddFormSubmit = async (newStaff: NewStaffData) => {
-   try {
+const handleAddFormSubmit = async (newStaff: NewStaffData) => {
+  try {
     setLoading(true);
-
-    // แปลง newStaff (ฟอร์มของคุณ) → PersonalData + Department ตาม interface backend
-    const personalData: PersonalData = {
-      // ถ้า ID จะถูกสร้างโดย DB ให้ไม่ต้องส่ง ID (optional)
-      Title: newStaff.title,
-      FirstName: newStaff.firstName,
-      LastName: newStaff.lastName,
-      Gender: newStaff.gender,
-      Email: newStaff.email,
-      Age: Number(newStaff.age) || 0,
-      EmpNationalID: newStaff.idCard,
-      Tel: newStaff.phone,
-      HouseNumber: newStaff.HouseNumber || newStaff.address || '',
-      Subdistrict: newStaff.Subdistrict || '',
-      District: newStaff.District || '',
-      VillageNumber: newStaff.VillageNumber || '',
-    };
-
-    const department: Department = {
-      // ID / PersonalDataID จะถูกเติมโดย backend เมื่อสร้างเสร็จ (ถ้าไม่ต้องการก็ไม่ต้องใส่)
-      Position: newStaff.position,
-      EmpType: newStaff.employeeType,
-      License: newStaff.licenseNumber || '',
-      CompRate: Number(newStaff.CompRate) || 0,
-      Specialization: newStaff.Specialization || '',
-StartDate: newStaff.startDate
-    ? newStaff.startDate.toISOString()  // แปลงเป็น ISO 8601
-    : new Date().toISOString(),        PersonalDataID: 0, // backend จะผูกเมื่อสร้าง record (สามารถส่ง 0 หรือ omit ขึ้นกับ backend)
-    };
-
-    // เรียก API เพิ่มข้อมูล (StaffController.addStaff ต้องรับ (personalData, department))
-    const added = await StaffController.addStaff(personalData, department);
+    const added = await StaffController.addStaff(newStaff);  // ← เรียก service
     setStaffData(prev => [...prev, added]);
-    setFilteredStaff(prev => [...prev, added]); // ถ้าคุณใช้ filtered list ด้วย
-    // รีเฟรชรายการจาก backend ให้แน่นอนว่า state ตรงกับ DB
-    const data = await StaffController.getAllStaff();
-    setStaffData(data);
+    setFilteredStaff(prev => [...prev, added]);
     message.success('เพิ่มข้อมูลบุคลากรใหม่เรียบร้อย!');
     setIsAddDrawerVisible(false);
   } catch (err) {
@@ -131,8 +92,11 @@ StartDate: newStaff.startDate
   } finally {
     setLoading(false);
   }
-  };
+};
 
+  const handleAddStaffClick = () => {
+    setIsAddDrawerVisible(true);
+  };
 
   const handleAddFormCancel = () => {
     setIsAddDrawerVisible(false);

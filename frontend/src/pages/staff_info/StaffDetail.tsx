@@ -9,7 +9,6 @@ import type { Staff } from '../../interface/types';
 const { Title } = Typography;
 const { Option } = Select;
 
-
 const StaffDetails: React.FC = () => {
   const [staff, setStaff] = useState<Staff | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,8 +36,6 @@ const StaffDetails: React.FC = () => {
 
     fetchStaff();
   }, [Employee_ID]);
-
-
   //Sync Data edit form
   useEffect(() => {
     const fetchStaff = async () => {
@@ -61,44 +58,15 @@ const StaffDetails: React.FC = () => {
   }, [Employee_ID, isEditing, form]);
 
   const onFinish = async (values: any) => {
-    const addressParts = values.address.split(',').map((part: string) => part.trim());
     if (!staff) return;
+
     try {
-      // เตรียม PersonalData ที่ต้องส่งไป backend
-      const personalData = {
-        Title: values.title,
-        FirstName: values.firstName,
-        LastName: values.lastName,
-        Gender: values.gender,
-        Email: values.email,
-        Age: Number(values.age),
-        EmpNationalID: values.idCard,
-        Tel: values.phone, // ถ้าอยากแก้ phone ต้องเพิ่ม field ใน form
-        HouseNumber: addressParts[0] || "",
-        Subdistrict: addressParts[1] || "",
-        District: addressParts[2] || "",
-        VillageNumber: addressParts[3] || "",
-      };
-
-      // เตรียม Department ที่ต้องส่งไป backend
-      const department = {
-        Position: values.position,
-        EmpType: values.employeeType,
-        StartDate: values.startDate.toISOString(),
-        License: values.licenseNumber,
-        Specialization: values.Specialization,
-        AffBrance: staff.Department?.AffBrance || "",
-        CompRate: Number(values.CompRate),
-        PersonalDataID: staff.Employee_ID,  // 👈 ต้องใส่เพิ่ม
-        ID: staff.Department?.ID || 0,      // 👈 กันไว้เผื่อมี field ID
-      };
-
-      // เรียก service
       const updatedStaff = await StaffController.updateStaff(
         staff.Employee_ID,
-        personalData,
-        department
+        values,
+        staff
       );
+
 
       message.success("บันทึกข้อมูลเรียบร้อยแล้ว");
       setStaff(updatedStaff);
@@ -108,7 +76,6 @@ const StaffDetails: React.FC = () => {
       message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
   };
-
 
   const handleGoBack = () => {
     navigate('/staff');
@@ -129,17 +96,17 @@ const StaffDetails: React.FC = () => {
     }
   };
 
- const handleDeleteStaff = async () => {
-  try {
-    if (!staff) return; // กัน null
-    await StaffController.deleteStaff(staff.Employee_ID); // เรียก API
-    message.success('ลบข้อมูลเรียบร้อย');
-    navigate('/staff'); // กลับไปหน้า list หรือ refresh
-  } catch (err) {
-    console.error(err);
-    message.error('เกิดข้อผิดพลาดในการลบข้อมูล');
-  }
-};
+  const handleDeleteStaff = async () => {
+    try {
+      if (!staff) return; // กัน null
+      await StaffController.deleteStaff(staff.Employee_ID); // เรียก API
+      message.success('ลบข้อมูลเรียบร้อย');
+      navigate('/staff'); // กลับไปหน้า list หรือ refresh
+    } catch (err) {
+      console.error(err);
+      message.error('เกิดข้อผิดพลาดในการลบข้อมูล');
+    }
+  };
 
 
   if (loading) {
