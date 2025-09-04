@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Modal, Input, Form, Select } from 'antd';
+import { Modal, Input, Form, Select, TimePicker, Button, Space } from 'antd';
+import dayjs from 'dayjs';
+import 'antd/dist/reset.css';
 
 type EventData = {
   title: string;
@@ -11,24 +13,26 @@ type Props = {
   visible: boolean;
   onAdd: (event: EventData) => void;
   onCancel: () => void;
+  selectedDate: Date | null;
 };
 
-const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel }) => {
+const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel, selectedDate }) => {
   const [title, setTitle] = useState('');
   const [timein, setTimein] = useState('');
   const [timeout, setTimeout] = useState('');
 
   const handleOk = () => {
-    if (title && timein && timeout) {
-      const today = new Date();
-      const start = new Date(today.toDateString() + ' ' + timein);
-      const end = new Date(today.toDateString() + ' ' + timeout);
-      onAdd({ title, start, end });
-      setTitle('');
-      setTimein('');
-      setTimeout('');
-    }
-  };
+  if (title && timein && timeout && selectedDate)  {
+      const base = dayjs(selectedDate); // วันจาก calendar
+    const start = base.hour(Number(timein.split(':')[0])).minute(Number(timein.split(':')[1])).second(0).toDate();
+    const end = base.hour(Number(timeout.split(':')[0])).minute(Number(timeout.split(':')[1])).second(0).toDate();
+
+    onAdd({ title, start, end });
+    setTitle('');
+    setTimein('');
+    setTimeout('');
+  }
+};
 
   //option of room
   const rooms = ["x001", "x002", "x003", "004"];
@@ -37,15 +41,14 @@ const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel }) => {
     <Modal
       title="เพิ่มกิจกรรม"
       open={visible}
-      onOk={handleOk}
+      footer={null}
       onCancel={() => {
         setTitle('');
         onCancel();
       }}
-      okText="เพิ่ม"
-      cancelText="ยกเลิก"
+      width={420}
     >
-      <Form layout="vertical">
+      <Form layout="vertical" onFinish={handleOk}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           <Form.Item label="เลือกห้อง">
             <Select
@@ -60,21 +63,45 @@ const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel }) => {
           </Form.Item>
 
           <Form.Item label="เวลาเข้างาน">
-            <Input
-              type='time'
-              value={timein}
-              onChange={(e) => setTimein(e.target.value)}
+            <TimePicker
+              value={timein ? dayjs(timein, 'HH:mm') : null}
+              onChange={t => setTimein(t ? t.format('HH:mm') : '')}
+              format="HH:mm"
+              minuteStep={1}
+              allowClear
+              style={{ width: '100%' }}
+              inputReadOnly
             />
           </Form.Item>
 
           <Form.Item label="เวลาออกงาน">
-            <Input
-              type='time'
-              value={timeout}
-              onChange={(e) => setTimeout(e.target.value)}
-
+            <TimePicker
+              value={timeout ? dayjs(timeout, 'HH:mm') : null}
+              onChange={t => setTimeout(t ? t.format('HH:mm') : '')}
+              format="HH:mm"
+              minuteStep={1}
+              allowClear
+              style={{ width: '100%' }}
+              inputReadOnly
             />
           </Form.Item>
+
+          <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>
+            <Space size="middle">
+              <Button type="primary" htmlType="submit" style={{ width: 120 }}>
+                เพิ่ม
+              </Button>
+              <Button style={{ width: 120 }} onClick={() => {
+                setTitle('');
+                setTimein('');
+                setTimeout('');
+                onCancel();
+              }}>
+                ยกเลิก
+              </Button>
+            </Space>
+          </Form.Item>
+
         </div>
       </Form>
     </Modal >

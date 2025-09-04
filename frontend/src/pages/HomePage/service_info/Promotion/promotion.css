@@ -1,16 +1,13 @@
-/*select_category*/
-.select_category {
-    width: 200px;
-    height: 25px;
-}
-
 
 /* table */
 .table-container {
     margin: 0px;
-    width: 1200px;
-    height: 450px;
-    border: solid 2px #f20909;
+    width: 100%;
+    max-width: 1200px;
+    height: 470px;
+    border: solid 1px #ccc;
+    overflow-y: auto;
+    background: #fff;
 }
 
 .item-table {
@@ -24,37 +21,13 @@
     border: 1px solid #ccc;
     padding: 10px;
     text-align: center;
+    height: 57px;
 }
 
-.item-table input {
-    width: 100%;
-    padding: 6px;
-    box-sizing: border-box;
-}
-
-.actions button {
-    margin-right: 8px;
-}
-
-.edit {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    border: 2px solid #ff2020;
-
-}
-
-
-
-/* fix หัวตาราง */
-.item-table-wrapper {
-  max-height: 400px; /* ความสูงตารางที่ต้องการให้ scroll */
-  overflow-y: auto;  /* scroll เฉพาะแนวตั้ง */
-}
 
 .item-table thead th {
   position: sticky;
   top: 0;
-  background-color: rgb(233, 233, 233); /* สีพื้นหลังหัวตาราง */
-  z-index: 10;             /* ให้หัวตารางอยู่บนเนื้อหา */
+  background-color: rgb(233, 233, 233);
+  z-index: 10;            
 }

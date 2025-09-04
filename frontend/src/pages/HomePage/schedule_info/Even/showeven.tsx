@@ -1,32 +1,87 @@
-import React from 'react';
-import { Modal } from 'antd';
-import type { Event as RBCEvent } from 'react-big-calendar';
+import React, { useState } from 'react';
+import { Modal, Button } from 'antd';
+import 'antd/dist/reset.css';
 
-type Props = {
-  event: RBCEvent | null;
-  visible: boolean;
-  onClose: () => void;
+type EventType = {
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
 };
 
-const ShowEven: React.FC<Props> = ({ event, visible, onClose }) => {
+type Props = {
+  event: EventType;
+  visible: boolean;
+  onClose: () => void;
+  onEdit?: (event: EventType) => void;
+  onDelete: (id: number, skipConfirm:boolean ) => void;
+};
+
+const ShowEven: React.FC<Props> = ({ event, visible, onClose, onEdit, onDelete }) => {
+  const [confirmVisible, setConfirmVisible] = useState(false);
+
+  const handleDelete = () => {
+    if (!event || !onDelete) return;
+    console.debug('[ShowEven] delete clicked, event id =', event.id);
+    setConfirmVisible(true);
+  };
+
   return (
     <Modal
-      title="รายละเอียด"
       open={visible}
-      onOk={onClose}
+      title={event ? event.title : 'รายละเอียดกิจกรรม'}
+      footer={null}
       onCancel={onClose}
-      okText="ปิด"
-      cancelButtonProps={{ style: { display: 'none' } }}
     >
-      {event ? (
-        <>
-          <p><strong>ห้อง:</strong> {event.title || 'ไม่ระบุชื่อ'}</p>
-          <p><strong>เริ่ม:</strong> {event.start ? event.start.toLocaleString() : 'ไม่ระบุเวลาเริ่ม'}</p>
-          <p><strong>สิ้นสุด:</strong> {event.end ? event.end.toLocaleString() : 'ไม่ระบุเวลาสิ้นสุด'}</p>
-        </>
-      ) : (
-        <p>ไม่พบข้อมูลกิจกรรม</p>
-      )}
+      <div>
+        <p><strong>ชื่อ:</strong> {event?.title}</p>
+        <p><strong>เริ่ม:</strong> {event ? event.start.toString() : '-'}</p>
+        <p><strong>สิ้นสุด:</strong> {event ? event.end.toString() : '-'}</p>
+      </div>
+
+      {/* ยืนยันการลบกิจกรรม */}
+      <Modal
+        open={confirmVisible}
+        title="ยืนยันการลบ"
+        onCancel={() => setConfirmVisible(false)}
+        footer={null}
+      >
+        <p>คุณต้องการลบกิจกรรมนี้จริงหรือไม่?</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 12 }}>
+          <Button danger style={{ width: 120 }} onClick={() => {
+            setConfirmVisible(false);
+            setTimeout(() => {
+              onDelete(event.id, true);
+              onClose();
+            },);
+          }}>
+            ลบ
+          </Button>
+          <Button style={{ width: 120 }} onClick={() => setConfirmVisible(false)}>ยกเลิก</Button>
+        </div>
+      </Modal>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 16 }}>
+        <Button
+          type="primary"
+          onClick={() => { if (event && onEdit) onEdit(event); }}
+          style={{ width: 120 }}
+        >
+          แก้ไข
+        </Button>
+
+        <Button
+          danger
+          onClick={handleDelete}
+          style={{ width: 120 }}
+        >
+          ลบ
+        </Button>
+
+        <Button onClick={onClose} style={{ width: 120 }}>
+          ปิด
+        </Button>
+      </div>
     </Modal>
   );
 };

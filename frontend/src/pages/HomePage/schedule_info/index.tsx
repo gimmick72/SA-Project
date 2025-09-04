@@ -5,12 +5,10 @@ import FullLayout from "../../../layout/FullLayout";
 
 const ScheduleInfoPage = () => {
   return (
-     <FullLayout>
-    <div style={{ width: '1220px', height: '550px', border: '2px solid #ffffff' }}>
-      <div>
+    <FullLayout>
+      <div style={{ width: '1220px', height: '100%', border: '2px solid #ffffff', marginTop: '-17px' }}>
         <MyCalendar />
       </div>
-    </div>
     </FullLayout>
   );
 };

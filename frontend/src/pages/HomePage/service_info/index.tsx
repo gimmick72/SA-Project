@@ -1,5 +1,4 @@
 import React from "react";
-import './Service/service'
 import FullLayout from '../../../layout/FullLayout';
 import SwitchPage from "./SwitchPage/switchpage";
 

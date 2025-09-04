@@ -1,34 +1,55 @@
+
 import * as React from 'react';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/th';
+import 'antd/dist/reset.css';
 
-export default function DatePickerViews() {
+interface PickMonthProps {
+  value: Date;
+  onChange: (date: Date) => void;
+}
+
+const PickMonth: React.FC<PickMonthProps> = ({ value, onChange }) => {
+  // set locale เป็นไทย
+  const thDayjs = dayjs(value).locale('th');
+
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
       <DemoContainer components={['DatePicker']}>
         <DatePicker
-          label={'"month" and "year" '}
-          views={['year', 'month',]}
+          label={'"เดือน / ปี"'}
+          views={['year', 'month']}
           openTo="month"
-          format="MM/YYYY"
+          value={thDayjs}
+          onChange={(newValue) => {
+            if (newValue) {
+              const jsDate = newValue.startOf('month').toDate();
+              onChange(jsDate);
+            }
+          }}
+          format="MMMM / YYYY"
           slotProps={{
             textField: {
               size: "small",
               fullWidth: true,
               InputProps: {
                 sx: {
-                  height: 40,             // ปรับความสูงกรอบ input
+                  height: 40,
+                  width: 200,
                   borderRadius: "12px",
-                  border: "1px solid #CBC6FF", // เส้นขอบ
                 }
               },
-              sx: { width: 200 } // ความกว้างรวม
             }
-          }} />
+          }}
+        />
       </DemoContainer>
     </LocalizationProvider>
   );
-}
+};
+
+export default PickMonth;
 

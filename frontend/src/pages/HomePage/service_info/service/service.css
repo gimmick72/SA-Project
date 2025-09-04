@@ -4,57 +4,36 @@
     height: 25px;
 }
 
-
 /* table */
 .table-container {
-    margin: 0px;
     width: 1200px;
-    height: 450px;
-    border: solid 2px #f20909;
+    height: 470px;
+    margin: 0;
+    border: solid 1px #b8b8b8ff;
+    border-Radius: 8px;
+    margin-Bottom: 30px;
+    overflow: 'auto';
 }
 
 .item-table {
     width: 100%;
-    border-collapse: collapse;
-    font-family: Arial, sans-serif;
+    table-layout: fixed;
+    border-collapse: separate;
 }
 
 .item-table th,
 .item-table td {
-    border: 1px solid #ccc;
-    padding: 10px;
     text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.item-table input {
-    width: 100%;
-    padding: 6px;
-    box-sizing: border-box;
-}
-
-.actions button {
-    margin-right: 8px;
-}
-
-.edit {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    border: 2px solid #ff2020;
-
-}
-
-
-
-/* fix หัวตาราง */
-.item-table-wrapper {
-  max-height: 400px; /* ความสูงตารางที่ต้องการให้ scroll */
-  overflow-y: auto;  /* scroll เฉพาะแนวตั้ง */
-}
-
-.item-table thead th {
-  position: sticky;
-  top: 0;
-  background-color: rgb(233, 233, 233); /* สีพื้นหลังหัวตาราง */
-  z-index: 10;             /* ให้หัวตารางอยู่บนเนื้อหา */
+.item-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f5f2f9;
 }

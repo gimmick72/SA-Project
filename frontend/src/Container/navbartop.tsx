@@ -30,7 +30,7 @@ const NavbarTop: React.FC = () => {
         </span>
       </Header>
 
-      <Header
+      {/* <Header
         style={{
           padding: 0,
           backgroundColor: "#FFFFFF",
@@ -38,8 +38,8 @@ const NavbarTop: React.FC = () => {
           maxHeight: "5vh",
         }}
       >
-        {/* BreadcrumbCom ใส่ได้ในอนาคต */}
-      </Header>
+        BreadcrumbCom ใส่ได้ในอนาคต
+      </Header> */}
     </>
   );
 };

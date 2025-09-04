@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import Service from "../Service/service";
+import Service from "../service/service";
 import "./switchpage.css"
 import Promotion from "../Promotion/promotion";
+import 'antd/dist/reset.css';
 
 export default function SwitchPage() {
   const [tab, setTab] = useState("services"); // ค่าเริ่มต้นคือ "บริการ"
 
   return (
-    <div style={{border: "2px none black", height: "550px"}} >
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0px', gap: '25px', border: "2px none black"      
-       }}>
-        <div>
-          <h1 className="text-2xl font-bold mb-4 gap-4">บริการ</h1>
+    <div style={{border: "2px none black", height: "550px", marginTop: 0, paddingTop: 0}} >
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0px', gap: '25px', border: "2px none black", marginTop: 0, paddingTop: 0 }}>
+        <div style={{ marginBottom: 0 }}>
+          <h1 style={{font:'18px', fontWeight:'bold', marginLeft:'18px'}} > บริการ </h1>
         </div >
 
         {/* ปุ่มเปลี่ยน content */}

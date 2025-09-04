@@ -3,29 +3,11 @@ import type { ToolbarProps } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import './toobar.css'
 import PickMonth from '../pickmonth/pickmonth';
-import Pick2 from '../pickmonth/pick2';
+import 'antd/dist/reset.css';
 
 const CustomToolbar: React.FC<ToolbarProps> = ({ date, onNavigate, onView }) => {
-    const month = date.getMonth();
-    const year = date.getFullYear();
-
-    const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newDate = new Date(date);
-        newDate.setMonth(parseInt(e.target.value));
-        onNavigate('DATE', newDate);
-    };
-
-    const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newDate = new Date(date);
-        newDate.setFullYear(parseInt(e.target.value));
-        onNavigate('DATE', newDate);
-    };
-
-    const handleViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onView(e.target.value as typeof Views[keyof typeof Views]);
-    };
-
     return (
+        // toobar layout
         <div
             style={{
                 display: 'flex',
@@ -33,9 +15,16 @@ const CustomToolbar: React.FC<ToolbarProps> = ({ date, onNavigate, onView }) => 
                 marginBottom: 8,
                 alignItems: 'center',
             }}>
+
+            {/* เลือกเดือนและปี */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <div style={{ fontSize: '18px', fontWeight: 'bold', marginLeft: '10px' }}>ปฏิทินแพทย์</div>
-                <div><PickMonth /></div>
+                <div>
+                    <PickMonth
+                        value={date}
+                        onChange={(newDate) => onNavigate('DATE', newDate)}
+                    />
+                </div>
             </div>
 
             {/* ซ้าย: ปุ่มย้อน/ถัดไป */}
