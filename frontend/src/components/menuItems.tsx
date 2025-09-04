@@ -9,6 +9,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 export const menuItems = [
   { key: "1", icon: TiHomeOutline, label: "Admin", path: "/admin" },
   { key: "2", icon: LuClipboardPen, label: "Member", path: "/member" },
+  { key: "3", icon: FaStethoscope, label: "Home", path: "/admin/home_info" },
 
 ].map((item) => ({
   key: item.key,

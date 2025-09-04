@@ -3,6 +3,7 @@ import type { RouteObject } from "react-router-dom";
 import Loadable from "../components/third-patry/Loadable";
 import FullLayout from "../layout/FullLayout";
 
+
 const HomeInfoPage = Loadable(lazy(() => import("../pages/Systems/home_info/index")));
 const PatientInfoPage = Loadable(lazy(() => import("../pages/Systems/patient_info/index"))); 
 const TreatmentInfoPage = Loadable(lazy(() => import("../pages/Systems/treatment_info/index")));
@@ -15,6 +16,8 @@ const AttendanceInfoPage = Loadable(lazy(() => import("../pages/Systems/attendan
 
 const Admin = Loadable(lazy(() => import("../pages/Systems/admin/admin")));
 const Member= Loadable(lazy(() => import("../pages/Systems/member/member")));
+const HomePage = Loadable(lazy(() => import("../pages/Systems/home_info/index")));
+const HomeMed = Loadable(lazy(() => import("../pages/Systems/home_med/index")));
 
 
 // Removed unused patient route imports - files were deleted
@@ -32,6 +35,13 @@ const AdminRoutes: RouteObject[] = [
       {
         path: "member",
         element: <Member/>,
+      },
+      
+      { path: "home", 
+        element: <HomePage /> 
+      },
+      { path: "homeMed", 
+        element: <HomeMed /> 
       },
     
 
