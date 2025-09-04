@@ -29,10 +29,17 @@ const NavbarTop: React.FC = () => {
         >
           {localStorage.getItem('username') || 'Admin'}
         </span>
-        <LogoutButton />
+        <LogoutButton 
+          buttonText="Logout"
+          confirmTitle="ยืนยันการออกจากระบบ"
+          confirmContent="คุณต้องการออกจากระบบใช่หรือไม่?"
+          okText="ออกจากระบบ"
+          cancelText="ยกเลิก"
+        />
       </Space>
     </Header>
   );
 };
 
 export default NavbarTop;
+

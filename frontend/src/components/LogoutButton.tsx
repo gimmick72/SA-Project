@@ -3,15 +3,29 @@ import { Button, Modal } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
-const LogoutButton: React.FC = () => {
+interface LogoutButtonProps {
+  buttonText?: string;
+  confirmTitle?: string;
+  confirmContent?: string;
+  okText?: string;
+  cancelText?: string;
+}
+
+const LogoutButton: React.FC<LogoutButtonProps> = ({
+  buttonText = 'Logout',
+  confirmTitle = 'Confirm Logout',
+  confirmContent = 'Are you sure you want to logout?',
+  okText = 'Logout',
+  cancelText = 'Cancel'
+}) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     Modal.confirm({
-      title: 'ยืนยันการออกจากระบบ',
-      content: 'คุณต้องการออกจากระบบใช่หรือไม่?',
-      okText: 'ออกจากระบบ',
-      cancelText: 'ยกเลิก',
+      title: confirmTitle,
+      content: confirmContent,
+      okText: okText,
+      cancelText: cancelText,
       onOk: () => {
         // Clear authentication data
         localStorage.removeItem('isAuthenticated');
@@ -31,7 +45,7 @@ const LogoutButton: React.FC = () => {
       icon={<LogoutOutlined />} 
       onClick={handleLogout}
     >
-      ออกจากระบบ
+      {buttonText}
     </Button>
   );
 };
