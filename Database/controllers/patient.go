@@ -36,36 +36,86 @@ func CreatePatient(c *gin.Context) {
 }
 
 // GET /patients
-func GetPatient(c *gin.Context) {
-	DB := configs.DB
+func FindPatient(c *gin.Context) {
+    var patients []patientEntity.Patient
+    db := configs.DB.
+        Model(&patientEntity.Patient{}).
+        Preload("Address").
+        Preload("ContactPerson").
+        Preload("InitialSymptomps").
+        Preload("Histories") // <-- ชื่อต้องตรงกับฟิลด์ใน struct
 
-	var patients []patientEntity.Patient
-	if err := DB.Find(&patients).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+    patientID := c.Query("patientID")
+    if patientID != "" {
+        if err := db.Where("id = ?", patientID).Find(&patients).Error; err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+    } else {
+        if err := db.Find(&patients).Error; err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+    }
 
-	c.JSON(http.StatusOK, patients)
+    c.JSON(http.StatusOK, gin.H{"data": patients})
 }
 
-// controllers/patient.go (ต่อจากของเดิม)
+
+// PUT /patients/:id
+func UpdatePatient(c *gin.Context) {
+    var patient patientEntity.Patient
+    if err := c.ShouldBindJSON(&patient); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    if tx := configs.DB.Model(&patientEntity.Patient{}).
+        Where("id = ?", patient.ID).
+        Updates(&patient); tx.RowsAffected == 0 {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "คนไข้ไม่มีประวัติในระบบ"})
+        return
+    }
+
+    if err := configs.DB.
+        Preload("Address").
+        Preload("ContactPerson").
+        Preload("InitialSymptomps").
+        Preload("Histories").
+        First(&patient, patient.ID).Error; err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "แก้ไขข้อมูลคนไข้เรียบร้อย"})
+}
+
+// GET /patients/:id
 func GetPatientByID(c *gin.Context) {
-	DB := configs.DB
-	var p patientEntity.Patient
-	id := c.Param("id")
-	if tx := DB.First(&p, id); tx.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "ไม่พบข้อมูล"})
-		return
-	}
-	c.JSON(http.StatusOK, p)
+    var patient patientEntity.Patient
+    id := c.Param("id")
+
+    if err := configs.DB.
+        Preload("Address").
+        Preload("ContactPerson").
+        Preload("InitialSymptomps").
+        Preload("Histories").
+        First(&patient, id).Error; err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "ไม่พบข้อมูลคนไข้"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"data": patient})
 }
 
+// DELETE /patients/:id
 func DeletePatient(c *gin.Context) {
-	DB := configs.DB
-	id := c.Param("id")
-	if tx := DB.Delete(&patientEntity.Patient{}, id); tx.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "ไม่พบข้อมูล"})
+	patientID := c.Param("id")
+
+	if tx := configs.DB.Delete(&patientEntity.Patient{}, patientID); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ไม่พบข้อมูลคนไข้"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "ลบแล้ว"})
+
+	c.JSON(http.StatusOK, gin.H{"message": "ลบข้อมูลคนไข้เรียบร้อย"})
 }
+

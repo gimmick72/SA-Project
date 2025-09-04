@@ -23,33 +23,44 @@ const AddPatientPage: React.FC = () => {
   const [form] = Form.useForm<Patient>();
 
   const handleSubmit = async (values: Patient) => {
-    console.log("[onFinish] raw values:", values);
     try {
       setSubmitting(true);
-
-      const payload: Patient = {
-        ...values,
+  
+      // บังคับวันเกิดเป็น ISO 8601 ที่ Go รับได้
+      const birthdayISO = values.birthday
+        ? dayjs(values.birthday as any).startOf('day').toDate().toISOString()
+        : undefined; // ถ้า BE require วันเกิด ควร validate ให้มี
+  
+      // ส่งเฉพาะ field ที่ backend struct Patient มีจริง ๆ (ตาม json tag ในโค้ด Go)
+      const payload = {
+        citizenID: (values.citizenID || "").trim(),
+        prefix: values.prefix || "",
+        firstname: (values.firstname || "").trim(),
+        lastname: (values.lastname || "").trim(),
+        nickname: values.nickname || "",
+        congenitadisease: values.congenitadisease || "",
+        blood_type: values.blood_type || "",
+        gender: values.gender || "",                 // "male" | "female" (ให้ตรงกับ BE)
+        birthday: birthdayISO!,                      // สำคัญ: ต้องเป็น ISO
+        phonenumber: (values.phonenumber || "").trim(),
         age: Number(values.age) || 0,
-        birthday: values.birthday
-          ? dayjs(values.birthday as any).format("YYYY-MM-DD")
-          : "",
+        drugallergy: values.drugAllergyType === "hasAllergy" ? (values.drugallergy || "") : "",
       };
-
-      // ถ้า PatientAPI.create() คืน data เฉย ๆ ไม่ต้องเช็ค res.status
-      await PatientAPI.create(payload);
-
-      messageApi.success("บันทึกสำเร็จ");
+  
+      // อย่าส่ง field ที่ BE ไม่รู้จัก เช่น drugAllergyType, phonenumber_emergency, address ฯลฯ
+      await PatientAPI.create(payload as any);
+  
+      messageApi.success("บันทึกข้อมูลสำเร็จ");
       form.resetFields();
     } catch (err: any) {
-      // รองรับ AxiosError และเคสอื่น ๆ
-      const msg =
-        err?.response?.data?.message || err?.message || "บันทึกไม่สำเร็จ";
-      console.error(err);
+      const msg = err?.response?.data?.message || err?.message || "บันทึกไม่สำเร็จ";
+      console.error("[handleSubmit] Error:", err);
       messageApi.error(msg);
     } finally {
       setSubmitting(false);
     }
   };
+
   return (
     <div className="form-shell">
       <div className="form-scroll">
@@ -63,7 +74,7 @@ const AddPatientPage: React.FC = () => {
             onFinish={handleSubmit}
             onValuesChange={(changed) => {
               if ("birthday" in changed) {
-                const d = changed.birthday as any; // Dayjs | null
+                const d = changed.birthday as any;
                 form.setFieldsValue({
                   age: d ? dayjs().diff(d, "year") : undefined,
                 });
@@ -78,30 +89,50 @@ const AddPatientPage: React.FC = () => {
               congenitadisease: "",
               blood_type: "",
               gender: "",
-              birthday: null, // ใช้ null สำหรับ DatePicker (ไม่ใช่ "")
+              birthday: null,
               phonenumber: "",
               age: 0,
               drugallergy: "",
-              relationship: "",
-              phonenumber_emergency: "",
-              housenumber: "",
-              moo: "",
-              subdistrict: "",
-              district: "",
-              province: "",
-              postalcode: "",
+              drugAllergyType: "noAllergy", // เพิ่ม field นี้
+              // relationship: "",
+              // phonenumber_emergency: "",
+              // housenumber: "",
+              // moo: "",
+              // subdistrict: "",
+              // district: "",
+              // province: "",
+              // postcode: "",
             }}
           >
             {/* แถวชื่อ-สกุล-เลขบัตร */}
             <Row gutter={[16, 8]}>
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
-                <Form.Item name="citizenID" label="เลขบัตรประชาชน">
-                  <Input placeholder="เลขบัตรประชาชน" />
+                <Form.Item 
+                  name="citizenID" 
+                  label="เลขบัตรประชาชน"
+                  rules={[
+                    { required: true, message: "กรุณากรอกเลขบัตรประชาชน" },
+                    { len: 13, message: "เลขบัตรประชาชนต้องมี 13 หลัก" }
+                  ]}
+                >
+                  <Input 
+                    placeholder="เลขบัตรประชาชน" 
+                    maxLength={13}
+                    onChange={(e) => {
+                      // รับเฉพาะตัวเลข
+                      const value = e.target.value.replace(/\D/g, '');
+                      form.setFieldsValue({ citizenID: value });
+                    }}
+                  />
                 </Form.Item>
               </Col>
 
               <Col xs={18} sm={8} md={6} lg={4} xl={3}>
-                <Form.Item name="prefix" label="คำนำหน้า">
+                <Form.Item 
+                  name="prefix" 
+                  label="คำนำหน้า"
+                  rules={[{ required: true, message: "กรุณาเลือกคำนำหน้า" }]}
+                >
                   <Select placeholder="เลือกคำนำหน้า">
                     <Option value="นาย">นาย</Option>
                     <Option value="นางสาว">นางสาว</Option>
@@ -111,13 +142,21 @@ const AddPatientPage: React.FC = () => {
               </Col>
 
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
-                <Form.Item name="firstname" label="ชื่อ">
+                <Form.Item 
+                  name="firstname" 
+                  label="ชื่อ"
+                  rules={[{ required: true, message: "กรุณากรอกชื่อ" }]}
+                >
                   <Input placeholder="ชื่อ" />
                 </Form.Item>
               </Col>
 
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
-                <Form.Item name="lastname" label="นามสกุล">
+                <Form.Item 
+                  name="lastname" 
+                  label="นามสกุล"
+                  rules={[{ required: true, message: "กรุณากรอกนามสกุล" }]}
+                >
                   <Input placeholder="นามสกุล" />
                 </Form.Item>
               </Col>
@@ -132,7 +171,6 @@ const AddPatientPage: React.FC = () => {
             {/* แถว เพศ / วันเกิด / อายุ / โรคประจำตัว / หมู่เลือด / โทรศัพท์ */}
             <Row gutter={[16, 8]}>
               <Col xs={24} sm={12} md={8} lg={6} xl={4}>
-                {/* ใช้ aria-labelledby กับ Radio.Group เพื่อเลี่ยง label-for เตือน */}
                 <div
                   id="gender_label"
                   style={{ marginBottom: 4, fontWeight: 500 }}
@@ -151,7 +189,11 @@ const AddPatientPage: React.FC = () => {
               </Col>
 
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
-                <Form.Item name="birthday" label="วันเกิด">
+                <Form.Item 
+                  name="birthday" 
+                  label="วันเกิด"
+                  rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
+                >
                   <DatePicker
                     format="YYYY-MM-DD"
                     style={{ width: "100%" }}
@@ -197,8 +239,22 @@ const AddPatientPage: React.FC = () => {
               </Col>
 
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
-                <Form.Item name="phonenumber" label="หมายเลขโทรศัพท์">
-                  <Input placeholder="หมายเลขโทรศัพท์" />
+                <Form.Item 
+                  name="phonenumber" 
+                  label="หมายเลขโทรศัพท์"
+                  rules={[
+                    { required: true, message: "กรุณากรอกหมายเลขโทรศัพท์" },
+                    { pattern: /^[0-9]{10}$/, message: "หมายเลขโทรศัพท์ต้องมี 10 หลัก" }
+                  ]}
+                >
+                  <Input 
+                    placeholder="หมายเลขโทรศัพท์" 
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      form.setFieldsValue({ phonenumber: value });
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -216,7 +272,6 @@ const AddPatientPage: React.FC = () => {
                     </div>
                     <Form.Item
                       name="drugAllergyType"
-                      initialValue="noAllergy"
                       style={{ marginBottom: 0 }}
                     >
                       <Radio.Group
@@ -275,7 +330,7 @@ const AddPatientPage: React.FC = () => {
               </Col>
             </Row>
 
-            {/* ผู้ติดต่อได้ */}
+            {/* ผู้ติดต่อได้
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
               ผู้ที่ติดต่อได้
             </div>
@@ -287,12 +342,19 @@ const AddPatientPage: React.FC = () => {
               </Col>
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
                 <Form.Item name="phonenumber_emergency" label="หมายเลขโทรศัพท์">
-                  <Input placeholder="หมายเลขโทรศัพท์" />
+                  <Input 
+                    placeholder="หมายเลขโทรศัพท์" 
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      form.setFieldsValue({ phonenumber: value });
+                    }}
+                  />
                 </Form.Item>
               </Col>
-            </Row>
+            </Row> */}
 
-            {/* ที่อยู่ */}
+            {/* ที่อยู่
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
               ที่อยู่
             </div>
@@ -323,21 +385,33 @@ const AddPatientPage: React.FC = () => {
                 </Form.Item>
               </Col>
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
-                <Form.Item name="postalcode" label="รหัสไปรษณีย์">
-                  <Input placeholder="รหัสไปรษณีย์" />
+                <Form.Item 
+                  name="postalcode" 
+                  label="รหัสไปรษณีย์"
+                  rules={[
+                    { pattern: /^[0-9]{5}$/, message: "รหัสไปรษณีย์ต้องมี 5 หลัก" }
+                  ]}
+                >
+                  <Input 
+                    placeholder="รหัสไปรษณีย์" 
+                    maxLength={5}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      form.setFieldsValue({ postcode: value });
+                    }}
+                  />
                 </Form.Item>
               </Col>
-            </Row>
+            </Row> */}
 
             {/* ปุ่ม */}
             <div className="buttons">
               <button
-                type="button"
+                type="submit"
                 className="save-button"
                 disabled={submitting}
-                onClick={() => form.submit()}
               >
-                บันทึก
+                {submitting ? "กำลังบันทึก..." : "บันทึก"}
               </button>
               <button
                 type="button"

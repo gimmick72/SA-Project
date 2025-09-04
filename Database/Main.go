@@ -16,21 +16,19 @@ func main() {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 
+	//api OK
 	router := r.Group("/api")
 	{
-		// // AddPatient routes
-		router.POST("/patients", controllers.CreatePatient)
-		router.GET("/patients", controllers.GetPatient)
-		// Patients
-		// router.POST("/patients", controllers.CreatePatient)     // สร้าง
-		// router.GET("/patients", controllers.GetPatient)         // ดึงทั้งหมด
-		// router.GET("/patients/:id", controllers.GetPatientByID) // (เพิ่ม) ดึงรายตัว
-		// // router.PUT("/patients/:id", controllers.UpdatePatient)  // (เพิ่ม) แก้ไข
-		// router.DELETE("/patients/:id", controllers.DeletePatient) // (เพิ่ม) ลบ
+		//Patient
+		router.POST("/patients", controllers.CreatePatient)     // สร้าง
+		router.GET("/patients", controllers.FindPatient)         // ดึงทั้งหมด
+		router.GET("/patients/:id", controllers.GetPatientByID) // (เพิ่ม) ดึงรายตัว
+		router.PUT("/patients/:id", controllers.UpdatePatient)  // (เพิ่ม) แก้ไข
+		router.DELETE("/patients/:id", controllers.DeletePatient) // (เพิ่ม) ลบ
 
-		if err := r.Run(":" + PORT); err != nil {
-			panic(err)
-		}
+			// Run the server go run main.go
+			r.Run("localhost:" + PORT)
+			
 	}
 
 }
@@ -56,3 +54,4 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+

@@ -22,7 +22,7 @@ const PatientListPage = () => {
 
       {/* พื้นที่ตาราง */}
       <div className="table-wrap">
-      {/* <PatienTable /> */}
+      <PatienTable />
       </div>
     </div>
     
