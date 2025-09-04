@@ -10,8 +10,11 @@
 
     "baseUrl": "src",                          
     "paths": {
-      "@c/*": ["components/*"]                 
+      "@c/*": ["components/*"] ,  
+      "@interface/*": ["interface/*"],
+      "@service/*": ["services/*"]           
     }
   },
   "include": ["src"]
+  
 }

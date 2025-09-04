@@ -2,7 +2,7 @@
 import React from 'react';
 import { Form, Input, Button, InputNumber, Select, DatePicker, message, Card, Space, Row, Col } from 'antd';
 import dayjs from 'dayjs';
-import { createSupply } from '../../services/supply';
+import { createSupply } from '@service/supply/supply';
 
 const { Option } = Select;
 
@@ -85,7 +85,8 @@ const AddSupplyPage: React.FC = () => {
           </Col>
           <Col span={12}>
             <Form.Item name="importDate" label="วันที่นำเข้า" rules={[{ required: true, message: 'กรุณาเลือกวันที่นำเข้า!' }]}>
-              <DatePicker style={{ width: '100%' }} />
+              <DatePicker styimport { Supply } from '..';
+le={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={12}>
