@@ -2,6 +2,9 @@ import axios from 'axios';
 import type { AxiosError, AxiosResponse } from 'axios';
 import type { Patient, ContactPerson,Address,InitialSymptomps,ServiceRef,HistoryPatien,CaseRef} from '../interface/patient';
 
+// Re-export the Patient type
+export type { Patient };
+
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
