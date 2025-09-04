@@ -85,8 +85,7 @@ const AddSupplyPage: React.FC = () => {
           </Col>
           <Col span={12}>
             <Form.Item name="importDate" label="วันที่นำเข้า" rules={[{ required: true, message: 'กรุณาเลือกวันที่นำเข้า!' }]}>
-              <DatePicker styimport { Supply } from '..';
-le={{ width: '100%' }} />
+              <DatePicker style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -95,7 +94,7 @@ le={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item style={{ marginTop: 4,marginRight: 8, textAlign: 'right' }}>
+        <Form.Item style={{ marginTop: 4, marginRight: 8, textAlign: 'right' }}>
           <Space>
             <Button htmlType="button" onClick={onReset} disabled={submitting}>
               ล้างข้อมูล
@@ -103,7 +102,7 @@ le={{ width: '100%' }} />
             <Button type="primary" htmlType="submit" loading={submitting}>
               เพิ่มเวชภัณฑ์
             </Button>
-            
+
           </Space>
         </Form.Item>
       </Form>

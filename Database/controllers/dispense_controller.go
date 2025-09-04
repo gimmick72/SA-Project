@@ -1,4 +1,3 @@
-// controllers/dispense.go
 package controllers
 
 import (

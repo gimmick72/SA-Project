@@ -1,6 +1,4 @@
-// controllers/patient_controller.go
 package controllers
-
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"

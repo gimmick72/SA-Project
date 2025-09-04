@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"Database/entity"
 	"log"
 
 	"gorm.io/driver/sqlite"
@@ -22,17 +21,4 @@ func ConnectDatabase() {
 		log.Fatal("failed to connect database: ", err)
 	}
 	log.Println("✅ Connected to SQLite database")
-}
-
-func SetupDatbase() {
-
-	//Migrate the schema
-	DB.AutoMigrate(
-		//Patient
-		&entity.Patient{},
-		&entity.Address{},
-		&entity.ContactPerson{},
-		&entity.HistoryPatien{},
-		&entity.InitialSymptomps{},
-	)
 }

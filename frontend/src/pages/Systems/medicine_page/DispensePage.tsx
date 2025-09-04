@@ -18,7 +18,6 @@ import type { ColumnsType } from "antd/es/table";
 
 // ✅ ดึงบริการจริงจาก services
 import { fetchSupplyOptions, createDispense } from '@service/supply/supply';
-import { Supply } from '..';
 
 const { Option } = Select;
 

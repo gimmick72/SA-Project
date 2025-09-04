@@ -7,15 +7,13 @@ import (
 
 	"Database/configs"
 	"Database/controllers"
-	// "Database/entity"
+	"Database/entity"
 )
 
 const PORT = "8080"
 
 func main() {
 	configs.ConnectDatabase()
-	configs.SetupDatbase()
-
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 
@@ -24,6 +22,22 @@ func main() {
 		//Patient
 		router.POST("/patient", controllers.CreatePatient)
 		router.GET("/patient", controllers.GetPatient)
+
+		// Supplies
+		router.GET("/supplies", controllers.ListSupplies)
+		router.POST("/supplies", controllers.CreateSupply)
+		router.DELETE("/supplies/:id", controllers.DeleteSupply)
+		router.POST("/dispenses", controllers.CreateDispense)
+		router.GET("/dispenses", controllers.ListDispenses)
+		router.PUT("/supplies/:id", controllers.UpdateSupply)
+
+		// Schedule / Queue
+		router.GET("/schedule", controllers.GetSchedule)
+		router.POST("/schedule/assign", controllers.AssignSchedule)
+
+		// 🔧 FIX: อย่าเขียน /api ซ้ำ
+		router.GET("/patients", controllers.GetPatients)
+
 	}
 
 	// Run the server
@@ -44,6 +58,56 @@ func CORSMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		c.Next()
+	}
+}
+
+
+
+
+
+
+
+//ฟอร์ด
+// -----------------------------------------------------------
+// AutoMigrate
+// -----------------------------------------------------------
+func migrateAll() {
+	// เวชภัณฑ์
+	must(configs.DB.AutoMigrate(
+		&entity.Supply{},
+		&entity.RecordSupply{},
+	))
+
+	// ตารางคิว
+	must(configs.DB.AutoMigrate(
+		&entity.Appointment{},
+	))
+
+	// (ตัวเลือก) ถ้าจะใช้ตารางผู้ป่วยจริงด้านล่างนี้ ให้เปิดคอมเมนต์
+	// must(configs.DB.AutoMigrate(&entity.Patient{}, &entity.ContactPerson{}, &entity.Address{}, &entity.InitialSymptomps{}, &entity.HistoryPatien{}))
+
+	log.Println("✅ AutoMigrate done")
+}
+
+func must(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// -----------------------------------------------------------
+// Middlewares
+// -----------------------------------------------------------
+func simpleCORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
 		c.Next()
 	}
 }
