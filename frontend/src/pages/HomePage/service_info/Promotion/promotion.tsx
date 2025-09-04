@@ -147,15 +147,10 @@ const Promotion = () => {
         }
     };
 
-    const handleAddItem = () => {
-        setModal({ visible: true, type: 'add', detail: '', itemIndex: null });
-    };
-
     const handleModalSave = () => {
         if (modal.type === 'add') {
-            // ดึงค่าจากฟอร์มใน modal
             if (!newItem.name || !newItem.service) return;
-            setItems([...items, { ...newItem, id: Date.now(), detail: modal.detail }]);
+            setItems([...items, { ...newItem, id: Date.now() }]);
             setNewItem({ name: "", service: "", detail: "", price: 0, startDate: "", endDate: "" });
         } else if (modal.type === 'view' && modal.itemIndex !== null) {
             const updated = [...items];
@@ -186,6 +181,11 @@ const Promotion = () => {
     };
 
 
+    const handleNewItemChange = (field: keyof typeof newItem, value: any) => {
+    setNewItem(prev => ({ ...prev, [field]: value }));
+};
+
+
     return (
         <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto 0 auto', display: 'flex', flexDirection: 'column', gap: '20px', boxSizing: 'border-box', position: 'relative', background: '#fff' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
@@ -196,7 +196,7 @@ const Promotion = () => {
                     onChange={e => setSearch(e.target.value)}
                     style={{ width: 350, marginRight: 16 }}
                 />
-                <Button type="primary" onClick={handleAddItem}>+ เพิ่มโปรโมชัน</Button>
+                <Button type="primary" onClick={() => openModal('add', null)}>+ เพิ่มโปรโมชัน</Button>
             </div>
             <div className="table-container">
                 <table className="item-table">
@@ -292,7 +292,7 @@ const Promotion = () => {
                         <Input
                             placeholder="ชื่อรายการ"
                             value={newItem.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
+                            onChange={(e) => handleNewItemChange('name', e.target.value)}
                         />
                         <Input
                             placeholder="บริการ"
@@ -302,8 +302,8 @@ const Promotion = () => {
                         <Input.TextArea
                             rows={3}
                             placeholder="รายละเอียด"
-                            value={modal.detail}
-                            onChange={(e) => setModal({ ...modal, detail: e.target.value })}
+                            value={newItem.detail}
+                            onChange={(e) => handleChange('detail', e.target.value)}
                         />
                         <Input
                             type="number"
@@ -323,6 +323,7 @@ const Promotion = () => {
                         />
                     </div>
                 )}
+
                 {/* ดูรายละเอียด */}
                 {modal.type === 'view' && (
                     <Input.TextArea

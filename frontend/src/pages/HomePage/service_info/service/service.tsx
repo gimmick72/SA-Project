@@ -76,11 +76,10 @@ const Service = () => {
     };
 
     const handleAddItem = () => {
-        if (!newItem.name || isNaN(newItem.price) || !currentCategory) return;
+        if (!newItem.name || isNaN(newItem.price) || !newItem.category) return;
         setItems([...items, {
             ...newItem,
             id: Date.now(),
-            category: currentCategory
         }]);
         setNewItem({ name: '', price: 0, detail: '', category: '' });
     };
@@ -88,6 +87,7 @@ const Service = () => {
     const handleDelete = (id: number) => {
         setItems(prev => prev.filter(item => item.id !== id));
     };
+
 
     const handleEdit = (index: number) => setEditIndex(index);
     const handleSave = () => setEditIndex(null);
@@ -133,47 +133,47 @@ const Service = () => {
         }}>
 
             {/* แถบเครื่องมือ -> ค้นหา, หมวดหมู่, เพิ่มรายการ */}
-                <div style={{
-                    display: 'flex',
-                    gap: '20px',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    border: 'none 2px #000',
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                        {/* ช่องค้นหาข้อมูล */}
-                        <Input.Search
-                            placeholder="ค้นหาบริการหรือรายละเอียด..."
-                            allowClear
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            style={{ width: 300, marginLeft: 0 }}
-                        />
+            <div style={{
+                display: 'flex',
+                gap: '20px',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                border: 'none 2px #000',
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    {/* ช่องค้นหาข้อมูล */}
+                    <Input.Search
+                        placeholder="ค้นหาบริการหรือรายละเอียด..."
+                        allowClear
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        style={{ width: 300, marginLeft: 0 }}
+                    />
 
-                        {/* ตัวเลือกหมวดหมู่ */}
-                        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold' }}>หมวดหมู่</div>
-                            <select
-                                className="select_category"
-                                value={currentCategory}
-                                onChange={(e) => setCurrentCategory(e.target.value)}
-                            >
-                                <option value="">-- แสดงทั้งหมด --</option>
-                                {categoryOptions.map(cat => (
-                                    <option key={cat.value} value={cat.value}>{cat.label}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                    </div>
-                    {/* ปุ่มเพิ่มรายการ */}
-                    <div >
-                        <Button type="primary" onClick={() => openModal('add', null)}>+ เพิ่มบริการ</Button>
+                    {/* ตัวเลือกหมวดหมู่ */}
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                        <div style={{ fontSize: '18px', fontWeight: 'bold' }}>หมวดหมู่</div>
+                        <select
+                            className="select_category"
+                            value={currentCategory}
+                            onChange={(e) => setCurrentCategory(e.target.value)}
+                        >
+                            <option value="">-- แสดงทั้งหมด --</option>
+                            {categoryOptions.map(cat => (
+                                <option key={cat.value} value={cat.value}>{cat.label}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
-            {/*  */}
+                {/* ปุ่มเพิ่มรายการ */}
+                <div >
+                    <Button type="primary" onClick={() => openModal('add', null)}>+ เพิ่มบริการ</Button>
+                </div>
+            </div>
+
+            {/* ตารางแสดงข้อมูล */}
             <div className="table-container" >
                 <table className="item-table">
                     <thead style={{ display: "flix" }}>
@@ -213,10 +213,10 @@ const Service = () => {
                                     <Button danger onClick={() => handleDelete(item.id)}>ลบ</Button>
                                     {editIndex === index ? (
                                         <Button style={{ marginLeft: "10px" }}
-                                        onClick={handleSave}>บันทึก</Button>
+                                            onClick={handleSave}>บันทึก</Button>
                                     ) : (
                                         <Button style={{ marginLeft: "10px" }}
-                                        onClick={() => handleEdit(index)}>แก้ไข</Button>
+                                            onClick={() => handleEdit(index)}>แก้ไข</Button>
                                     )}
                                 </td>
                             </tr>
@@ -228,7 +228,14 @@ const Service = () => {
             <Modal
                 open={modal.visible}
                 title={modal.type === 'add' ? 'เพิ่มบริการใหม่' : 'ดูรายละเอียด'}
-                onOk={handleModalSave}
+                onOk={() => {
+                    if (modal.type === 'add') {
+                        handleAddItem();   // ✅ ดึงค่าจาก newItem โดยตรง
+                    } else {
+                        handleModalSave();
+                    }
+                    setModal({ visible: false, type: null, detail: '', itemIndex: null });
+                }}
                 onCancel={() => setModal({ visible: false, type: null, detail: '', itemIndex: null })}
                 okText="บันทึก"
                 cancelText="ยกเลิก"
@@ -260,8 +267,8 @@ const Service = () => {
                         <Input.TextArea
                             rows={4}
                             placeholder="รายละเอียด"
-                            value={modal.detail}
-                            onChange={e => setModal({ ...modal, detail: e.target.value })}
+                            value={newItem.detail}   // ✅ ใช้ newItem.detail
+                            onChange={e => handleChange('detail', e.target.value)}
                         />
                     </div>
                 ) : (
