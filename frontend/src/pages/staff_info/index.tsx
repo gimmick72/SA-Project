@@ -4,31 +4,10 @@ import { Card, Input, Button, Row, Col, Typography, message, Drawer, Spin } from
 import { SearchOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AddStaffForm from './staffAdd';
-import { StaffController } from '../../controllers/staffController';
-import type { NewStaffData } from './staffAdd';
-
-
+import { StaffController } from '../../services/https/Staff';
+import type{ Department, NewStaffData, PersonalData , Staff } from '../../interface/types';
 const { Title } = Typography;
 
-
-// ... (Staff interface, NewStaffData interface, and initialStaffData dummy data) ...
-export interface Staff {
-  Employee_ID: number;
-  title: string;
-  firstName: string;
-  lastName: string;
-  position: string;
-  phone: string;
-  gender: string;
-  startDate: string;
-  age: number;
-  idCard: string;
-  address: string;
-  email: string;
-  employeeType: string;
-  licenseNumber: string;
-}
-  
 
 const formatEmployeeIdForDisplay = (id: number): string => {
   return String(id).padStart(2, '0');
@@ -42,15 +21,25 @@ const StaffInfoPaeg: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true); // Add a new loading state
   const navigate = useNavigate();
 
-useEffect(() => {
-  setLoading(true);
-  StaffController.getAllStaff().then((data) => {
-    setStaffData(data);
-    setLoading(false);
-  });
-}, []);
+  // Fetch All Staff Data from backend on component mount
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        setLoading(true); // เริ่ม loading
+        const data = await StaffController.getAllStaff(); // fetch จาก backend
 
+        setStaffData(data); // set state
+        setFilteredStaff(data); // set filtered 
+      } catch (error: any) {
+        message.error('ไม่สามารถโหลดข้อมูลบุคลากรได้');
+        console.error(error);
+      } finally {
+        setLoading(false); // ปิด loading
+      }
+    };
 
+    fetchStaff();
+  }, []);
 
   const applySearchFilter = () => {
     const trimmedText = searchText.trim();
@@ -85,7 +74,7 @@ useEffect(() => {
     setFilteredStaff(newFilteredStaff);
   };
 
-
+  //Search box
   useEffect(() => {
     applySearchFilter();
   }, [searchText, staffData]);
@@ -94,28 +83,56 @@ useEffect(() => {
     setIsAddDrawerVisible(true);
   };
 
-  const handleAddFormSubmit = (newStaff: NewStaffData) => {
-    const newId = Math.max(...staffData.map(s => s.Employee_ID)) + 1;
-    const newStaffWithId: Staff = {
-      Employee_ID: newId,
-      title: newStaff.title,
-      firstName: newStaff.firstName,
-      lastName: newStaff.lastName,
-      position: newStaff.position,
-      phone: newStaff.phone,
-      gender: newStaff.gender,
-      startDate: newStaff.startDate,
-      age: newStaff.age,
-      idCard: newStaff.idCard,
-      address: `${newStaff.addressHouseNo}, ${newStaff.addressMoo ? 'Moo ' + newStaff.addressMoo + ', ' : ''}${newStaff.addressSubDistrict}, ${newStaff.addressDistrict}`,
-      email: newStaff.email,
-      employeeType: newStaff.employeeType,
-      licenseNumber: newStaff.licenseNumber || '',
+  const handleAddFormSubmit = async (newStaff: NewStaffData) => {
+   try {
+    setLoading(true);
+
+    // แปลง newStaff (ฟอร์มของคุณ) → PersonalData + Department ตาม interface backend
+    const personalData: PersonalData = {
+      // ถ้า ID จะถูกสร้างโดย DB ให้ไม่ต้องส่ง ID (optional)
+      Title: newStaff.title,
+      FirstName: newStaff.firstName,
+      LastName: newStaff.lastName,
+      Gender: newStaff.gender,
+      Email: newStaff.email,
+      Age: Number(newStaff.age) || 0,
+      EmpNationalID: newStaff.idCard,
+      Tel: newStaff.phone,
+      HouseNumber: newStaff.HouseNumber || newStaff.address || '',
+      Subdistrict: newStaff.Subdistrict || '',
+      District: newStaff.District || '',
+      VillageNumber: newStaff.VillageNumber || '',
     };
-    setStaffData(prevData => [...prevData, newStaffWithId]);
+
+    const department: Department = {
+      // ID / PersonalDataID จะถูกเติมโดย backend เมื่อสร้างเสร็จ (ถ้าไม่ต้องการก็ไม่ต้องใส่)
+      Position: newStaff.position,
+      EmpType: newStaff.employeeType,
+      License: newStaff.licenseNumber || '',
+      CompRate: Number(newStaff.CompRate) || 0,
+      Specialization: newStaff.Specialization || '',
+StartDate: newStaff.startDate
+    ? newStaff.startDate.toISOString()  // แปลงเป็น ISO 8601
+    : new Date().toISOString(),        PersonalDataID: 0, // backend จะผูกเมื่อสร้าง record (สามารถส่ง 0 หรือ omit ขึ้นกับ backend)
+    };
+
+    // เรียก API เพิ่มข้อมูล (StaffController.addStaff ต้องรับ (personalData, department))
+    const added = await StaffController.addStaff(personalData, department);
+    setStaffData(prev => [...prev, added]);
+    setFilteredStaff(prev => [...prev, added]); // ถ้าคุณใช้ filtered list ด้วย
+    // รีเฟรชรายการจาก backend ให้แน่นอนว่า state ตรงกับ DB
+    const data = await StaffController.getAllStaff();
+    setStaffData(data);
     message.success('เพิ่มข้อมูลบุคลากรใหม่เรียบร้อย!');
     setIsAddDrawerVisible(false);
+  } catch (err) {
+    console.error(err);
+    message.error('เกิดข้อผิดพลาดในการเพิ่มบุคลากร');
+  } finally {
+    setLoading(false);
+  }
   };
+
 
   const handleAddFormCancel = () => {
     setIsAddDrawerVisible(false);
@@ -143,7 +160,7 @@ useEffect(() => {
             prefix={<SearchOutlined style={{ color: '#aaa' }} />}
             size="large"
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setSearchText(e.target.value)}
             style={{
               width: '300px',
               borderRadius: '25px',

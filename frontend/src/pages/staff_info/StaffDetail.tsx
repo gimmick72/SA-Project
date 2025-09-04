@@ -1,11 +1,11 @@
+//frontend/src/pages/staff_info/StaffDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Button, Typography, Spin, Row, Col, Form, Input, Select, DatePicker, message, Popconfirm, Space } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { StaffController } from '../../controllers/staffController';
-import type { Staff } from './index'; // import type from your list file where Staff is defined
-
+import { StaffController } from '../../services/https/Staff';
+import type { Staff } from '../../interface/types';
 const { Title } = Typography;
 const { Option } = Select;
 
@@ -17,87 +17,98 @@ const StaffDetails: React.FC = () => {
   const { Employee_ID } = useParams<{ Employee_ID: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  
+  // const id = Number(Employee_ID); // แปลงเป็น number 
 
-useEffect(() => {
-  if (staff && isEditing) {
-    form.setFieldsValue({
-      ...staff,
-      startDate: staff.startDate ? dayjs(staff.startDate) : null,
-    });
-  }
-  // intentionally omit calling setFieldsValue when not editing (avoids warning)
-}, [staff, form, isEditing]);
+  useEffect(() => {
+    const fetchStaff = async () => {
+      if (!Employee_ID) return;
 
-
-useEffect(() => {
-  setLoading(true);
-  StaffController.getAllStaff()
-    .then((data) => {
-      if (!Employee_ID) {
-        setStaff(null);
-        return;
+      try {
+        setLoading(true);
+        const data = await StaffController.getStaffByID(Number(Employee_ID));
+        setStaff(data);
+      } catch (error) {
+        message.error('ไม่พบข้อมูลบุคลากร');
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
-      const id = Number(Employee_ID);
-      const found = data.find(s => s.Employee_ID === id);
-      if (found) {
-        setStaff(found);
-        // ถ้าอยู่ในโหมดแก้ไข ให้ set ค่าเข้า form (ป้องกัน warning)
+    };
+
+    fetchStaff();
+  }, [Employee_ID]);
+
+
+  //Sync Data edit form
+  useEffect(() => {
+    const fetchStaff = async () => {
+      if (!Employee_ID) return;
+      setLoading(true);
+      try {
+        const data = await StaffController.getStaffByID(Number(Employee_ID));
+        setStaff(data);
         if (isEditing) {
-          form.setFieldsValue({
-            ...found,
-            startDate: found.startDate ? dayjs(found.startDate) : null,
-          });
+          form.setFieldsValue({ ...data, startDate: data.startDate ? dayjs(data.startDate) : null });
         }
-      } else {
+      } catch (err) {
+        console.error(err);
         setStaff(null);
+      } finally {
+        setLoading(false);
       }
-    })
-    .catch((err) => {
-      console.error('Failed to load staff list', err);
-      setStaff(null);
-    })
-    .finally(() => setLoading(false));
-}, [Employee_ID, form, isEditing]);
-
-
-
+    };
+    fetchStaff();
+  }, [Employee_ID, isEditing, form]);
 
   const onFinish = async (values: any) => {
+    const addressParts = values.address.split(',').map((part: string) => part.trim());
     if (!staff) return;
     try {
-      const updated = {
-        ...staff,
-        ...values,
-        startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : staff.startDate,
+      // เตรียม PersonalData ที่ต้องส่งไป backend
+      const personalData = {
+        Title: values.title,
+        FirstName: values.firstName,
+        LastName: values.lastName,
+        Gender: values.gender,
+        Email: values.email,
+        Age: Number(values.age),
+        EmpNationalID: values.idCard,
+        Tel: values.phone, // ถ้าอยากแก้ phone ต้องเพิ่ม field ใน form
+        HouseNumber: addressParts[0] || "",
+        Subdistrict: addressParts[1] || "",
+        District: addressParts[2] || "",
+        VillageNumber: addressParts[3] || "",
       };
 
-      // NOTE: backend PUT /staff/:id in your main.go expects updating PersonalData or Department?
-      // Here we attempt to PUT to /staff/:id — adjust payload in backend if needed.
-      const res = await fetch(`http://localhost:8080/staff/${staff.Employee_ID}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated),
-      });
+      // เตรียม Department ที่ต้องส่งไป backend
+      const department = {
+        Position: values.position,
+        EmpType: values.employeeType,
+        StartDate: values.startDate.toISOString(),
+        License: values.licenseNumber,
+        Specialization: values.Specialization,
+        AffBrance: staff.Department?.AffBrance || "",
+        CompRate: Number(values.CompRate),
+        PersonalDataID: staff.Employee_ID,  // 👈 ต้องใส่เพิ่ม
+        ID: staff.Department?.ID || 0,      // 👈 กันไว้เผื่อมี field ID
+      };
 
-      if (!res.ok) throw new Error('Update failed');
+      // เรียก service
+      const updatedStaff = await StaffController.updateStaff(
+        staff.Employee_ID,
+        personalData,
+        department
+      );
 
-      // If backend returns updated record in the same shape as StaffController mapping, set directly.
-      // Otherwise you may need to re-fetch:
-      // setStaff(respMapped)
-      message.success('แก้ไขข้อมูลเรียบร้อย!');
+      message.success("บันทึกข้อมูลเรียบร้อยแล้ว");
+      setStaff(updatedStaff);
       setIsEditing(false);
-
-      // safest: re-fetch the list + set this staff again (to keep in sync)
-      const fresh = await StaffController.getAllStaff();
-      const same = fresh.find(s => s.Employee_ID === staff.Employee_ID) || null;
-      setStaff(same);
-      if (same) form.setFieldsValue({ ...same, startDate: same.startDate ? dayjs(same.startDate) : null });
-    } catch (err) {
-      console.error(err);
-      message.error('เกิดข้อผิดพลาดในการอัปเดต');
+    } catch (error) {
+      console.error(error);
+      message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
   };
+
 
   const handleGoBack = () => {
     navigate('/staff');
@@ -117,6 +128,18 @@ useEffect(() => {
       });
     }
   };
+
+ const handleDeleteStaff = async () => {
+  try {
+    if (!staff) return; // กัน null
+    await StaffController.deleteStaff(staff.Employee_ID); // เรียก API
+    message.success('ลบข้อมูลเรียบร้อย');
+    navigate('/staff'); // กลับไปหน้า list หรือ refresh
+  } catch (err) {
+    console.error(err);
+    message.error('เกิดข้อผิดพลาดในการลบข้อมูล');
+  }
+};
 
 
   if (loading) {
@@ -167,11 +190,11 @@ useEffect(() => {
               </Button>
               <Popconfirm
                 title="คุณต้องการลบข้อมูลบุคลากรนี้หรือไม่?"
-                // onConfirm={handleDeleteStaff}
+                onConfirm={handleDeleteStaff}
                 okText="ใช่"
                 cancelText="ไม่"
               >
-                <Button 
+                <Button
                   type="primary"
                   icon={<DeleteOutlined />}
                   size="large"
@@ -216,12 +239,10 @@ useEffect(() => {
               <Descriptions.Item label="เบอร์โทรศัพท์">{staff.phone}</Descriptions.Item>
               <Descriptions.Item label="อีเมล">{staff.email}</Descriptions.Item>
               <Descriptions.Item label="เลขบัตรประชาชน">{staff.idCard}</Descriptions.Item>
-              <Descriptions.Item label="หมายเลขใบประกอบวิชาชีพ">
-                {staff.licenseNumber || "ไม่มี"}
-              </Descriptions.Item>
-              <Descriptions.Item label="ที่อยู่">
-                {staff.address}
-              </Descriptions.Item>
+              <Descriptions.Item label="เงินเดือนสุทธิ">{staff.CompRate}</Descriptions.Item>
+              <Descriptions.Item label="หมายเลขใบประกอบวิชาชีพ">   {staff.licenseNumber || "ไม่มี"}     </Descriptions.Item>
+              <Descriptions.Item label="เฉพาะทางด้าน">            {staff.Specialization || "ไม่มี"}     </Descriptions.Item>
+              <Descriptions.Item label="ที่อยู่">                   {staff.address}                     </Descriptions.Item>
             </Descriptions>
           </>
         ) : (
@@ -241,7 +262,7 @@ useEffect(() => {
                     <Option value="นางสาว">นางสาว</Option>
                     <Option value="ทพ.">ทพ.</Option>
                     <Option value="ทพ.ญ.">ทพ.ญ.</Option>
-                  </Select> 
+                  </Select>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -272,44 +293,71 @@ useEffect(() => {
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <Form.Item name="age" label="อายุ" rules={[{ required: true, message: 'กรุณากรอกอายุ' }]}>
-                  <Input placeholder="อายุ" type="number" />
+                  <Input placeholder="ใส่อายุ" type="number" />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12} md={6}>
-                <Form.Item name="position" label="ตำแหน่งงาน" rules={[{ required: true, message: 'กรุณาเลือกตำแหน่ง' }]}>
-                  <Input placeholder="ตำแหน่งงาน" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="employeeType" label="ประเภทพนักงาน" rules={[{ required: true, message: 'กรุณาเลือกประเภทพนักงาน' }]}>
-                  <Select placeholder="ประเภทพนักงาน">
-                    <Option value="Full-time">Full-time</Option>
-                    <Option value="Part-time">Part-time</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Row gutter={24}>
-              <Col xs={24} sm={12}>
                 <Form.Item name="idCard" label="เลขบัตรประชาชน" rules={[{ required: true, message: 'กรุณากรอกเลขบัตรประชาชน' }]}>
                   <Input placeholder="เลขบัตรประชาชน" />
                 </Form.Item>
               </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item name="phone" label="เบอร์โทรศัพท์" rules={[{ required: true, message: 'เบอร์ดโทรศัพท์' }]}>
+                  <Input placeholder="ใส่เบอร์ดโทรศัพท์" />
+                </Form.Item>
+              </Col>
+
+            </Row>
+            <Form.Item name="email" label="อีเมล" rules={[{ required: true, message: 'กรุณากรอกอีเมล', type: 'email' }]}>
+              <Input placeholder="อีเมล" />
+            </Form.Item>
+
+            <Form.Item name="address" label="ที่อยู่" rules={[{ required: true, message: 'กรุณากรอกที่อยู่' }]}>
+              <Input placeholder="ใส่ที่อยู่" />
+            </Form.Item>
+
+            <Row gutter={24}>
+              <Col xs={24} sm={12}>
+
+                <Form.Item name="position" label="ตำแหน่งงาน" rules={[{ required: true, message: 'กรุณาเลือกตำแหน่ง' }]}>
+                  <Input placeholder="ตำแหน่งงาน" />
+                </Form.Item>
+              </Col>
+              <Form.Item name="employeeType" label="ประเภทพนักงาน" rules={[{ required: true, message: 'กรุณาเลือกประเภทพนักงาน' }]}>
+                <Select placeholder="ประเภทพนักงาน">
+                  <Option value="Full-time">Full-time</Option>
+                  <Option value="Part-time">Part-time</Option>
+                </Select>
+              </Form.Item>
               <Col xs={24} sm={12}>
                 <Form.Item name="licenseNumber" label="หมายเลขใบประกอบวิชาชีพ">
                   <Input placeholder="หมายเลขใบประกอบวิชาชีพ" />
                 </Form.Item>
               </Col>
+              <Col xs={24} sm={6}>
+
+
+                <Form.Item name="Specialization" label="เฉพาะทางด้าน">
+                  <Select placeholder="เฉพาะทางด้าน">
+                    <Option value="เด็ก">ทันตกรรมเด็ก</Option>
+                    <Option value="จัดฟัน">ทันตกรรมจัดฟัน</Option>
+                    <Option value="ปริทันต์">ทันตกรรมปริทันต์</Option>
+                    <Option value="ผ่าตัดช่องปาก">ทันตกรรมผ่าตัดช่องปาก/ใบหน้า</Option>
+                    <Option value="รากฟันเทียม">ทันตกรรมบูรณะ/ประดิษฐ์ฟัน</Option>
+                    <Option value="รากฟัน">ทันตกรรมรากฟัน</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={6}>
+                <Form.Item name="CompRate" label="เงินเดือนสุทธิ">
+                  <Input placeholder="เงินเดือนสุทธิ" />
+                </Form.Item>
+              </Col>
+
             </Row>
 
-            <Form.Item name="address" label="ที่อยู่" rules={[{ required: true, message: 'กรุณากรอกที่อยู่' }]}>
-              <Input placeholder="ที่อยู่" />
-            </Form.Item>
 
-            <Form.Item name="email" label="อีเมล" rules={[{ required: true, message: 'กรุณากรอกอีเมล', type: 'email' }]}>
-              <Input placeholder="อีเมล" />
-            </Form.Item>
+
 
             <Row justify="end" gutter={16}>
               <Col>
