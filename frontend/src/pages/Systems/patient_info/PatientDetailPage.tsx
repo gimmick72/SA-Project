@@ -4,6 +4,16 @@ import Navigate from "./component_patient/header_navigate";
 import React, { useState } from "react";
 
 const AddPatientPage = () => {
+  const [formData, setFormData] = useState({});
+
+  const fetchPatientData = async () => {
+    try {
+
+    }catch (error) {
+      console.error("Error fetching patient data:", error);
+    }
+  }
+
   return (
     <div className="wrapper">
       <Navigate />

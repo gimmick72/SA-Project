@@ -3,9 +3,10 @@ import { Table, message, Space, Popconfirm, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PatientAPI } from "../../../../services/patient/patientApi";
 import { PatientRow } from "../../../../interface/patient";
-// ดึง array ออกมาจากรูปแบบ response ต่าง ๆ + map field ให้ตรงคอลัมน์
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom"; // ✅ ใช้ useNavigate
+
 const toRows = (resp: any): PatientRow[] => {
-  // console.log("getAll() raw:", resp); // เปิดดีบักได้ถ้าจำเป็น
   const raw =
     (Array.isArray(resp) && resp) ||
     (Array.isArray(resp?.data) && resp.data) ||
@@ -15,7 +16,7 @@ const toRows = (resp: any): PatientRow[] => {
     [];
 
   return raw.map((p: any, i: number) => ({
-    id: p.ID ?? p.id ?? i,                            // GORM ส่ง ID (พิมพ์ใหญ่)
+    id: p.ID ?? p.id ?? `row-${i}`, // ✅ มีค่าเสมอ
     firstname: p.firstname ?? p.first_name ?? "",
     lastname: p.lastname ?? p.last_name ?? "",
     phonenumber: p.phonenumber ?? p.phone_number ?? "",
@@ -26,15 +27,16 @@ const PatienTable: React.FC = () => {
   const [data, setData] = useState<PatientRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate(); // ✅
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const resp = await PatientAPI.getAll(); 
-      setData(toRows(resp));                 
-    } catch (error) {
+      const resp = await PatientAPI.getAll();
+      setData(toRows(resp));
+    } catch (error: any) {
       console.error("Error fetching patients:", error);
-      messageApi.error("โหลดข้อมูลไม่สำเร็จ");
+      messageApi.error(error?.response?.data?.error || "โหลดข้อมูลไม่สำเร็จ");
       setData([]);
     } finally {
       setLoading(false);
@@ -43,7 +45,7 @@ const PatienTable: React.FC = () => {
 
   const handleDelete = async (id: number | string) => {
     try {
-      await PatientAPI.delete(Number(id)); // endpoint มักรับเลข
+      await PatientAPI.delete(Number(id));
       messageApi.success("ลบข้อมูลสำเร็จ");
       fetchData();
     } catch (error) {
@@ -60,22 +62,41 @@ const PatienTable: React.FC = () => {
     { title: "รหัส", dataIndex: "id", key: "id", width: 120 },
     { title: "ชื่อ", dataIndex: "firstname", key: "firstname" },
     { title: "นามสกุล", dataIndex: "lastname", key: "lastname" },
-    // ใช้ "phonenumber" ให้ตรง payload จริง (ไม่ใช่ phone_number)
     { title: "เบอร์โทรศัพท์", dataIndex: "phonenumber", key: "phonenumber" },
     {
       title: "Action",
       key: "action",
-      width: 140,
-      // ลำดับพารามิเตอร์ที่ถูกต้อง: (text, record, index)
+      width: 220,
       render: (_text, record) => (
         <Space>
+          {/* เพิ่มข้อมูลย่อยของคนไข้รายนี้ */}
+          <Button
+            size="small"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate(`initial-symptoms/${record.id}`)} 
+          >
+            เพิ่ม
+          </Button>
+
+          {/* ไปหน้าแก้ไข/รายละเอียด */}
+          <Button
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => navigate(`detail/${record.id}`)} 
+          >
+            แก้ไข
+          </Button>
+
           <Popconfirm
             title="ยืนยันการลบ?"
             okText="ลบ"
             cancelText="ยกเลิก"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button danger size="small">ลบ</Button>
+            <Button size="small" danger icon={<DeleteOutlined />}>
+              ลบ
+            </Button>
           </Popconfirm>
         </Space>
       ),
@@ -89,8 +110,9 @@ const PatienTable: React.FC = () => {
         loading={loading}
         columns={columns}
         dataSource={data}
-        rowKey={(record, index) => String(record.id ?? index)} // กันเคส id หาย
+        rowKey="id"                              
         pagination={{ pageSize: 10 }}
+        
       />
     </>
   );
