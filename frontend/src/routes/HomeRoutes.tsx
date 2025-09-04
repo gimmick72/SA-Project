@@ -6,46 +6,24 @@ import Loadable from "../components/third-patry/Loadable";
 
 
 // HomePage
-const HomePage = Loadable(lazy(() => import("../pages/Home_page/index")));
-const BookingPage = Loadable(lazy(() => import("../pages/Home_page/booking/index")));
-const OurDentist = Loadable(lazy(() => import("../pages/Home_page/ourDentists/index")));
-const ContactUs = Loadable(lazy(() => import("../pages/Home_page/contactUs/index")));
-const PriceGuide = Loadable(lazy(() => import("../pages/Home_page/priceGuide/index")));
-const ServicePage = Loadable(lazy(() => import("../pages/Home_page/services/index")));
+const FirstPages = Loadable(lazy(() => import("../pages/First_pages/main")));
+
+
 
 const IndexRoutes: RouteObject[] = [
   {
     path: "/",                         
-    element: <IndexLayout />,          
+    element: <FirstPages/>,          
     children: [
       {
         index: true,                   
         element: <Navigate to="/home" replace />, // redirect ไป /home
       },
-      {
-        path: "home",                  
-        element: <HomePage />,
-      },
-      {
-        path: "booking",
-        element: <BookingPage />,
-      },
-      {
-        path: "dentists",
-        element: <OurDentist />,
-      },
-      {
-        path: "contact",
-        element: <ContactUs />,
-      },
-      {
-        path: "guide-service",
-        element: <PriceGuide />,
-      },
-      {
-        path: "services",
-        element: <ServicePage />,
-      },
+      // {
+      //   path: "home",                  
+      //   element: <HomePage />,
+      // },
+
     ],
   },
 ];
