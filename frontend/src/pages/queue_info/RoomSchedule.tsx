@@ -2,7 +2,8 @@
 import React, { useMemo } from "react";
 import { Card, Button } from "antd";
 import { useDrop, useDrag } from "react-dnd";
-import { Patient, RoomScheduleData, TimeSlot } from "./types";
+import { Patient, RoomScheduleData, TimeSlot,ViewMode } from "./types";
+import dayjs, { Dayjs } from "dayjs";
 
 interface Props {
   room: RoomScheduleData;
@@ -14,6 +15,8 @@ interface Props {
   ) => void;
   /** ความสูงของเนื้อในการ์ด รับได้ทั้ง px (number) หรือ "100%" เพื่อให้เต็มพื้นที่ */
   maxBodyHeight?: number | string;
+  currentDate?: Dayjs; 
+  viewMode:ViewMode;
 }
 
 export default function RoomSchedule({

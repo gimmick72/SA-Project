@@ -14,11 +14,11 @@ const { Title } = Typography;
 const MedicinePage = () => {
   const [activeKey, setActiveKey] = useState('1');
 
-  const onTabChange = (key) => {
+  const onTabChange = (key:string) => {
     setActiveKey(key);
   };
 
-  const renderTabTitle = (key, title) => {
+  const renderTabTitle = (key:string, title:string) => {
     const isActive = activeKey === key;
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
