@@ -1,8 +1,10 @@
-import "./design/initail.css";
+import "./design/initial.css";
+import React from "react";
 
-const InitialPage = () => {
+
+const InitialPage: React.FC= () => {
+  
   return (
-   
     (
       <div className="form-wrapper">
         <div className="form-container">
