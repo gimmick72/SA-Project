@@ -1,25 +1,8 @@
 // src/services/supply.ts
+import { } from "../interface/types";
 export const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
-
-export type Supply = {
-  id: number;
-  code: string;
-  name: string;
-  category: string;
-  quantity: number;
-  unit: string;
-  importDate: string;  // "YYYY-MM-DD" หรือ RFC3339
-  expiryDate: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
-export type SupplyPage = {
-  items: Supply[];
-  total: number;
-  page: number;
-  page_size: number;
-};
+import { Supply, SupplyPage } from "../interface/types";
+import { DispenseItem, DispensePage } from "../interface/types";
 
 // --- helper แปลงคีย์ให้เป็นตัวเล็กแบบที่ UI ใช้ ---
 function normalizeSupply(raw: any): Supply {
@@ -137,26 +120,6 @@ export async function createDispense(payload: {
   if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
   try { return JSON.parse(text); } catch { return text; }
 }
-
-export type DispenseItem = {
-  id: number;
-  recorded_at: string;
-  action: string;
-  supply_id: number;
-  supply_code: string;
-  supply_name: string;
-  category: string;
-  quantity: number;
-  case_code: string;
-  dispenser: string;
-};
-
-export type DispensePage = {
-  items: DispenseItem[];
-  total: number;
-  page: number;
-  page_size: number;
-};
 
 export async function fetchDispenses(params: {
   q?: string;

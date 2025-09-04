@@ -35,7 +35,9 @@ const MedicinePage = () => {
   return (
       <FullLayout>
         <div style={{ padding: 0, width: '100%', height: '100%', boxSizing: 'border-box',overflow: 'hidden', }}>
-          <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center' }}>
+          <div style={{ marginBottom: 24
+            
+            , display: 'flex', alignItems: 'center' }}>
             <Title level={2} style={{ margin: 0 }}>
               เวชภัณฑ์
             </Title>
