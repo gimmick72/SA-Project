@@ -31,6 +31,10 @@ const PatientInfoPageRoute: RouteObject[] = [
     path: "add-patient",
     element: React.createElement(AddPatientPage),
   },
+  {
+    path: "admin/patient",
+    element: React.createElement(PatientListPage),
+  }
 ];
 
 export default PatientInfoPageRoute;

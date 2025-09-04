@@ -3,10 +3,11 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import type { Patient } from '../../interface/patient';
 
 // 1) รวม /api ตั้งแต่ต้น
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080');
+const API_URL = "http://localhost:8080/api";
 
 const http = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -39,7 +40,7 @@ const getConfigWithOutAuth = () => ({
 export const Post = async (url: string, data: any, requireAuth = true): Promise<AxiosResponse | any> => {
   const config = requireAuth ? getConfig() : getConfigWithOutAuth();
   return await axios
-    .post(`${API_BASE_URL}${url}`, data, config)   // <<---- ไม่ต่อ /api ซ้ำ
+    .post(`${API_BASE_URL}${url}`, data, config)   
     .then((response) => response)
     .catch((error: AxiosError) => {
       if (error?.response?.status === 401) {
@@ -53,7 +54,7 @@ export const Post = async (url: string, data: any, requireAuth = true): Promise<
 export const Get = async (url: string, requireAuth = true): Promise<AxiosResponse | any> => {
   const config = requireAuth ? getConfig() : getConfigWithOutAuth();
   return await axios
-    .get(`${API_BASE_URL}${url}`, config)          // <<---- ใช้ BASE_URL ตรง ๆ
+    .get(`${API_BASE_URL}${url}`, config)          
     .then((response) => response)
     .catch((error: AxiosError) => {
       if (error?.message === "Network Error") return error.response;
@@ -93,11 +94,13 @@ export const Delete = async (url: string, requireAuth = true): Promise<AxiosResp
     });
 };
 
-// ===== Patient API (อย่าใส่ /api ซ้ำ) =====
+
 export const PatientAPI = {
   getAll:   () => Get('/patient'),
-  getByID:  (id: number) => Get(`/patient/${id}`),
-  create:   (data: Patient) => Post('/patient', data, false),
-  update:   (id: number, data: Patient) => Update(`/patient/${id}`, data),
-  delete:   (id: number) => Delete(`/patient/${id}`),
+  getByID:  (id: number) => Get(`${API_URL}/patients/${id}`),
+  create:   (data: Patient) => Post(`${API_URL}/patients`, data, false),
+  update:   (id: number, data: Patient) => Update(`${API_URL}/patients/${id}`, data),
+  delete:   (id: number) => Delete(`${API_URL}/patients/${id}`),
 };
+
+

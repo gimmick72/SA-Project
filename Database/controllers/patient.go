@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Database/configs"
-	"Database/entity/patient"
+	patientEntity "Database/entity/patient"
 )
 
 // POST /patients
@@ -46,4 +46,26 @@ func GetPatient(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, patients)
+}
+
+// controllers/patient.go (ต่อจากของเดิม)
+func GetPatientByID(c *gin.Context) {
+	DB := configs.DB
+	var p patientEntity.Patient
+	id := c.Param("id")
+	if tx := DB.First(&p, id); tx.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "ไม่พบข้อมูล"})
+		return
+	}
+	c.JSON(http.StatusOK, p)
+}
+
+func DeletePatient(c *gin.Context) {
+	DB := configs.DB
+	id := c.Param("id")
+	if tx := DB.Delete(&patientEntity.Patient{}, id); tx.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "ไม่พบข้อมูล"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "ลบแล้ว"})
 }
