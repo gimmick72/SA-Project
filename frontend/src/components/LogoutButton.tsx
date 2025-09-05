@@ -28,7 +28,7 @@ const LogoutButton: React.FC = () => {
     <Button 
       type="primary" 
       danger 
-      icon={<LogoutOutlined />} 
+      //icon={<LogoutOutlined />} 
       onClick={handleLogout}
     >
       ออกจากระบบ
