@@ -86,6 +86,12 @@ const PatienTable: React.FC = () => {
 
           {/* ไปหน้าแก้ไข/รายละเอียด */}
           <Button
+          style={{
+            backgroundColor: "#FEFFC6",
+            color: "black",
+            border: "gray solid 1px",
+            borderRadius: "10px"
+          }}
             size="small"
             icon={<EditOutlined />}
             onClick={() => navigate(`detail/${record.id}`)} 
@@ -99,7 +105,15 @@ const PatienTable: React.FC = () => {
             cancelText="ยกเลิก"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button size="small" danger icon={<DeleteOutlined />}>
+            <Button 
+            style={{
+              backgroundColor: "#FFCDD2",
+              color: "black",
+              border: "gray solid 1px",
+              borderRadius: "10px"
+            }}
+            size="small" 
+            danger icon={<DeleteOutlined />}>
               ลบ
             </Button>
           </Popconfirm>

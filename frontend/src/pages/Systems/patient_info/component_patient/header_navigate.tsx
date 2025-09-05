@@ -7,7 +7,7 @@ const PatientHeader = () => {
     <div className="header">
       <h2 
       style={{ fontWeight: "600" }}
-      onClick={() => navigate("/admin/patient/detail")}
+      onClick={() => navigate("/admin/patient/detail/${record.id}")}
       >ข้อมูลประจำตัว</h2>
       
       {/* <h3 className="header-element">
@@ -22,7 +22,7 @@ const PatientHeader = () => {
       <h3 className="header-element">
         <span
           style={{ margin: "0.5rem", color: "black", fontWeight: "400", cursor: "pointer" }}
-          onClick={() => navigate("/admin/patient/patient-history")}
+          onClick={() => navigate("/admin/patient/patient-history/${record.id}")}
         >
           ประวัติการรักษา
         </span>

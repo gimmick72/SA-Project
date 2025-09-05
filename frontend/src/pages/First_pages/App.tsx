@@ -4,7 +4,7 @@ import HomePage from "./First_pages/HomePage/HomePage";
 import OurDentists from "./First_pages/OurDentistsPage/OurDentistsPage";
 import Services from "./First_pages/Services/ServicesPage";
 import ContactPage from "./First_pages/ContactUs/ContactUs";
-import AllBooking from "./First_pages/booking_page/index";
+import AllBooking from "./First_pages/booking_page/Booking";
 
 const App: React.FC = () => {
   return (

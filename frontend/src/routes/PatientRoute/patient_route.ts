@@ -14,9 +14,9 @@ const PatientRoute: RouteObject[] = [
   { index: true, element: React.createElement(PatientListPage) },
   { path: "detail/:id", element: React.createElement(PatientDetailPage) },          
   { path: "initial-symptoms/:id", element: React.createElement(InitialSymptoms) },  
-  { path: "patient-history", element: React.createElement(HistoryPage) },
+  { path: "patient-history/:id", element: React.createElement(HistoryPage) },
   { path: "add-patient", element: React.createElement(AddPatientPage) },
-  { path: "admin/patient", element: React.createElement(PatientListPage) },
+  // { path: "admin/patient", element: React.createElement(PatientListPage) },
 ];
 
 export { PatientRoute };
