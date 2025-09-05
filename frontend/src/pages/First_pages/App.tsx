@@ -4,7 +4,9 @@ import HomePage from "./First_pages/HomePage/HomePage";
 import OurDentists from "./First_pages/OurDentistsPage/OurDentistsPage";
 import Services from "./First_pages/Services/ServicesPage";
 import ContactPage from "./First_pages/ContactUs/ContactUs";
-import BookingPage from './First_pages/booking_page/index';
+import AllBooking from './First_pages/booking_page/index';
+
+
 
 
 const App: React.FC = () => {
@@ -15,7 +17,7 @@ const App: React.FC = () => {
         <Route path="/dentists" element={<OurDentists />} />
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<ContactPage />} />
-        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/allbooking" element={< AllBooking/>} />
       </Routes>
     </div>
   );

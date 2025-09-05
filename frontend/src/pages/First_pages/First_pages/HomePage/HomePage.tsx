@@ -5,13 +5,12 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
-import ClinicPromo from "./ClinicPromo";
-import PhotoPromo from "./PhotoPromo";
 import OurDentistsPage from "../OurDentistsPage/OurDentistsPage";
 import ServicesPage from "../Services/ServicesPage";
 import ContactPage from "../ContactUs/ContactUs";
 import PriceGuidePage from "../PriceGuide/PriceGuidePage";
 import SlideInTop from "../../Motion/SlideInTop";
+import PromoPage from "../PromoPage/PromoPage";
 
 
 const { Header, Content } = Layout;
@@ -20,7 +19,7 @@ const menuItems = [
   { label: "หน้าแรก", path: "/" },
   { label: "ทันตแพทย์ของเรา", path: "/dentists" },
   { label: "บริการ", path: "/services" },
-  { label: "จองคิว", path: "/booking" },
+  { label: "จองคิว", path: "/allbooking" },
   { label: "ติดต่อเรา", path: "/contact" },
 ];
 
@@ -59,6 +58,9 @@ const HomePage: React.FC = () => {
           <Menu.Item key="home">
             <a href="#home">หน้าแรก</a>
           </Menu.Item>
+          {/* <Menu.Item key="Promo">
+            <a href="#Promo">หน้าแรก</a>
+          </Menu.Item> */}
           <Menu.Item key="dentists">
             <a href="#dentists">ทันตแพทย์ของเรา</a>
           </Menu.Item>
@@ -68,16 +70,16 @@ const HomePage: React.FC = () => {
           <Menu.Item key="contact">
             <a href="#contact">ติดต่อเรา</a>
           </Menu.Item>
-          <Menu.Item key="booking">
-            <Link to="booking">จองคิว</Link>
+          <Menu.Item key="allbooking">
+            <Link to="allbooking">จองคิว</Link>
           </Menu.Item>
         </Menu>
 
         {/* Sign In */}
         <div style={{ color: "#722ED1", fontWeight: 600, cursor: "pointer" }}>
           <Link to="/auth/login" style={{ width: '100%' }}>
-          <UserOutlined style={{ marginRight: 6 }} />
-          ลงชื่อเข้าใช้
+            <UserOutlined style={{ marginRight: 6 }} />
+            ลงชื่อเข้าใช้
           </Link>
         </div>
       </Header>
@@ -91,30 +93,10 @@ const HomePage: React.FC = () => {
         }}
       >
         <SlideInTop>
-          <Row justify="center">
-            <Col xs={24} md={20} lg={18}>
-              <Card
-                bordered={false}
-                style={{
-                  borderRadius: 24,
-                  padding: 24,
-                  backgroundColor: "#fff",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                }}
-              >
-                <Row gutter={24}>
-                  <Col xs={24} md={12}>
-                    <ClinicPromo />
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <PhotoPromo />
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-          </Row>
+          <div id="home" style={{ marginTop: "0px" }}>
+          <PromoPage />
+        </div>
         </SlideInTop>
-
         <div id="dentists" style={{ marginTop: "80px" }}>
           <OurDentistsPage />
         </div>
@@ -127,7 +109,6 @@ const HomePage: React.FC = () => {
         <div id="contact" style={{ marginTop: "80px" }}>
           <ContactPage />
         </div>
-        
 
       </Content>
     </Layout>
