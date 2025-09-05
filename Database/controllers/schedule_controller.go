@@ -39,6 +39,8 @@ type timeSlotResp struct {
 	Time    string      `json:"time"`
 	Patient interface{} `json:"patient"` // nil หรือ { id,name,type,caseCode,note,durationMin }
 }
+
+
 type roomResp struct {
 	RoomID         string        `json:"roomId"`
 	RoomName       string        `json:"roomName"`

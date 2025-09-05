@@ -35,8 +35,28 @@ func main() {
 		router.GET("/schedule", controllers.GetSchedule)
 		router.POST("/schedule/assign", controllers.AssignSchedule)
 
-		// 🔧 FIX: อย่าเขียน /api ซ้ำ
-		router.GET("/patients", controllers.GetPatients)
+		//DentisMenagement
+		router.GET("/dentistmanagement", controllers.GetAllDentistMenagement)
+		router.GET("/dentistmanagement/:id", controllers.GetDentistMenagementByID)
+		router.POST("/dentistmanagement", controllers.CreateDentistMenagement)
+		router.PUT("/dentistmanagement/:id", controllers.UpdateDentistMenagement)
+		router.DELETE("/dentistmanagement/:id", controllers.DeleteDentistMenagement)
+
+		// Service 
+		router.GET("/services", controllers.ListServices)
+		router.POST("/services", controllers.CreateService)
+		router.PUT("/services/:id", controllers.UpdateService)
+		router.DELETE("/services/:id", controllers.DeleteService)
+
+		// Category 
+		router.GET("/categories", controllers.ListCategories)
+		router.POST("/categories", controllers.CreateCategory)
+
+		// Promotion 
+		router.GET("/promotions", controllers.ListPromotions)
+		router.POST("/promotions", controllers.CreatePromotion)
+		router.PUT("/promotions/:id", controllers.UpdatePromotion)
+		router.DELETE("/promotions/:id", controllers.DeletePromotion)
 
 	}
 
@@ -62,13 +82,7 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
-
-
-
-
-
-
-//ฟอร์ด
+// ฟอร์ด
 // -----------------------------------------------------------
 // AutoMigrate
 // -----------------------------------------------------------

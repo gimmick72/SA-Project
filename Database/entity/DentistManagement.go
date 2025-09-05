@@ -11,4 +11,5 @@ type DentistMenagement struct {
 	Date time.Time
 	Timein time.Time
 	TimeOut time.Time
+	Dentis string
 }

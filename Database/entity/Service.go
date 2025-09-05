@@ -10,23 +10,29 @@ type Service struct{
 	NameService string
 	DetailService string
 	Cost float32
+
+	CategoryID uint
+	Category Category
 }
+
+type Category struct{
+	gorm.Model
+	NameCategory string
+}
+
+
 
 type Promotion struct{
 	gorm.Model
-	PromotionDetail string
-}
-
-// รวมservive และ promotion
-type ServicePromotion struct{
-	gorm.Model
+	NamePromotion string
 
 	ServiceID uint
 	Service Service
 
-	PromotionID uint
-	Promotion Promotion
+	PromotionDetail string
+	Cost int
+	
+	DateStart time.Time
+	DateEnd time.Time
 
-	StartDate time.Time
-	EndDate time.Time
 }
