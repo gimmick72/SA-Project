@@ -4,8 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Button, Typography, Spin, Row, Col, Form, Input, Select, DatePicker, message, Popconfirm, Space } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { StaffController } from '../../services/https/Staff';
-import type { Staff } from '../../interface/types';
+import { StaffController } from '../../services/https/StaffAPI';
+import type { Staff } from '../../interface/Staff';
 const { Title } = Typography;
 const { Option } = Select;
 
@@ -108,7 +108,6 @@ const StaffDetails: React.FC = () => {
     }
   };
 
-
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -116,7 +115,6 @@ const StaffDetails: React.FC = () => {
       </div>
     );
   }
-
 
   if (!staff) {
     return (

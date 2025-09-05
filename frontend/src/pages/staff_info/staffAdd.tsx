@@ -1,7 +1,7 @@
 // src/pages/staff_info/staffAdd.tsx
 import React from 'react';
 import { Form, Input, Select, DatePicker, Row, Col, Button, message, InputNumber, Space } from 'antd';
-import type { NewStaffData } from '../../interface/types';
+import type { NewStaffData } from '../../interface/Staff';
 
 const { Option } = Select;
 

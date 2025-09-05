@@ -4,8 +4,8 @@ import { Card, Input, Button, Row, Col, Typography, message, Drawer, Spin } from
 import { SearchOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AddStaffForm from './staffAdd';
-import { StaffController } from '../../services/https/Staff';
-import type{  NewStaffData, Staff } from '../../interface/types';
+import { StaffController } from '../../services/https/StaffAPI';
+import type{  NewStaffData, Staff } from '../../interface/Staff';
 const { Title } = Typography;
 
 
