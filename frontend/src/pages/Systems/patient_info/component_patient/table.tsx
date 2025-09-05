@@ -71,12 +71,17 @@ const PatienTable: React.FC = () => {
         <Space>
           {/* เพิ่มข้อมูลย่อยของคนไข้รายนี้ */}
           <Button
+            style={{
+              backgroundColor: "#B9F6FF",
+              color: "black",
+              border: "gray solid 1px",
+              borderRadius: "10px"
+            }}
             size="small"
             type="primary"
-            icon={<PlusOutlined />}
             onClick={() => navigate(`initial-symptoms/${record.id}`)} 
           >
-            เพิ่ม
+            บันทึกบริการ
           </Button>
 
           {/* ไปหน้าแก้ไข/รายละเอียด */}
@@ -105,15 +110,17 @@ const PatienTable: React.FC = () => {
 
   return (
     <>
+
       {contextHolder}
       <Table
         loading={loading}
         columns={columns}
         dataSource={data}
         rowKey="id"                              
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 5 }}
         
       />
+   
     </>
   );
 };

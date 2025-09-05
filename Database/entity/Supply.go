@@ -20,11 +20,11 @@ type Supply struct {
 
 }
 
-type RecordSupply struct {
-    gorm.Model
-    DateRecord time.Time
+// type RecordSupply struct {
+//     gorm.Model
+//     DateRecord time.Time
 
-    SupplyID uint
-    Supply   Supply `gorm:"foreignKey:SupplyID"`
-}
+//     SupplyID uint
+//     Supply   Supply `gorm:"foreignKey:SupplyID"`
+// }
 
