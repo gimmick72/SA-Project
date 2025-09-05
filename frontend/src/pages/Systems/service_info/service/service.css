@@ -1,0 +1,39 @@
+/*select_category*/
+.select_category {
+    width: 200px;
+    height: 25px;
+}
+
+/* table */
+.table-container {
+    width: 1200px;
+    height: 470px;
+    margin: 0;
+    border: solid 1px #b8b8b8ff;
+    border-Radius: 8px;
+    margin-Bottom: 30px;
+    overflow: 'auto';
+}
+
+.item-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+}
+
+.item-table th,
+.item-table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f5f2f9;
+}

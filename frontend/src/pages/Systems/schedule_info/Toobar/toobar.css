@@ -1,0 +1,19 @@
+/* even color */
+.rbc-event {
+  background-color: #ff7875;
+  border-radius: 8px;
+  padding: 2px 4px;
+  font-size: 0.85rem;
+}
+
+/*toobar */
+/* ซ้าย: ปุ่มย้อน/ถัดไป */
+.bottonday button{
+  background-color: #ffffff;
+  border: solid 2px #CBC6FF;
+  border-radius: 15px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
