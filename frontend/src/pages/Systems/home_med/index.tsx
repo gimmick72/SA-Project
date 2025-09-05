@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import {
-  Card, Row, Col, Table, Typography, Button, Space, Input, Tag, Empty,
+  Card, Row, Col, Table, Typography, Button, Input, Tag, Empty, Pagination, // ⬅️ เพิ่ม Pagination
 } from "antd";
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 type QItem = {
   id: number; firstName: string; lastName: string;
@@ -32,6 +32,12 @@ const HomeMed: React.FC = () => {
   const [search, setSearch] = useState("");
   const [activeId, setActiveId] = useState<number | null>(QUEUE[0]?.id ?? null);
 
+  // จัดการหน้าเอง เพื่อแสดง Pagination ภายนอกและตรึงขวาล่าง
+  const [pagination, setPagination] = useState<{ current: number; pageSize: number }>({
+    current: 1,
+    pageSize: 7,
+  });
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return QUEUE;
@@ -40,13 +46,25 @@ const HomeMed: React.FC = () => {
     );
   }, [search]);
 
+  // ตัดหน้าเอง (slice) สำหรับ Table
+  const paged = useMemo(() => {
+    const start = (pagination.current - 1) * pagination.pageSize;
+    return filtered.slice(start, start + pagination.pageSize);
+  }, [filtered, pagination]);
+
   const active = useMemo(
     () => filtered.find((x) => x.id === activeId) ?? filtered[0] ?? null,
     [filtered, activeId]
   );
 
   const columns = [
-    { title: "No.", width: 70, align: "center" as const, render: (_: any, __: any, i: number) => i + 1 },
+    {
+      title: "No.",
+      width: 70,
+      align: "center" as const,
+      render: (_: any, __: any, i: number) =>
+        (pagination.current - 1) * pagination.pageSize + (i + 1), // ⬅️ เลขคิวต่อเนื่องข้ามหน้า
+    },
     {
       title: "ชื่อ",
       dataIndex: "firstName",
@@ -70,7 +88,14 @@ const HomeMed: React.FC = () => {
 
   return (
     <div className="container" style={{ padding: 16 }}>
-      <Card bodyStyle={{ padding: 20 }} style={{ borderRadius: 20, boxShadow: "0 1px 6px rgba(0,0,0,0.08)" }}>
+      <Card
+        bodyStyle={{ padding: 20 }}
+        style={{
+          borderRadius: 20,
+          boxShadow: "0 1px 6px rgba(0,0,0,0.08)",
+          backgroundColor: "#FFF",
+        }}
+      >
         <Row gutter={[24, 24]} align="top">
           {/* ซ้าย: รายการ + ค้นหา */}
           <Col xs={24} md={10}>
@@ -82,24 +107,57 @@ const HomeMed: React.FC = () => {
                   <Input.Search
                     placeholder="ค้นหาชื่อ/บริการ/ห้อง"
                     allowClear
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setPagination((p) => ({ ...p, current: 1 })); // ⬅️ ค้นหาใหม่กลับหน้า 1
+                    }}
                     style={{ width: 220 }}
                     size="middle"
                   />
                 </div>
               }
               style={{ borderRadius: 16, border: "1px solid #e6e6e6" }}
-              bodyStyle={{ padding: 0 }}
+              bodyStyle={{
+                padding: 0,
+                height: "calc(100vh - 250px)",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+              }}
             >
-              <Table<QItem>
-                rowKey="id"
-                columns={columns}
-                dataSource={filtered}
-                pagination={{ pageSize: 7, showSizeChanger: false }}
-                onRow={(rec) => ({ onClick: () => setActiveId(rec.id) })}
-                rowClassName={(rec) => (rec.id === active?.id ? "active-row" : "")}
-                size="middle"
-              />
+              {/* พื้นที่ตาราง (กันทับด้วย paddingBottom) */}
+              <div style={{ paddingBottom: 10 }}>
+                <Table<QItem>
+                  rowKey="id"
+                  columns={columns}
+                  dataSource={paged}
+                  pagination={false}                           // ⬅️ ปิด pagination ใน Table
+                  scroll={{ y: "calc(100vh - 360px - 10px)" }} // ⬅️ เว้นที่ให้ footer 56px
+                  onRow={(rec) => ({ onClick: () => setActiveId(rec.id) })}
+                  rowClassName={(rec) => (rec.id === active?.id ? "active-row" : "")}
+                  size="middle"
+                />
+              </div>
+
+              {/* Pagination ตรึงขวาล่างตลอด */}
+              <div
+                style={{
+                  position: "absolute",
+                  right: 16,
+                  bottom: 12,
+                  background: "rgba(255,255,255,0.9)",
+                  borderRadius: 8,
+                  padding: "4px 8px",
+                }}
+              >
+                <Pagination
+                  current={pagination.current}
+                  pageSize={pagination.pageSize}
+                  total={filtered.length}
+                  showSizeChanger={false}
+                  onChange={(page, pageSize) => setPagination({ current: page, pageSize })}
+                />
+              </div>
             </Card>
           </Col>
 
@@ -109,7 +167,8 @@ const HomeMed: React.FC = () => {
               {active ? (
                 <>
                   <Paragraph style={{ marginBottom: 8 }}>
-                    <Text strong>คิวที่:</Text> {filtered.findIndex((x) => x.id === active.id) + 1}
+                    <Text strong>คิวที่:</Text>{" "}
+                    {filtered.findIndex((x) => x.id === active.id) + 1}
                   </Paragraph>
                   <Paragraph style={{ marginBottom: 6 }}>
                     <Text strong>เวลา:</Text> {active.timeStart} น. ถึง {active.timeEnd} น.
@@ -118,7 +177,8 @@ const HomeMed: React.FC = () => {
                     <Text strong>ชื่อ:</Text> {active.firstName} {active.lastName}
                   </Paragraph>
                   <Paragraph style={{ marginBottom: 6 }}>
-                    <Text strong>ทันตกรรม:</Text> <Tag color={serviceColor(active.service)}>{active.service}</Tag>
+                    <Text strong>ทันตกรรม:</Text>{" "}
+                    <Tag color={serviceColor(active.service)}>{active.service}</Tag>
                   </Paragraph>
                   <Paragraph style={{ marginBottom: 0 }}>
                     <Text strong>ห้อง:</Text> {active.room}
@@ -129,14 +189,11 @@ const HomeMed: React.FC = () => {
               )}
             </Card>
 
-            {/* ปุ่ม 2 หลัก 3 แถว ขนาดเท่ากัน */}
             <div className="action-grid">
               <Button className="action-btn" onClick={() => console.log("เวชระเบียน:", active)}>เวชระเบียน</Button>
               <Button className="action-btn" onClick={() => console.log("ประวัติเบื้องต้น:", active)}>ประวัติเบื้องต้น</Button>
-
               <Button className="action-btn" onClick={() => console.log("การรักษา:", active)}>การรักษา</Button>
               <Button className="action-btn" onClick={() => console.log("เวชภัณฑ์:", active)}>เวชภัณฑ์</Button>
-
               <Button className="action-btn" type="primary" onClick={() => console.log("สำเร็จ:", active)}>สำเร็จ</Button>
               <Button className="action-btn" danger onClick={() => console.log("ยกเลิก:", active)}>ยกเลิก</Button>
             </div>
@@ -144,19 +201,10 @@ const HomeMed: React.FC = () => {
         </Row>
       </Card>
 
-      {/* สไตล์เพิ่มเติม */}
       <style>{`
-        .active-row td { background: #f9f0ff !important; }  /* โทนม่วงอ่อน */
-        .action-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-        }
-        .action-btn {
-          width: 100%;
-          height: 40px;           /* ขนาดพอดี เท่ากันทุกปุ่ม */
-          font-size: 14px;
-        }
+        .active-row td { background: #f9f0ff !important; }
+        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .action-btn { width: 100%; height: 40px; font-size: 14px; }
       `}</style>
     </div>
   );
