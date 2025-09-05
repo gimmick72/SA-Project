@@ -2,6 +2,11 @@
 .select_category {
     width: 200px;
     height: 25px;
+    cursor: pointer;
+}
+
+.option_category{
+    cursor: pointer;
 }
 
 /* table */
@@ -37,3 +42,20 @@
     z-index: 2;
     background: #f5f2f9;
 }
+
+
+.add_Button {
+    background-color: #9288ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.add_Button:hover {
+    background-color: #6f63e8 !important;
+}
+

@@ -88,7 +88,7 @@ const Service = () => {
 
     //  ลบข้อมูล
     const [isCardVisible, setIsCardVisible] = useState(false);
-    const [itemIdToDelete, setItemIdToDelete] = useState(null);
+    const [itemIdToDelete, setItemIdToDelete] = useState<null | Number>(null);
 
     const handleDelete = (id: number) => {
         setItems(prev => prev.filter(item => item.id !== id));
@@ -112,8 +112,6 @@ const Service = () => {
         setIsCardVisible(false);
         setItemIdToDelete(null);
     };
-
-
 
     // แก้ไขข้อมูล
     const handleEdit = (index: number) => setEditIndex(index);
@@ -199,7 +197,8 @@ const Service = () => {
 
                 {/* ปุ่มเพิ่มรายการ */}
                 <div >
-                    <Button type="primary" onClick={() => openModal('add', null)}>+ เพิ่มบริการ</Button>
+                    <Button className="add_Button"
+                        type="primary" onClick={() => openModal('add', null)}>+ เพิ่มบริการ</Button>
                 </div>
             </div>
 
@@ -240,67 +239,59 @@ const Service = () => {
                                     <Button onClick={() => openModal('view', index)}>ดูรายละเอียด</Button>
                                 </td>
 
-                                <td className="edit" >
+                                <td style={{ textAlign: "center", verticalAlign: "middle" }}>
 
-                                    {/* <Button danger onClick={() => confirmDelete(item.id)}>
-                                        ลบ
-                                    </Button> */}
-                                    {/* <Modal
-                                        title="ยืนยันการลบ"
-                                        open={isModalVisible}
-                                        onOk={handleOk}
-                                        onCancel={handleCancel}          
-                                        okText="ยืนยัน"
-                                        cancelText="ยกเลิก"
-                                        maskStyle={{ backgroundColor: 'rgba(0, 0, 0,0)' }}
-                                    >
-                                        <p>คุณต้องการลบรายการนี้ใช่หรือไม่?</p>
-                                    </Modal> */}
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <Button danger onClick={() => confirmDelete(item.id)}><DeleteOutlined /> ลบ </Button>
 
-                                    <Button danger onClick={() => confirmDelete(item.id)}> <DeleteOutlined /> ลบ </Button>
+                                        {editIndex === index ? (
+                                            <Button style={{ marginLeft: "10px" }}
+                                                onClick={handleSave}>บันทึก</Button>
+                                        ) : (
+                                            <Button style={{ marginLeft: "10px" }}
+                                                onClick={() => handleEdit(index)}>แก้ไข</Button>
+                                        )}
+                                    </div>
 
-                                    {
-                                        isCardVisible && (
+                                    {isCardVisible && (
+                                        <div
+                                            style={{
+                                                position: "fixed",
+                                                top: 0,
+                                                left: 0,
+                                                width: "100%",
+                                                height: "100%",
+                                                backgroundColor: "rgba(0,0,0,0)", // overlay
+                                                zIndex: 999,
+                                                pointerEvents: "auto", // ปิดการคลิก background ไม่ได้
+                                            }}
+                                        >
                                             <Card
                                                 title="ยืนยันการลบ"
                                                 style={{
-                                                    width: 300,
-                                                    position: 'absolute',
-                                                    top: '50%',
-                                                    left: '50%',
-                                                    transform: 'translate(-50%, -50%)',
+                                                    width: 450,
+                                                    position: "absolute",
+                                                    top: "40%",
+                                                    left: "55%",
+                                                    transform: "translate(-50%, -50%)",
                                                     zIndex: 1000,
-                                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                                    border: "2px solid #CBC6FF",
+                                                    pointerEvents: "auto", // ทำให้ card สามารถคลิกได้
                                                 }}
                                                 actions={[
-                                                    <Button key="cancel"
-                                                        onClick={handleCancel}
-                                                        style={{ width: 120 }}
-                                                        >
-                                                            
+                                                    <Button key="cancel" onClick={handleCancel} style={{ width: 120 }}>
                                                         ยกเลิก
                                                     </Button>,
-
-                                                    <Button key="ok"
-                                                        type="primary"
-                                                        danger onClick={handleOk}>
+                                                    <Button key="ok" type="primary" danger onClick={handleOk} style={{ width: 120 }}>
                                                         ยืนยัน
                                                     </Button>,
                                                 ]}
                                             >
                                                 <p>คุณต้องการลบรายการนี้ใช่หรือไม่?</p>
                                             </Card>
-                                        )}
-
-
-
-                                    {editIndex === index ? (
-                                        <Button style={{ marginLeft: "10px" }}
-                                            onClick={handleSave}>บันทึก</Button>
-                                    ) : (
-                                        <Button style={{ marginLeft: "10px" }}
-                                            onClick={() => handleEdit(index)}>แก้ไข</Button>
+                                        </div>
                                     )}
+
                                 </td>
                             </tr>
                         ))}
@@ -313,7 +304,7 @@ const Service = () => {
                 title={modal.type === 'add' ? 'เพิ่มบริการใหม่' : 'ดูรายละเอียด'}
                 onOk={() => {
                     if (modal.type === 'add') {
-                        handleAddItem();   // ✅ ดึงค่าจาก newItem โดยตรง
+                        handleAddItem();   // ดึงค่าจาก newItem โดยตรง
                     } else {
                         handleModalSave();
                     }
@@ -350,7 +341,7 @@ const Service = () => {
                         <Input.TextArea
                             rows={4}
                             placeholder="รายละเอียด"
-                            value={newItem.detail}   // ✅ ใช้ newItem.detail
+                            value={newItem.detail}   // ใช้ newItem.detail
                             onChange={e => handleChange('detail', e.target.value)}
                         />
                     </div>
