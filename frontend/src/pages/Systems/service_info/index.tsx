@@ -1,5 +1,4 @@
 import React from "react";
-import FullLayout from '../../../layout/FullLayout';
 import SwitchPage from "./SwitchPage/switchpage";
 
 const ServiceInfoPage = () => {
@@ -9,4 +8,5 @@ const ServiceInfoPage = () => {
     </div>
   );
 };
+
 export default ServiceInfoPage;

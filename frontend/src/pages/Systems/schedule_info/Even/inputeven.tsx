@@ -37,6 +37,14 @@ const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel, selectedDate
   //option of room
   const rooms = ["x001", "x002", "x003", "004"];
 
+  // default timein  - timeout
+  const defaultTimeIn = dayjs('09:00', 'HH:mm');
+
+  const defaultTimeOut = dayjs('17:00', 'HH:MM');
+
+
+
+
   return (
     <Modal
       title="เพิ่มกิจกรรม"
@@ -71,6 +79,7 @@ const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel, selectedDate
               allowClear
               style={{ width: '100%' }}
               inputReadOnly
+              defaultOpenValue={defaultTimeIn}
             />
           </Form.Item>
 
@@ -83,6 +92,7 @@ const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel, selectedDate
               allowClear
               style={{ width: '100%' }}
               inputReadOnly
+              defaultOpenValue={defaultTimeOut}
             />
           </Form.Item>
 

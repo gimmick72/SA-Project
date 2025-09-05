@@ -8,3 +8,26 @@
     align-items: center !important;
     font-weight: normal !important;
 }
+
+.rbc-day-bg {
+     background-color: #ffffff;
+}
+
+.rbc-day-bg:hover{
+    background-color: #dedede;
+}
+
+
+
+/* even color */
+.rbc-event {
+    background-color: #ff7875;
+    border-radius: 8px;
+    padding: 2px 4px;
+    font-size: 0.85rem;
+}
+
+.rbc-event:hover {
+    background-color: #e8413e;
+
+}
