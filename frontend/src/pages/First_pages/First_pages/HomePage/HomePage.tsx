@@ -12,7 +12,7 @@ import ServicesPage from "../Services/ServicesPage";
 import ContactPage from "../ContactUs/ContactUs";
 import PriceGuidePage from "../PriceGuide/PriceGuidePage";
 import SlideInTop from "../../Motion/SlideInTop";
-import BookingPage from "../Booking";
+import Booking from "../Booking/Booking";
 
 
 const { Header, Content } = Layout;
@@ -126,7 +126,6 @@ const HomePage: React.FC = () => {
         <div id="contact" style={{ marginTop: "80px" }}>
           <ContactPage />
         </div>
-        
 
       </Content>
     </Layout>

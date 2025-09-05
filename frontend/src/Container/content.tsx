@@ -18,7 +18,7 @@ const ContentLayout: React.FC<ContentLayoutProps> = ({ children }) => {
         style={{
           padding: 24,
           height: "100%",
-          background: "#FFFFFF",
+          background: "#ffffff",
           borderRadius: 20,
           border: "0.5px solid #000000",
           display: "block", 

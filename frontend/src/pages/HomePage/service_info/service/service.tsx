@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import './service.css';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input, Button, Popconfirm, Card } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
 
 interface Item {
@@ -75,6 +76,7 @@ const Service = () => {
         }
     };
 
+    // เพิ่มข้อมูล
     const handleAddItem = () => {
         if (!newItem.name || isNaN(newItem.price) || !newItem.category) return;
         setItems([...items, {
@@ -84,12 +86,38 @@ const Service = () => {
         setNewItem({ name: '', price: 0, detail: '', category: '' });
     };
 
+    //  ลบข้อมูล
+    const [isCardVisible, setIsCardVisible] = useState(false);
+    const [itemIdToDelete, setItemIdToDelete] = useState(null);
+
     const handleDelete = (id: number) => {
         setItems(prev => prev.filter(item => item.id !== id));
+        setIsCardVisible(false);
+    };
+
+    // ยืนยันการลบ
+    const confirmDelete = (id: number) => {
+        setItemIdToDelete(id);
+        setIsCardVisible(true);
+    };
+    const handleOk = () => {
+        // Filter out the item with the stored ID
+        setItems(prev => prev.filter(item => item.id !== itemIdToDelete));
+
+        // Clean up state
+        setIsCardVisible(false);
+        setItemIdToDelete(null);
+    };
+    const handleCancel = () => {
+        setIsCardVisible(false);
+        setItemIdToDelete(null);
     };
 
 
+
+    // แก้ไขข้อมูล
     const handleEdit = (index: number) => setEditIndex(index);
+
     const handleSave = () => setEditIndex(null);
 
     const openModal = (type: 'add' | 'view', index: number | null) => {
@@ -105,6 +133,7 @@ const Service = () => {
         }
     };
 
+    //บันทึกบริการ
     const handleModalSave = () => {
         if (modal.type === 'add') {
             setNewItem(prev => ({ ...prev, detail: modal.detail }));
@@ -115,6 +144,7 @@ const Service = () => {
         }
         setModal({ visible: false, type: null, detail: '', itemIndex: null });
     };
+
 
     return (
 
@@ -209,8 +239,61 @@ const Service = () => {
                                 <td>
                                     <Button onClick={() => openModal('view', index)}>ดูรายละเอียด</Button>
                                 </td>
+
                                 <td className="edit" >
-                                    <Button danger onClick={() => handleDelete(item.id)}>ลบ</Button>
+
+                                    {/* <Button danger onClick={() => confirmDelete(item.id)}>
+                                        ลบ
+                                    </Button> */}
+                                    {/* <Modal
+                                        title="ยืนยันการลบ"
+                                        open={isModalVisible}
+                                        onOk={handleOk}
+                                        onCancel={handleCancel}          
+                                        okText="ยืนยัน"
+                                        cancelText="ยกเลิก"
+                                        maskStyle={{ backgroundColor: 'rgba(0, 0, 0,0)' }}
+                                    >
+                                        <p>คุณต้องการลบรายการนี้ใช่หรือไม่?</p>
+                                    </Modal> */}
+
+                                    <Button danger onClick={() => confirmDelete(item.id)}> <DeleteOutlined /> ลบ </Button>
+
+                                    {
+                                        isCardVisible && (
+                                            <Card
+                                                title="ยืนยันการลบ"
+                                                style={{
+                                                    width: 300,
+                                                    position: 'absolute',
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    transform: 'translate(-50%, -50%)',
+                                                    zIndex: 1000,
+                                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                                                }}
+                                                actions={[
+                                                    <Button key="cancel"
+                                                        onClick={handleCancel}
+                                                        style={{ width: 120 }}
+                                                        >
+                                                            
+                                                        ยกเลิก
+                                                    </Button>,
+
+                                                    <Button key="ok"
+                                                        type="primary"
+                                                        danger onClick={handleOk}>
+                                                        ยืนยัน
+                                                    </Button>,
+                                                ]}
+                                            >
+                                                <p>คุณต้องการลบรายการนี้ใช่หรือไม่?</p>
+                                            </Card>
+                                        )}
+
+
+
                                     {editIndex === index ? (
                                         <Button style={{ marginLeft: "10px" }}
                                             onClick={handleSave}>บันทึก</Button>

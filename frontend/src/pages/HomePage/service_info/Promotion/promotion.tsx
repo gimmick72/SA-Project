@@ -194,7 +194,7 @@ const Promotion = () => {
                     allowClear
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    style={{ width: 350, marginRight: 16 }}
+                    style={{ width: 300, marginRight: 16 }}
                 />
                 <Button type="primary" onClick={() => openModal('add', null)}>+ เพิ่มโปรโมชัน</Button>
             </div>
