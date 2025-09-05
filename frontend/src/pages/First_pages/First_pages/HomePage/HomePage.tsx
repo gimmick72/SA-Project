@@ -128,6 +128,9 @@ const HomePage: React.FC = () => {
         <div id="contact" style={{ marginTop: "80px" }}>
           <ContactPage />
         </div>
+        <div id="booking" style={{ marginTop: "80px" }}>
+          <BookingPage />
+        </div>
         
 
       </Content>
