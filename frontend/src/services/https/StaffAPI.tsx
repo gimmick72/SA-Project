@@ -3,6 +3,34 @@ import axios from 'axios';
 const API_BASE = 'http://localhost:8080';
 import type { Department, NewStaffData, PersonalData, Staff } from '../../interface/Staff';
 
+const mapToPersonalData = (values: any): PersonalData => {
+  const addr = values.address?.split(',').map((x: string) => x.trim()) || [];
+  return {
+    Title: values.title,
+    FirstName: values.firstName,
+    LastName: values.lastName,
+    Gender: values.gender,
+    Email: values.email,
+    Age: Number(values.age) || 0,
+    EmpNationalID: values.idCard,
+    Tel: values.phone,
+    HouseNumber: addr[0] || values.HouseNumber || '',
+    Subdistrict: addr[1] || values.Subdistrict || '',
+    District: addr[2] || values.District || '',
+    VillageNumber: addr[3] || values.VillageNumber || '',
+  };
+};
+
+const mapToDepartment = (values: any, staff?: Staff): Department => ({
+  ID: staff?.Department?.ID || 0,
+  PersonalDataID: staff?.Employee_ID || 0,
+  Position: values.position,
+  EmpType: values.employeeType,
+  License: values.licenseNumber || '',
+  Specialization: values.Specialization || '',
+  CompRate: Number(values.CompRate) || 0,
+  StartDate: values.startDate ? values.startDate.toISOString() : new Date().toISOString(),
+});
 
 export const StaffController = {
   getAllStaff: async (): Promise<Staff[]> => {
@@ -55,78 +83,21 @@ export const StaffController = {
     };
   },
   updateStaff: async (id: number, values: any, staff: Staff): Promise<Staff> => {
-    // แยก address
-    const addressParts = values.address
-      ? values.address.split(',').map((part: string) => part.trim())
-      : [];
-
-    // เตรียม personalData
-    const personalData: PersonalData = {
-      Title: values.title,
-      FirstName: values.firstName,
-      LastName: values.lastName,
-      Gender: values.gender,
-      Email: values.email,
-      Age: Number(values.age),
-      EmpNationalID: values.idCard,
-      Tel: values.phone,
-      HouseNumber: addressParts[0] || "",
-      Subdistrict: addressParts[1] || "",
-      District: addressParts[2] || "",
-      VillageNumber: addressParts[3] || "",
+    const payload = {
+      personalData: mapToPersonalData(values),
+      department: mapToDepartment(values, staff),
     };
-
-    // เตรียม department
-    const department: Department = {
-      Position: values.position,
-      EmpType: values.employeeType,
-      StartDate: values.startDate ? values.startDate.toISOString() : null,
-      License: values.licenseNumber,
-      Specialization: values.Specialization,
-      CompRate: Number(values.CompRate),
-      PersonalDataID: staff.Employee_ID,
-      ID: staff.Department?.ID || 0,
-    };
-
-    // เรียก API อัปเดต
-    const payload = { personalData, department };
-    const response = await axios.put<Staff>(`${API_BASE}/staff/${id}`, payload);
-    return response.data;
+    const { data } = await axios.put<Staff>(`${API_BASE}/staff/${id}`, payload);
+    return data;
   },
-  // Staff.tsx
   addStaff: async (newStaff: NewStaffData): Promise<Staff> => {
-    const personalData: PersonalData = {
-      Title: newStaff.title,
-      FirstName: newStaff.firstName,
-      LastName: newStaff.lastName,
-      Gender: newStaff.gender,
-      Email: newStaff.email,
-      Age: Number(newStaff.age) || 0,
-      EmpNationalID: newStaff.idCard,
-      Tel: newStaff.phone,
-      HouseNumber: newStaff.HouseNumber || newStaff.address || '',
-      Subdistrict: newStaff.Subdistrict || '',
-      District: newStaff.District || '',
-      VillageNumber: newStaff.VillageNumber || '',
+    const payload = {
+      personalData: mapToPersonalData(newStaff),
+      department: mapToDepartment(newStaff),
     };
-
-    const department: Department = {
-      Position: newStaff.position,
-      EmpType: newStaff.employeeType,
-      License: newStaff.licenseNumber || '',
-      CompRate: Number(newStaff.CompRate) || 0,
-      Specialization: newStaff.Specialization || '',
-      StartDate: newStaff.startDate
-        ? newStaff.startDate.toISOString()
-        : new Date().toISOString(),
-      PersonalDataID: 0,
-    };
-
-    const payload = { personalData, department };
-    const response = await axios.post<Staff>(`${API_BASE}/staff`, payload);
-    return response.data;
+    const { data } = await axios.post<Staff>(`${API_BASE}/staff`, payload);
+    return data;
   },
-
   deleteStaff: async (id: number): Promise<void> => {
     await axios.delete(`${API_BASE}/staff/${id}`);
   },

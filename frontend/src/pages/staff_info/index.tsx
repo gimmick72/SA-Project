@@ -5,7 +5,7 @@ import { SearchOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AddStaffForm from './staffAdd';
 import { StaffController } from '../../services/https/StaffAPI';
-import type{  NewStaffData, Staff } from '../../interface/Staff';
+import type { NewStaffData, Staff } from '../../interface/Staff';
 const { Title } = Typography;
 
 
@@ -78,21 +78,25 @@ const StaffInfoPaeg: React.FC = () => {
     applySearchFilter();
   }, [searchText, staffData]);
 
-const handleAddFormSubmit = async (newStaff: NewStaffData) => {
-  try {
-    setLoading(true);
-    const added = await StaffController.addStaff(newStaff);  // ← เรียก service
-    setStaffData(prev => [...prev, added]);
-    setFilteredStaff(prev => [...prev, added]);
-    message.success('เพิ่มข้อมูลบุคลากรใหม่เรียบร้อย!');
-    setIsAddDrawerVisible(false);
-  } catch (err) {
-    console.error(err);
-    message.error('เกิดข้อผิดพลาดในการเพิ่มบุคลากร');
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleAddFormSubmit = async (newStaff: NewStaffData) => {
+    try {
+      setLoading(true);
+      await StaffController.addStaff(newStaff);  // เรียก service เพิ่มข้อมูล
+
+      // โหลดข้อมูลล่าสุดทั้งหมดจาก backend
+      const allStaff = await StaffController.getAllStaff();
+      setStaffData(allStaff);
+      setFilteredStaff(allStaff);
+
+      message.success('เพิ่มข้อมูลบุคลากรใหม่เรียบร้อย!');
+      setIsAddDrawerVisible(false);
+    } catch (err) {
+      console.error(err);
+      message.error('เกิดข้อผิดพลาดในการเพิ่มบุคลากร');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddStaffClick = () => {
     setIsAddDrawerVisible(true);
@@ -162,17 +166,17 @@ const handleAddFormSubmit = async (newStaff: NewStaffData) => {
         overflowX: 'auto',
         whiteSpace: 'nowrap',
       }}>
-        <span style={{ flex: '1 0 100px' }}>รหัสพนักงาน</span>
-        <span style={{ flex: '1 0 100px' }}>ตำแหน่งงาน</span>
-        <span style={{ flex: '1 0 100px' }}>คำนำหน้าชื่อ</span>
-        <span style={{ flex: '2 0 150px' }}>ชื่อ</span>
+        <span style={{ flex: '1 0 100px' }}>รหัสพนักงาน</span>        
+        <span style={{ flex: '1 0 150px' }}>คำนำหน้าชื่อ</span>
+        <span style={{ flex: '2 0 100px' }}>ชื่อ</span>
         <span style={{ flex: '2 0 150px' }}>นามสกุล</span>
+        <span style={{ flex: '1 0 150px' }}>ตำแหน่งงาน</span>
         <span style={{ width: '30px', flexShrink: 0, visibility: 'hidden' }}></span>
       </div>
 
       <Card
         style={{
-          borderRadius: 10,
+          borderRadius: 0,
           boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
           flex: 1,
           display: 'flex',
@@ -196,9 +200,9 @@ const handleAddFormSubmit = async (newStaff: NewStaffData) => {
               <Spin size="large" tip="กำลังโหลดข้อมูลบุคลากร..." />
             </div>
           ) : filteredStaff.length > 0 ? (
-            filteredStaff.map((staff) => (
+            filteredStaff.map((staff, index) => (
               <div
-                key={staff.Employee_ID}
+                key={`${staff.Employee_ID ?? 'id'}-${index}`} // combine ID กับ index
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -211,11 +215,11 @@ const handleAddFormSubmit = async (newStaff: NewStaffData) => {
                 }}
                 onClick={() => navigate(`/staff/PersonalData/${staff.Employee_ID}`)}
               >
-                <span style={{ flex: '1 0 100px' }}>{formatEmployeeIdForDisplay(staff.Employee_ID)}</span>
-                <span style={{ flex: '1 0 100px' }}>{staff.position}</span>
-                <span style={{ flex: '1 0 100px' }}>{staff.title}</span>
+                <span style={{ flex: '1 0 100px' }}>{formatEmployeeIdForDisplay(staff.Employee_ID)}</span>                
+                <span style={{ flex: '1 0 150px' }}>{staff.title}</span>
                 <span style={{ flex: '2 0 150px' }}>{staff.firstName}</span>
                 <span style={{ flex: '2 0 150px' }}>{staff.lastName}</span>
+                <span style={{ flex: '1 0 150px' }}>{staff.position}</span>
                 <RightOutlined style={{ fontSize: '14px', color: '#ccc', flexShrink: 0, marginLeft: '10px' }} />
               </div>
             ))

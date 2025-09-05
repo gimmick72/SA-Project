@@ -195,19 +195,22 @@ const StaffDetails: React.FC = () => {
           // VIEW MODE
           <>
             <Descriptions bordered column={1}>
-              <Descriptions.Item label="รหัสพนักงาน">{String(staff.Employee_ID).padStart(2, '0')}</Descriptions.Item>
-              <Descriptions.Item label="ตำแหน่งงาน">{staff.position}</Descriptions.Item>
-              <Descriptions.Item label="ประเภทพนักงาน">{staff.employeeType}</Descriptions.Item>
+              <Descriptions.Item label="รหัสพนักงาน">{String(staff.Employee_ID).padStart(2, '0')}</Descriptions.Item> 
+
+              <Descriptions.Item label="เลขบัตรประชาชน">{staff.idCard}</Descriptions.Item>        
               <Descriptions.Item label="เพศ">{staff.gender}</Descriptions.Item>
               <Descriptions.Item label="อายุ">{staff.age}</Descriptions.Item>
-              <Descriptions.Item label="วันที่เริ่มงาน">{staff.startDate}</Descriptions.Item>
+              <Descriptions.Item label="ที่อยู่">                   {staff.address}                     </Descriptions.Item>
+              <Descriptions.Item label="อีเมล">{staff.email}</Descriptions.Item>              
               <Descriptions.Item label="เบอร์โทรศัพท์">{staff.phone}</Descriptions.Item>
-              <Descriptions.Item label="อีเมล">{staff.email}</Descriptions.Item>
-              <Descriptions.Item label="เลขบัตรประชาชน">{staff.idCard}</Descriptions.Item>
+
+              <Descriptions.Item label="วันที่เริ่มงาน">{staff.startDate}</Descriptions.Item>
+              <Descriptions.Item label="ตำแหน่งงาน">{staff.position}</Descriptions.Item>
+              <Descriptions.Item label="ประเภทพนักงาน">{staff.employeeType}</Descriptions.Item>
               <Descriptions.Item label="เงินเดือนสุทธิ">{staff.CompRate}</Descriptions.Item>
               <Descriptions.Item label="หมายเลขใบประกอบวิชาชีพ">   {staff.licenseNumber || "ไม่มี"}     </Descriptions.Item>
               <Descriptions.Item label="เฉพาะทางด้าน">            {staff.Specialization || "ไม่มี"}     </Descriptions.Item>
-              <Descriptions.Item label="ที่อยู่">                   {staff.address}                     </Descriptions.Item>
+              
             </Descriptions>
           </>
         ) : (
@@ -216,6 +219,7 @@ const StaffDetails: React.FC = () => {
             form={form}
             layout="vertical"
             onFinish={onFinish}
+            id="staffForm"// ✅ ตั้ง id ให้ฟอร์ม
           >
             {/* ... (Form.Items are the same as before) ... */}
             <Row gutter={24}>
@@ -250,7 +254,7 @@ const StaffDetails: React.FC = () => {
             <Row gutter={24}>
               <Col xs={24} sm={12} md={6}>
                 <Form.Item name="gender" label="เพศ" rules={[{ required: true, message: 'กรุณาเลือกเพศ' }]}>
-                  <Select placeholder="เพศ">
+                  <Select placeholder="เลือกเพศ">
                     <Option value="ชาย">ชาย</Option>
                     <Option value="หญิง">หญิง</Option>
                   </Select>
@@ -262,19 +266,50 @@ const StaffDetails: React.FC = () => {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12} md={6}>
-                <Form.Item name="idCard" label="เลขบัตรประชาชน" rules={[{ required: true, message: 'กรุณากรอกเลขบัตรประชาชน' }]}>
-                  <Input placeholder="เลขบัตรประชาชน" />
-                </Form.Item>
+                <Form.Item
+  name="idCard"
+  label="เลขบัตรประชาชน"
+  rules={[
+    { required: true, message: 'กรุณากรอกเลขบัตรประชาชน' },
+    { pattern: /^\d{1,13}$/, message: 'กรอกได้เฉพาะตัวเลขและไม่เกิน 13 หลัก' },
+  ]}
+>
+  <Input
+    placeholder="ใส่เลขบัตรประชาชน"
+    maxLength={13} // จำกัด input
+    onKeyPress={(event) => {
+      if (!/[0-9]/.test(event.key)) {
+        event.preventDefault(); // ห้ามพิมพ์ตัวอักษร
+      }
+    }}
+  />
+</Form.Item>
               </Col>
               <Col xs={24} sm={12} md={6}>
-                <Form.Item name="phone" label="เบอร์โทรศัพท์" rules={[{ required: true, message: 'เบอร์ดโทรศัพท์' }]}>
-                  <Input placeholder="ใส่เบอร์ดโทรศัพท์" />
-                </Form.Item>
+                <Form.Item
+  name="phone"
+  label="เบอร์โทรศัพท์"
+  rules={[
+    { required: true, message: 'กรุณาใส่เบอร์โทรศัพท์' },
+    { pattern: /^\d*$/, message: 'กรอกได้เฉพาะตัวเลขเท่านั้น' },
+  ]}
+>
+  <Input
+    placeholder="ใส่เบอร์โทรศัพท์"
+    maxLength={10} // ถ้าต้องการจำกัดความยาว เช่น 10 หลัก
+    onKeyPress={(event) => {
+      if (!/[0-9]/.test(event.key)) {
+        event.preventDefault(); // ห้ามพิมพ์ตัวอักษร
+      }
+    }}
+  />
+</Form.Item>
+
               </Col>
 
             </Row>
             <Form.Item name="email" label="อีเมล" rules={[{ required: true, message: 'กรุณากรอกอีเมล', type: 'email' }]}>
-              <Input placeholder="อีเมล" />
+              <Input placeholder="ใส่อีเมล" />
             </Form.Item>
 
             <Form.Item name="address" label="ที่อยู่" rules={[{ required: true, message: 'กรุณากรอกที่อยู่' }]}>
@@ -285,18 +320,18 @@ const StaffDetails: React.FC = () => {
               <Col xs={24} sm={12}>
 
                 <Form.Item name="position" label="ตำแหน่งงาน" rules={[{ required: true, message: 'กรุณาเลือกตำแหน่ง' }]}>
-                  <Input placeholder="ตำแหน่งงาน" />
+                  <Input placeholder="เลือกตำแหน่งงาน" />
                 </Form.Item>
               </Col>
               <Form.Item name="employeeType" label="ประเภทพนักงาน" rules={[{ required: true, message: 'กรุณาเลือกประเภทพนักงาน' }]}>
-                <Select placeholder="ประเภทพนักงาน">
+                <Select placeholder="เลือกประเภทพนักงาน">
                   <Option value="Full-time">Full-time</Option>
                   <Option value="Part-time">Part-time</Option>
                 </Select>
               </Form.Item>
               <Col xs={24} sm={12}>
                 <Form.Item name="licenseNumber" label="หมายเลขใบประกอบวิชาชีพ">
-                  <Input placeholder="หมายเลขใบประกอบวิชาชีพ" />
+                  <Input placeholder="ใส่หมายเลขใบประกอบวิชาชีพ" />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={6}>
@@ -314,8 +349,8 @@ const StaffDetails: React.FC = () => {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={6}>
-                <Form.Item name="CompRate" label="เงินเดือนสุทธิ">
-                  <Input placeholder="เงินเดือนสุทธิ" />
+                <Form.Item name="CompRate" label="เงินเดือนสุทธิ" rules={[{ required: true, message: 'กรุณากรอกเงินเดือนสุทธิ' }]}>
+                  <Input placeholder="ใส่เงินเดือนสุทธิ" />
                 </Form.Item>
               </Col>
 
@@ -324,25 +359,33 @@ const StaffDetails: React.FC = () => {
 
 
 
-            <Row justify="end" gutter={16}>
-              <Col>
-                <Button onClick={handleCancelEdit}>ยกเลิก</Button>
-              </Col>
-              <Col>
-                <Button type="primary" htmlType="submit" style={{
-                  backgroundColor: '#52c41a',
-                  borderColor: '#52c41a',
-                  color: 'white',
-                }}>
-                  บันทึกข้อมูล
-                </Button>
-              </Col>
-            </Row>
+
           </Form>
         )}
       </Card>
 
-      <Button onClick={() => navigate('/staff')}>ย้อนกลับ</Button>
+      {!isEditing ? (
+        <Button onClick={() => navigate('/staff')}>ย้อนกลับ</Button>
+      ) : (
+        <>
+          <Button
+            type="primary"
+            htmlType="submit"
+            form="staffForm"   // ✅ ชี้ไปที่ form id
+            style={{
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              color: "white",
+              marginLeft: 8,
+            }}
+          >
+            บันทึกข้อมูล
+          </Button>
+          <Button  style={{marginTop : 18}} onClick={handleCancelEdit}>ยกเลิก
+          </Button>
+
+        </>
+      )}
     </div>
   );
 };

@@ -23,7 +23,6 @@ func ConnectionDB() {
 }
 
 func SetupDatabase() {
-	// 1️⃣ Migrate schema
 	db.AutoMigrate(
 		&entity.PersonalData{},
 		&entity.Department{},
@@ -31,7 +30,6 @@ func SetupDatabase() {
 	if err := db.AutoMigrate(&entity.PersonalData{}, &entity.Department{}); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
-	// 2️⃣ Seed staff data
 	 SeedStaff()
 }
 
