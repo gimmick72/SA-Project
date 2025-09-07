@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { Modal, Input, Form, Select, TimePicker, Button, Space } from 'antd';
 import dayjs from 'dayjs';
 import 'antd/dist/reset.css';
+// import { dentists } from './../../../First_pages/First_pages/OurDentistsPage/dentistsData';
 
 type EventData = {
-  title: string;
+  room: string;
   start: Date;
   end: Date;
+  dentist: string;
 };
+
+
 
 type Props = {
   visible: boolean;
@@ -17,41 +21,41 @@ type Props = {
 };
 
 const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel, selectedDate }) => {
-  const [title, setTitle] = useState('');
+  const [room, setRoom] = useState('');
   const [timein, setTimein] = useState('');
   const [timeout, setTimeout] = useState('');
+  const [dentist, setDentist] = useState("สมชาย");
 
   const handleOk = () => {
-  if (title && timein && timeout && selectedDate)  {
+    if (room && timein && timeout && selectedDate) {
       const base = dayjs(selectedDate); // วันจาก calendar
-    const start = base.hour(Number(timein.split(':')[0])).minute(Number(timein.split(':')[1])).second(0).toDate();
-    const end = base.hour(Number(timeout.split(':')[0])).minute(Number(timeout.split(':')[1])).second(0).toDate();
+      const start = base.hour(Number(timein.split(':')[0])).minute(Number(timein.split(':')[1])).second(0).toDate();
+      const end = base.hour(Number(timeout.split(':')[0])).minute(Number(timeout.split(':')[1])).second(0).toDate();
 
-    onAdd({ title, start, end });
-    setTitle('');
-    setTimein('');
-    setTimeout('');
-  }
-};
+      onAdd({ room, start, end, dentist });
+      setRoom('');
+      setTimein('');
+      setTimeout('');
+      setDentist('');
+    }
+  };
 
   //option of room
-  const rooms = ["x001", "x002", "x003", "004"];
+  const rooms = ["B001", "B002", "B003", "B004"];
 
   // default timein  - timeout
   const defaultTimeIn = dayjs('09:00', 'HH:mm');
-
   const defaultTimeOut = dayjs('17:00', 'HH:MM');
-
 
 
 
   return (
     <Modal
-      title="เพิ่มกิจกรรม"
+      title="เพิ่มรายการ"
       open={visible}
       footer={null}
       onCancel={() => {
-        setTitle('');
+        setRoom('');
         onCancel();
       }}
       width={420}
@@ -60,8 +64,8 @@ const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel, selectedDate
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           <Form.Item label="เลือกห้อง">
             <Select
-              value={title}
-              onChange={(value) => setTitle(value)}
+              value={room}
+              onChange={(value) => setRoom(value)}
               placeholder="เลือกห้อง"
               options={rooms.map((room) => ({
                 value: room,
@@ -102,7 +106,7 @@ const AddEventModal: React.FC<Props> = ({ visible, onAdd, onCancel, selectedDate
                 เพิ่ม
               </Button>
               <Button style={{ width: 120 }} onClick={() => {
-                setTitle('');
+                setRoom('');
                 setTimein('');
                 setTimeout('');
                 onCancel();

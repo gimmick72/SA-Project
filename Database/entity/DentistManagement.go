@@ -5,11 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type DentistMenagement struct {
+type DentistManagement struct {
 	gorm.Model
 	Room string
-	Date time.Time
-	Timein time.Time
+	TimeIn time.Time
 	TimeOut time.Time
-	Dentis string
+	Dentist string
 }

@@ -15,7 +15,6 @@ import (
 type DentistManagement struct {
 	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	Room    string    `json:"room"`
-	Date    time.Time `json:"date"`
 	TimeIn  time.Time `json:"time_in"`
 	TimeOut time.Time `json:"time_out"`
 	Dentist string    `json:"dentist"`
@@ -24,7 +23,7 @@ type DentistManagement struct {
 // ------------------- API Handlers -------------------
 
 // สร้างจองทันตแพทย์
-func CreateDentistMenagement(c *gin.Context) {
+func CreateDentistManagement(c *gin.Context) {
 	var booking DentistManagement
 	if err := c.ShouldBindJSON(&booking); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -41,7 +40,7 @@ func CreateDentistMenagement(c *gin.Context) {
 }
 
 // ดึงข้อมูลทั้งหมด
-func GetAllDentistMenagement(c *gin.Context) {
+func GetAllDentistManagement(c *gin.Context) {
 	var bookings []DentistManagement
 	db := configs.DB
 	if err := db.Find(&bookings).Error; err != nil {
@@ -52,7 +51,7 @@ func GetAllDentistMenagement(c *gin.Context) {
 }
 
 // ดึงข้อมูลโดย ID
-func GetDentistMenagementByID(c *gin.Context) {
+func GetDentistManagementByID(c *gin.Context) {
 	id := c.Param("id")
 	var booking DentistManagement
 	db := configs.DB
@@ -68,7 +67,7 @@ func GetDentistMenagementByID(c *gin.Context) {
 }
 
 // แก้ไขข้อมูล
-func UpdateDentistMenagement(c *gin.Context) {
+func UpdateDentistManagement(c *gin.Context) {
 	id := c.Param("id")
 	var booking DentistManagement
 	db := configs.DB
@@ -85,7 +84,6 @@ func UpdateDentistMenagement(c *gin.Context) {
 	}
 
 	booking.Room = input.Room
-	booking.Date = input.Date
 	booking.TimeIn = input.TimeIn
 	booking.TimeOut = input.TimeOut
 	booking.Dentist = input.Dentist
@@ -99,7 +97,7 @@ func UpdateDentistMenagement(c *gin.Context) {
 }
 
 // ลบข้อมูล
-func DeleteDentistMenagement(c *gin.Context) {
+func DeleteDentistManagement(c *gin.Context) {
 	id := c.Param("id")
 	db := configs.DB
 

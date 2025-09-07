@@ -36,23 +36,23 @@ func main() {
 		router.POST("/schedule/assign", controllers.AssignSchedule)
 
 		//DentisMenagement
-		router.GET("/dentistmanagement", controllers.GetAllDentistMenagement)
-		router.GET("/dentistmanagement/:id", controllers.GetDentistMenagementByID)
-		router.POST("/dentistmanagement", controllers.CreateDentistMenagement)
-		router.PUT("/dentistmanagement/:id", controllers.UpdateDentistMenagement)
-		router.DELETE("/dentistmanagement/:id", controllers.DeleteDentistMenagement)
+		router.GET("/dentistmanagement_controller", controllers.GetAllDentistManagement)
+		router.GET("/dentistmanagement_controller/:id", controllers.GetDentistManagementByID)
+		router.POST("/dentistmanagement_controller", controllers.CreateDentistManagement)
+		router.PUT("/dentistmanagement_controller/:id", controllers.UpdateDentistManagement)
+		router.DELETE("/dentistmanagement_controller/:id", controllers.DeleteDentistManagement)
 
-		// Service 
+		// Service
 		router.GET("/services", controllers.ListServices)
 		router.POST("/services", controllers.CreateService)
 		router.PUT("/services/:id", controllers.UpdateService)
 		router.DELETE("/services/:id", controllers.DeleteService)
 
-		// Category 
+		// Category
 		router.GET("/categories", controllers.ListCategories)
 		router.POST("/categories", controllers.CreateCategory)
 
-		// Promotion 
+		// Promotion
 		router.GET("/promotions", controllers.ListPromotions)
 		router.POST("/promotions", controllers.CreatePromotion)
 		router.PUT("/promotions/:id", controllers.UpdatePromotion)
@@ -60,10 +60,13 @@ func main() {
 
 	}
 
+	migrateAll()
+
 	// Run the server
 	if err := r.Run(":" + PORT); err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -98,10 +101,59 @@ func migrateAll() {
 		&entity.Appointment{},
 	))
 
+	// ตาราง DentistManagement
+	must(configs.DB.AutoMigrate(
+		&entity.DentistManagement{},
+
+	))
+
+
+
+	// เพิ่ม mock data สำหรับ DentistManagement ถ้ายังว่าง
+	var count int64
+	configs.DB.Model(&entity.DentistManagement{}).Count(&count)
+	if count == 0 {
+		mockData := controllers.GetMockDentists()
+		for _, d := range mockData {
+			configs.DB.Create(&d)
+		}
+		log.Println("✅ Added mock DentistManagement data")
+	} else {
+		log.Println("⚡ DentistManagement table already has data")
+	}
+
+
+	// เพิ่ม mock data สำหรับ Supplies ถ้ายังว่าง
+	configs.DB.Model(&entity.Supply{}).Count(&count)
+	if count == 0 {
+		mockData := controllers.GetMockSupplies()
+		for _, d := range mockData {
+			configs.DB.Create(&d)
+		}
+		log.Println("✅ Added mock DentistManagement data")
+	} else {
+		log.Println("⚡ DentistManagement table already has data")
+	}
+
+
+	// เพิ่ม mock data สำหรับ Appointments ถ้ายังว่าง
+	configs.DB.Model(&entity.Appointment{}).Count(&count)
+	if count == 0 {
+		mockData := controllers.GetMockAppointments()
+		for _, d := range mockData {
+			configs.DB.Create(&d)
+		}
+		log.Println("✅ Added mock DentistManagement data")
+	} else {
+		log.Println("⚡ DentistManagement table already has data")
+	}
+
+
 	// (ตัวเลือก) ถ้าจะใช้ตารางผู้ป่วยจริงด้านล่างนี้ ให้เปิดคอมเมนต์
 	// must(configs.DB.AutoMigrate(&entity.Patient{}, &entity.ContactPerson{}, &entity.Address{}, &entity.InitialSymptomps{}, &entity.HistoryPatien{}))
 
 	log.Println("✅ AutoMigrate done")
+
 }
 
 func must(err error) {
