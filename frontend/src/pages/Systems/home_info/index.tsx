@@ -39,7 +39,7 @@ const HomeInfoPage: React.FC = () => {
   };
 
   return (
-    <div className="container" style={{ padding: 16 }}>
+    <div className="container" style={{ padding: 10 }}>
       <Tabs
         defaultActiveKey="list"
         items={[
