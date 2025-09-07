@@ -34,5 +34,9 @@ func SetupDatbase() {
 		&entity.ContactPerson{},
 		&entity.HistoryPatien{},
 		&entity.InitialSymptomps{},
+		&entity.Member{},
+		&entity.Role{},
+		&entity.MemberRole{},
+		&entity.Employee{},
 	)
 }

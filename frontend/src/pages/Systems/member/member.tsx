@@ -1,217 +1,159 @@
-import React, { useMemo, useState } from "react";
-import {
-  Table,
-  Input,
-  Button,
-  Space,
-  Typography,
-  Tooltip,
-  Modal,
-  Form,
-  message,
-} from "antd";
-import {
-  EditOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
-  SearchOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Card, Table, Input, Button, Space, Modal, Form, message, Popconfirm } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { Member } from "../../../interface/member";
+import { fetchMembers, createMember, updateMember, deleteMember } from "../../../services/member";
 
-const { Title, Text } = Typography;
+const MemberPage: React.FC = () => {
+  const [rows, setRows] = useState<Member[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState({ current: 1, pageSize: 10 });
 
-type MemberRow = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  username: string;
-  password: string; // mock
-};
-
-// --- mock data 10 รายการ ---
-const MOCK_MEMBERS: MemberRow[] = [
-  { id: 1, firstName: "Napat",    lastName: "Wongchai",   email: "napat.w@example.com",    phone: "081-234-5678", username: "napatw",  password: "Pa$$w0rd1" },
-  { id: 2, firstName: "Benjawan", lastName: "Suksan",     email: "benja.s@example.com",    phone: "089-765-4321", username: "benja",    password: "Secret#22" },
-  { id: 3, firstName: "Kittisak", lastName: "Boonyuen",   email: "kitti.b@example.com",    phone: "082-111-2222", username: "kitti",    password: "1234abcd" },
-  { id: 4, firstName: "Thanaporn",lastName: "Meechai",    email: "thana.m@example.com",    phone: "086-000-9900", username: "thanap",   password: "Me3chai!!" },
-  { id: 5, firstName: "Sudarat",  lastName: "Prasert",    email: "sudarat.p@example.com",  phone: "080-555-6666", username: "sudap",    password: "Pra$ert55" },
-  { id: 6, firstName: "Anucha",   lastName: "Kraiwut",    email: "anucha.k@example.com",   phone: "083-444-5555", username: "anucha",   password: "AnuCha_66" },
-  { id: 7, firstName: "Warisa",   lastName: "Chanida",    email: "warisa.c@example.com",   phone: "087-333-2222", username: "warisac",  password: "w@riSa77" },
-  { id: 8, firstName: "Prayuth",  lastName: "Thongdee",   email: "prayuth.t@example.com",  phone: "085-999-0000", username: "pyt",      password: "Th0ngd33" },
-  { id: 9, firstName: "Peerawat", lastName: "Kongsiri",   email: "peerawat.k@example.com", phone: "084-777-8888", username: "peera",    password: "K0ngS!ri" },
-  { id:10, firstName: "Kannika",  lastName: "Limsakul",   email: "kannika.l@example.com",  phone: "089-111-9999", username: "kannika",  password: "Lim$akul" },
-];
-
-const mask = (s: string) => "•".repeat(Math.max(6, Math.min(12, s.length)));
-
-const Member: React.FC = () => {
-  // ข้อมูล + ฟิลเตอร์
-  const [list, setList] = useState<MemberRow[]>(MOCK_MEMBERS);
-  const [query, setQuery] = useState("");
-  const [showPwIds, setShowPwIds] = useState<Set<number>>(new Set());
-
-  // Modal เพิ่มสมาชิก
-  const [openAdd, setOpenAdd] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Member | null>(null);
   const [form] = Form.useForm();
 
-  const data = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return list;
-    return list.filter((m) => {
-      const blob = `${m.firstName} ${m.lastName} ${m.email} ${m.phone} ${m.username} ${m.password}`.toLowerCase();
-      return blob.includes(q);
-    });
-  }, [query, list]);
+  const load = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchMembers({
+        q, page: page.current, page_size: page.pageSize, sort_by: "created_at", order: "desc",
+      });
+      setRows(res.items);
+      setTotal(res.total);
+    } catch (e: any) {
+      message.error(e?.message || "โหลดข้อมูลไม่สำเร็จ");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => { load(); }, [q, page.current, page.pageSize]);
 
-  const toggleShow = (id: number) => {
-    setShowPwIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
+  const onOpenCreate = () => { setEditing(null); form.resetFields(); setOpen(true); };
+  const onOpenEdit = (m: Member) => {
+    setEditing(m); setOpen(true);
+    form.setFieldsValue({
+      first_name: m.first_name, last_name: m.last_name, email: m.email,
+      phone: m.phone, username: m.username, password: "",
     });
   };
 
-  const handleAdd = (values: any) => {
-    const nextId = list.length ? Math.max(...list.map((e) => e.id)) + 1 : 1;
-    const newMember: MemberRow = {
-      id: nextId,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      phone: values.phone,
-      username: values.username,
-      password: values.password,
-    };
-    setList((prev) => [newMember, ...prev]);
-    message.success("เพิ่มสมาชิกเรียบร้อย");
-    setOpenAdd(false);
-    form.resetFields();
+  const onSubmit = async () => {
+    try {
+      const v = await form.validateFields();
+      if (editing) {
+        const payload = { ...v };
+        if (!payload.password) delete (payload as any).password;
+        await updateMember(editing.id, payload);
+        message.success("แก้ไขสำเร็จ");
+      } else {
+        await createMember(v);
+        message.success("เพิ่มสมาชิกสำเร็จ");
+        setPage((p) => ({ ...p, current: 1 }));
+      }
+      setOpen(false); load();
+    } catch (e: any) {
+      if (e?.errorFields) return;
+      message.error(e?.message || "บันทึกไม่สำเร็จ");
+    }
   };
 
-  const columns = [
-    { title: "ชื่อ", dataIndex: "firstName", sorter: (a: MemberRow, b: MemberRow) => a.firstName.localeCompare(b.firstName) },
-    { title: "นามสกุล", dataIndex: "lastName", sorter: (a: MemberRow, b: MemberRow) => a.lastName.localeCompare(b.lastName) },
-    { title: "อีเมล", dataIndex: "email", responsive: ["md"] as const },
-    { title: "เบอร์โทร", dataIndex: "phone", width: 140 },
-    { title: "ชื่อผู้ใช้", dataIndex: "username", width: 140, sorter: (a: MemberRow, b: MemberRow) => a.username.localeCompare(b.username) },
-    {
-      title: "รหัสผ่าน",
-      key: "password",
-      width: 200,
-      render: (_: unknown, row: MemberRow) => {
-        const show = showPwIds.has(row.id);
-        return (
-          <Space>
-            <Text code>{show ? row.password : mask(row.password)}</Text>
-            <Tooltip title={show ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}>
-              <Button
-                size="small"
-                type="text"
-                icon={show ? <EyeInvisibleOutlined /> : <EyeTwoTone twoToneColor="#1677ff" />}
-                onClick={() => toggleShow(row.id)}
-              />
-            </Tooltip>
-          </Space>
-        );
-      },
-    },
+  const onDelete = async (id: number) => {
+    try { await deleteMember(id); message.success("ลบสำเร็จ"); load(); }
+    catch (e: any) { message.error(e?.message || "ลบไม่สำเร็จ"); }
+  };
+
+  const columns: ColumnsType<Member> = [
+    { title: "ชื่อ-นามสกุล", render: (_, r) => `${r.first_name} ${r.last_name}` },
+    { title: "อีเมล", dataIndex: "email" },
+    { title: "เบอร์โทร", dataIndex: "phone" },
+    { title: "ชื่อผู้ใช้", dataIndex: "username" },
+    { title: "รหัสผ่าน", render: () => "••••••••" },
     {
       title: "การจัดการ",
-      key: "actions",
-      fixed: "right" as const,
-      width: 110,
-      render: (_: unknown, row: MemberRow) => (
-        <Button
-          type="primary"
-          icon={<EditOutlined />}
-          onClick={() => console.log("edit member:", row)} // ไว้ต่อ Modal/Form จริงภายหลัง
-        >
-          แก้ไข
-        </Button>
+      width: 200,
+      fixed: "right",
+      render: (_, r) => (
+        <Space>
+          <Button size="small" onClick={() => onOpenEdit(r)}>แก้ไข</Button>
+          <Popconfirm title="ยืนยันการลบ?" onConfirm={() => onDelete(r.id)}>
+            <Button size="small" danger>ลบ</Button>
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
 
   return (
     <div className="container" style={{ padding: 16 }}>
-      {/* แถวหัวข้อ + ปุ่มเพิ่มสมาชิก */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 12, // เว้นระยะกับตัวกรอง
-          gap: 8,
-          flexWrap: "wrap",
-        }}
+      <Card
+        title="สมาชิก"
+        extra={
+          <Space>
+            <Input.Search
+              placeholder="ค้นหา: ชื่อ/อีเมล/เบอร์/ชื่อผู้ใช้"
+              allowClear
+              onSearch={(v) => { setPage((p) => ({ ...p, current: 1 })); setQ(v); }}
+              onChange={(e) => { setPage((p) => ({ ...p, current: 1 })); setQ(e.target.value); }}
+              style={{ width: 260 }}
+            />
+            <Button type="primary" onClick={onOpenCreate}>เพิ่มสมาชิก</Button>
+          </Space>
+        }
+        bodyStyle={{ padding: 0 }}
+        style={{ borderRadius: 12 }}
       >
-        <Title level={3} style={{ margin: 0 }}>รายชื่อสมาชิก</Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenAdd(true)}>
-          เพิ่มสมาชิก
-        </Button>
-      </div>
-
-      {/* ตัวกรอง (ค้นหาทุกคอลัมน์) */}
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          alignItems: "center",
-          marginBottom: 16, // เว้นระยะกับตาราง
-          flexWrap: "wrap",
-        }}
-      >
-        <Input
-          allowClear
-          prefix={<SearchOutlined />}
-          placeholder="ค้นหาชื่อ, นามสกุล, อีเมล, เบอร์, ชื่อผู้ใช้..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          style={{ width: 360, maxWidth: "100%" }}
+        <Table<Member>
+          rowKey="id"
+          columns={columns}
+          dataSource={rows}
+          loading={loading}
+          pagination={{
+            current: page.current,
+            pageSize: page.pageSize,
+            total,
+            showSizeChanger: true,
+            pageSizeOptions: [5, 10, 20, 50],
+            onChange: (current, pageSize) => setPage({ current, pageSize }),
+            position: ["bottomRight"],
+          }}
+          scroll={{ x: 900 }}
         />
-      </div>
+      </Card>
 
-      {/* ตาราง */}
-      <Table<MemberRow>
-        rowKey="id"
-        columns={columns}
-        dataSource={data}
-        pagination={{ pageSize: 8, showSizeChanger: false }}
-        scroll={{ x: 950 }}
-        bordered
-        size="middle"
-      />
-
-      {/* Modal เพิ่มสมาชิก */}
       <Modal
-        open={openAdd}
-        title="เพิ่มสมาชิก"
-        onCancel={() => setOpenAdd(false)}
-        onOk={() => form.submit()}
+        title={editing ? "แก้ไขสมาชิก" : "เพิ่มสมาชิก"}
+        open={open}
+        onCancel={() => setOpen(false)}
+        onOk={onSubmit}
         okText="บันทึก"
         cancelText="ยกเลิก"
         destroyOnClose
       >
-        <Form form={form} layout="vertical" onFinish={handleAdd} preserve={false}>
-          <Form.Item label="ชื่อ" name="firstName" rules={[{ required: true, message: "กรอกชื่อ" }]}>
+        <Form form={form} layout="vertical">
+          <Form.Item name="first_name" label="ชื่อ" rules={[{ required: true, message: "กรอกชื่อ" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="นามสกุล" name="lastName" rules={[{ required: true, message: "กรอกนามสกุล" }]}>
+          <Form.Item name="last_name" label="นามสกุล" rules={[{ required: true, message: "กรอกนามสกุล" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="อีเมล" name="email" rules={[{ required: true, type: "email", message: "อีเมลไม่ถูกต้อง" }]}>
+          <Form.Item name="email" label="อีเมล" rules={[{ type: "email", required: true, message: "อีเมลไม่ถูกต้อง" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="เบอร์โทร" name="phone" rules={[{ required: true, message: "กรอกเบอร์โทร" }]}>
+          <Form.Item name="phone" label="เบอร์โทร" rules={[{ required: true, message: "กรอกเบอร์โทร" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="ชื่อผู้ใช้" name="username" rules={[{ required: true, message: "กรอกชื่อผู้ใช้" }]}>
+          <Form.Item name="username" label="ชื่อผู้ใช้" rules={[{ required: true, message: "กรอกชื่อผู้ใช้" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="รหัสผ่าน" name="password" rules={[{ required: true, message: "กรอกรหัสผ่าน" }]}>
-            <Input.Password />
+          <Form.Item
+            name="password"
+            label={editing ? "รหัสผ่าน (เว้นว่าง = ไม่เปลี่ยน)" : "รหัสผ่าน"}
+            rules={editing ? [] : [{ required: true, message: "กรอกรหัสผ่าน" }]}
+          >
+            <Input.Password placeholder={editing ? "ปล่อยว่างเพื่อใช้รหัสเดิม" : ""} />
           </Form.Item>
         </Form>
       </Modal>
@@ -219,4 +161,4 @@ const Member: React.FC = () => {
   );
 };
 
-export default Member;
+export default MemberPage;

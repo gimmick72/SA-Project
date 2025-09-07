@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  Card,
   Table,
   Input,
   Select,
@@ -11,6 +12,7 @@ import {
   Modal,
   Form,
   message,
+  Popconfirm,
 } from "antd";
 import {
   EditOutlined,
@@ -20,6 +22,14 @@ import {
   FilterOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+
+import type { ColumnsType } from "antd/es/table";
+import {
+  fetchEmployees,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+} from "../../../services/employee";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -31,226 +41,293 @@ type Employee = {
   firstName: string;
   lastName: string;
   username: string;
-  password: string;
   role: Role;
+  // หมายเหตุ: backend ไม่ส่ง password กลับมา (เพื่อความปลอดภัย)
 };
 
-// --- mock data 10 คน ---
-const MOCK_EMPLOYEES: Employee[] = [
-  { id: 1,  firstName: "Anan",    lastName: "Prakob",   username: "anan.p",   password: "Dent@1001", role: "ทันตแพทย์" },
-  { id: 2,  firstName: "Bussara", lastName: "Krittaya", username: "bussara",  password: "Assist#22", role: "ผู้ช่วยทันตะ" },
-  { id: 3,  firstName: "Chatchai",lastName: "Lertpras", username: "chatchai", password: "Rec0rd123", role: "เวชระเบียน" },
-  { id: 4,  firstName: "Duangjai",lastName: "Siri",     username: "duang",    password: "Pharm_44",  role: "คนจ่ายยา" },
-  { id: 5,  firstName: "Ekkarat", lastName: "Maneerat", username: "ekkarat",  password: "DenT5599",  role: "ทันตแพทย์" },
-  { id: 6,  firstName: "Fah",     lastName: "Thongkum", username: "fah.t",    password: "Hygi@n66",  role: "ทันตภิบาล" },
-  { id: 7,  firstName: "Ganya",   lastName: "Suksawat", username: "ganya",    password: "Assist_77", role: "ผู้ช่วยทันตะ" },
-  { id: 8,  firstName: "Hiran",   lastName: "Boonsom",  username: "hiran.b",  password: "Rec0rd88",  role: "เวชระเบียน" },
-  { id: 9,  firstName: "Intira",  lastName: "Meedech",  username: "intira",   password: "Ph@rm99",   role: "คนจ่ายยา" },
-  { id: 10, firstName: "Jirawat", lastName: "Saelim",   username: "jirawat",  password: "DenTx101",  role: "ทันตแพทย์" },
-];
-
-const mask = (s: string) => "•".repeat(Math.max(6, Math.min(12, s.length)));
+const mask = (len = 8) => "•".repeat(len);
 
 const roleTagColor = (role: Role) => {
   switch (role) {
-    case "ทันตแพทย์": return "geekblue";
-    case "ผู้ช่วยทันตะ": return "green";
-    case "ทันตภิบาล": return "purple";
-    case "เวชระเบียน": return "gold";
-    case "คนจ่ายยา": return "volcano";
-    default: return "default";
+    case "ทันตแพทย์":
+      return "geekblue";
+    case "ผู้ช่วยทันตะ":
+      return "green";
+    case "ทันตภิบาล":
+      return "purple";
+    case "เวชระเบียน":
+      return "gold";
+    case "คนจ่ายยา":
+      return "volcano";
+    default:
+      return "default";
   }
 };
 
 const Admin: React.FC = () => {
-  // ข้อมูล + ฟิลเตอร์
-  const [list, setList] = useState<Employee[]>(MOCK_EMPLOYEES);
-  const [q, setQ] = useState<string>("");
+  // ตาราง + คิวรี
+  const [rows, setRows] = useState<Employee[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [q, setQ] = useState("");
   const [role, setRole] = useState<string>("all");
+  const [page, setPage] = useState({ current: 1, pageSize: 10 });
+
+  // toggle ดู/ซ่อน "รหัสผ่าน" (จริง ๆ จะบอกข้อมูลไม่ได้)
   const [showPwIds, setShowPwIds] = useState<Set<number>>(new Set());
-
-  // Modal เพิ่มพนักงาน
-  const [openAdd, setOpenAdd] = useState(false);
-  const [form] = Form.useForm();
-
-  const data = useMemo(() => {
-    const text = q.trim().toLowerCase();
-    return list.filter((e) => {
-      const matchesText =
-        !text ||
-        `${e.firstName} ${e.lastName} ${e.username} ${e.password} ${e.role}`
-          .toLowerCase()
-          .includes(text);
-      const matchesRole = role === "all" || e.role === role;
-      return matchesText && matchesRole;
-    });
-  }, [q, role, list]);
-
-  const toggleShow = (id: number) => {
+  const toggleShow = (id: number) =>
     setShowPwIds((prev) => {
       const n = new Set(prev);
       n.has(id) ? n.delete(id) : n.add(id);
       return n;
     });
-  };
 
-  const handleAdd = async (values: any) => {
-    const nextId = list.length ? Math.max(...list.map((e) => e.id)) + 1 : 1;
-    const newEmp: Employee = {
-      id: nextId,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      username: values.username,
-      password: values.password,
-      role: values.role as Role,
-    };
-    setList((prev) => [newEmp, ...prev]);
-    message.success("เพิ่มพนักงานเรียบร้อย");
-    setOpenAdd(false);
+  // Modal เพิ่ม/แก้ไข
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Employee | null>(null);
+  const [form] = Form.useForm();
+
+  // โหลดข้อมูล
+  const load = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchEmployees({
+        q,
+        role,
+        page: page.current,
+        page_size: page.pageSize,
+      });
+      setRows(res.items as Employee[]);
+      setTotal(res.total);
+    } catch (e: any) {
+      message.error(e?.message || "โหลดข้อมูลไม่สำเร็จ");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, role, page.current, page.pageSize]);
+
+  // เปิดโมดัล
+  const openCreate = () => {
+    setEditing(null);
     form.resetFields();
+    setOpen(true);
+  };
+  const openEdit = (row: Employee) => {
+    setEditing(row);
+    setOpen(true);
+    form.setFieldsValue({
+      firstName: row.firstName,
+      lastName: row.lastName,
+      username: row.username,
+      role: row.role,
+      password: "", // เว้นว่าง = ไม่เปลี่ยน
+    });
   };
 
-  const columns = [
-    { title: "ชื่อ", dataIndex: "firstName", sorter: (a: Employee, b: Employee) => a.firstName.localeCompare(b.firstName) },
-    { title: "นามสกุล", dataIndex: "lastName", sorter: (a: Employee, b: Employee) => a.lastName.localeCompare(b.lastName) },
-    { title: "ชื่อผู้ใช้", dataIndex: "username", width: 160, sorter: (a: Employee, b: Employee) => a.username.localeCompare(b.username) },
-    {
-      title: "รหัสผ่าน",
-      key: "password",
-      width: 200,
-      render: (_: unknown, row: Employee) => {
-        const show = showPwIds.has(row.id);
-        return (
-          <Space>
-            <Text code>{show ? row.password : mask(row.password)}</Text>
-            <Tooltip title={show ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}>
-              <Button
-                size="small"
-                type="text"
-                icon={show ? <EyeInvisibleOutlined /> : <EyeTwoTone twoToneColor="#1677ff" />}
-                onClick={() => toggleShow(row.id)}
-              />
-            </Tooltip>
-          </Space>
-        );
+  // submit
+  const onSubmit = async () => {
+    try {
+      const v = await form.validateFields();
+      if (editing) {
+        const payload: any = {
+          firstName: v.firstName,
+          lastName: v.lastName,
+          username: v.username,
+          role: v.role,
+        };
+        if (v.password) payload.password = v.password; // ส่งเมื่อมีการเปลี่ยนจริง
+        await updateEmployee(editing.id, payload);
+        message.success("แก้ไขข้อมูลสำเร็จ");
+      } else {
+        await createEmployee({
+          firstName: v.firstName,
+          lastName: v.lastName,
+          username: v.username,
+          password: v.password,
+          role: v.role,
+        });
+        message.success("เพิ่มพนักงานสำเร็จ");
+        setPage((p) => ({ ...p, current: 1 }));
+      }
+      setOpen(false);
+      load();
+    } catch (e: any) {
+      if (e?.errorFields) return; // validation error ในฟอร์ม
+      message.error(e?.message || "บันทึกไม่สำเร็จ");
+    }
+  };
+
+  const onDelete = async (id: number) => {
+    try {
+      await deleteEmployee(id);
+      message.success("ลบพนักงานสำเร็จ");
+      load();
+    } catch (e: any) {
+      message.error(e?.message || "ลบไม่สำเร็จ");
+    }
+  };
+
+  const columns: ColumnsType<Employee> = useMemo(
+    () => [
+      {
+        title: "ชื่อ",
+        dataIndex: "firstName",
+        sorter: (a, b) => a.firstName.localeCompare(b.firstName),
       },
-    },
-    {
-      title: "ตำแหน่ง",
-      dataIndex: "role",
-      width: 160,
-      filters: [
-        { text: "ทันตแพทย์", value: "ทันตแพทย์" },
-        { text: "ผู้ช่วยทันตะ", value: "ผู้ช่วยทันตะ" },
-        { text: "ทันตภิบาล", value: "ทันตภิบาล" },
-        { text: "เวชระเบียน", value: "เวชระเบียน" },
-        { text: "คนจ่ายยา", value: "คนจ่ายยา" },
-      ],
-      onFilter: (value: string, rec: Employee) => rec.role === value,
-      render: (v: Role) => <Tag color={roleTagColor(v)}>{v}</Tag>,
-    },
-    {
-      title: "การจัดการ",
-      key: "actions",
-      fixed: "right" as const,
-      width: 110,
-      render: (_: unknown, row: Employee) => (
-        <Button
-          type="primary"
-          icon={<EditOutlined />}
-          onClick={() => console.log("edit employee:", row)}
-        >
-          แก้ไข
-        </Button>
-      ),
-    },
-  ];
+      {
+        title: "นามสกุล",
+        dataIndex: "lastName",
+        sorter: (a, b) => a.lastName.localeCompare(b.lastName),
+      },
+      {
+        title: "ชื่อผู้ใช้",
+        dataIndex: "username",
+        width: 160,
+        sorter: (a, b) => a.username.localeCompare(b.username),
+      },
+      {
+        title: "รหัสผ่าน",
+        key: "password",
+        width: 220,
+        render: (_: unknown, row) => {
+          const show = showPwIds.has(row.id);
+          const display = show ? "ไม่สามารถแสดงรหัสเดิมได้" : mask();
+          return (
+            <Space>
+              <Text code>{display}</Text>
+              <Tooltip
+                title={show ? "ซ่อนข้อมูล" : "แสดงข้อมูล (ไม่แสดงรหัสจริงเพื่อความปลอดภัย)"}
+              >
+                <Button
+                  size="small"
+                  type="text"
+                  icon={show ? <EyeInvisibleOutlined /> : <EyeTwoTone twoToneColor="#1677ff" />}
+                  onClick={() => toggleShow(row.id)}
+                />
+              </Tooltip>
+            </Space>
+          );
+        },
+      },
+      {
+        title: "ตำแหน่ง",
+        dataIndex: "role",
+        width: 160,
+        filters: [
+          { text: "ทันตแพทย์", value: "ทันตแพทย์" },
+          { text: "ผู้ช่วยทันตะ", value: "ผู้ช่วยทันตะ" },
+          { text: "ทันตภิบาล", value: "ทันตภิบาล" },
+          { text: "เวชระเบียน", value: "เวชระเบียน" },
+          { text: "เจ้าหน้าที่จ่ายยา", value: "เจ้าหน้าที่จ่ายยา" },
+        ],
+        onFilter: (value: any, rec) => rec.role === value,
+        render: (v: Role) => <Tag color={roleTagColor(v)}>{v}</Tag>,
+      },
+      {
+        title: "การจัดการ",
+        key: "actions",
+        fixed: "right",
+        width: 160,
+        render: (_: unknown, row) => (
+          <Space>
+            <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(row)}>
+              แก้ไข
+            </Button>
+            <Popconfirm title="ยืนยันการลบพนักงานนี้?" onConfirm={() => onDelete(row.id)}>
+              <Button size="small" danger>
+                ลบ
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [showPwIds]
+  );
 
   return (
     <div className="container" style={{ padding: 16 }}>
-      {/* แถวหัวข้อ + ปุ่มเพิ่มพนักงาน */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 12, // เว้นระยะกับตัวกรอง
-          gap: 8,
-          flexWrap: "wrap",
-        }}
+      <Card
+        title={
+          <Space align="center">
+            <Title level={4} style={{ margin: 0 }}>
+              รายชื่อพนักงาน
+            </Title>
+          </Space>
+        }
+        extra={
+          <Space wrap>
+            <Input
+              allowClear
+              prefix={<SearchOutlined />}
+              placeholder="ค้นหา: ชื่อ/นามสกุล/ชื่อผู้ใช้/ตำแหน่ง"
+              value={q}
+              onChange={(e) => {
+                setPage((p) => ({ ...p, current: 1 }));
+                setQ(e.target.value);
+              }}
+              style={{ width: 300 }}
+            />
+            <Select
+              value={role}
+              onChange={(v) => {
+                setPage((p) => ({ ...p, current: 1 }));
+                setRole(v);
+              }}
+              style={{ width: 200 }}
+              suffixIcon={<FilterOutlined />}
+            >
+              <Option value="all">ตำแหน่งทั้งหมด</Option>
+              <Option value="ทันตแพทย์">ทันตแพทย์</Option>
+              <Option value="ผู้ช่วยทันตะ">ผู้ช่วยทันตะ</Option>
+              <Option value="ทันตภิบาล">ทันตภิบาล</Option>
+              <Option value="เวชระเบียน">เวชระเบียน</Option>
+              <Option value="เจ้าหน้าที่จ่ายยา">เจ้าหน้าที่จ่ายยา</Option>
+            </Select>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+              เพิ่มพนักงาน
+            </Button>
+          </Space>
+        }
+        bodyStyle={{ padding: 0 }}
+        style={{ borderRadius: 12 }}
       >
-        <Title level={3} style={{ margin: 0 }}>
-          รายชื่อพนักงาน
-        </Title>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setOpenAdd(true)}
-        >
-          เพิ่มพนักงาน
-        </Button>
-      </div>
-
-      {/* ตัวกรอง */}
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          alignItems: "center",
-          marginBottom: 16, // เว้นระยะกับตาราง
-          flexWrap: "wrap",
-        }}
-      >
-        <Input
-          allowClear
-          prefix={<SearchOutlined />}
-          placeholder="ค้นหาชื่อ, นามสกุล, ชื่อผู้ใช้, รหัสผ่าน, ตำแหน่ง..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          style={{ width: 320 }}
+        <Table<Employee>
+          rowKey="id"
+          columns={columns}
+          dataSource={rows}
+          loading={loading}
+          pagination={{
+            current: page.current,
+            pageSize: page.pageSize,
+            total,
+            showSizeChanger: true,
+            pageSizeOptions: [5, 10, 20, 50],
+            onChange: (current, pageSize) => setPage({ current, pageSize }),
+            position: ["bottomRight"],
+          }}
+          scroll={{ x: 900 }}
+          bordered
+          size="middle"
         />
-        <Select
-          value={role}
-          onChange={(v) => setRole(v)}
-          style={{ width: 200 }}
-          suffixIcon={<FilterOutlined />}
-        >
-          <Option value="all">ตำแหน่งทั้งหมด</Option>
-          <Option value="ทันตแพทย์">ทันตแพทย์</Option>
-          <Option value="ผู้ช่วยทันตะ">ผู้ช่วยทันตะ</Option>
-          <Option value="ทันตภิบาล">ทันตภิบาล</Option>
-          <Option value="เวชระเบียน">เวชระเบียน</Option>
-          <Option value="คนจ่ายยา">คนจ่ายยา</Option>
-        </Select>
-      </div>
+      </Card>
 
-      {/* ตาราง */}
-      <Table<Employee>
-        rowKey="id"
-        columns={columns}
-        dataSource={data}
-        pagination={{ pageSize: 8, showSizeChanger: false }}
-        scroll={{ x: 900 }}
-        bordered
-        size="middle"
-      />
-
-      {/* Modal เพิ่มพนักงาน */}
+      {/* Modal เพิ่ม/แก้ไข */}
       <Modal
-        open={openAdd}
-        title="เพิ่มพนักงาน"
-        onCancel={() => setOpenAdd(false)}
+        open={open}
+        title={editing ? "แก้ไขพนักงาน" : "เพิ่มพนักงาน"}
+        onCancel={() => setOpen(false)}
         onOk={() => form.submit()}
         okText="บันทึก"
         cancelText="ยกเลิก"
         destroyOnClose
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleAdd}
-          preserve={false}
-        >
+        <Form form={form} layout="vertical" onFinish={onSubmit} preserve={false}>
           <Form.Item
             label="ชื่อ"
             name="firstName"
@@ -272,13 +349,16 @@ const Admin: React.FC = () => {
           >
             <Input />
           </Form.Item>
+
+          {/* หมายเหตุ: เวลาตั้งค่าแก้ไข ถ้าปล่อยว่าง = ไม่เปลี่ยนรหัสผ่าน */}
           <Form.Item
-            label="รหัสผ่าน"
+            label={editing ? "รหัสผ่าน (เว้นว่าง = ไม่เปลี่ยน)" : "รหัสผ่าน"}
             name="password"
-            rules={[{ required: true, message: "กรอกรหัสผ่าน" }]}
+            rules={editing ? [] : [{ required: true, message: "กรอกรหัสผ่าน" }]}
           >
             <Input.Password />
           </Form.Item>
+
           <Form.Item
             label="ตำแหน่ง"
             name="role"
@@ -289,7 +369,7 @@ const Admin: React.FC = () => {
               <Option value="ผู้ช่วยทันตะ">ผู้ช่วยทันตะ</Option>
               <Option value="ทันตภิบาล">ทันตภิบาล</Option>
               <Option value="เวชระเบียน">เวชระเบียน</Option>
-              <Option value="คนจ่ายยา">คนจ่ายยา</Option>
+              <Option value="เจ้าหน้าที่จ่ายยา">เจ้าหน้าที่จ่ายยา</Option>
             </Select>
           </Form.Item>
         </Form>
