@@ -1,81 +1,86 @@
-export interface Patient {
-  id: number;
-  citizenID: string;
-  prefix: string;
-  firstname: string;
-  lastname: string;
-  nickname: string;
-  congenitadisease: string;
-  blood_type: string;
-  gender: string;
-  birthday: string;
-  phonenumber: string;
-  age: number;
-  drugallergy: string;
-
-  contactperson?: ContactPerson;
-  address?: Address;
-  initialsymptomps?: InitialSymptomps[];
-  histories?: HistoryPatien[];
+// src/interface/patient.ts
+export interface Address {
+  HouseNumber?: string;
+  Moo?: string;
+  Subdistrict?: string;
+  District?: string;
+  Provice?: string;
+  Postcod?: string;
 }
 
 export interface ContactPerson {
-  id: number;
-  relationship: string;
-  contactpersonphone: string;
-  patientID: number;
-
-  patient?: Patient;
-}
-
-export interface Address {
-  id: number;
-  housenumber: string;
-  moo: string;
-  subdistrict: string;
-  district: string;
-  provice: string;
-  postcod: string;
-  patientID: number;
-
-  patient?: Patient;
+  Relationship?: string;
+  ContactperPhone?: string;
 }
 
 export interface InitialSymptomps {
-  id: number;
-  symptomps: string;
-  bloodpressure: string;
-  visit: string; // ISO string
-  heartrate: string;
-  weight: number;
-  height: number;
-  serviceID: number;
-  patientID: number;
+  Symptomps?: string;
+  BloodPressure?: string;
+  Visit?: string | Date; // ถ้าใช้ date จาก backend
+  HeartRate?: string;
+  Weight?: number;
+  Height?: number;
+}
+export interface Quadrant {
+  ID?: number;
+  Quadrant: string;
+  TreatmentID?: number;
+}
+export interface Patient {
+  ID?: number;
+  CitizenID?: string;
+  Prefix?: string;
+  FirstName?: string;
+  LastName?: string;
+  NickName?: string;
+  PhoneNumber?: string;
+  Age?: number;
+  DrugAllergy?: string;
+  Address?:Address[]; 
+  ContactPerson?:ContactPerson[];
+  InitialSymptomps?:InitialSymptomps[];
+  CongenitaDisease?: string;
+  BloodType?: string
+}
+export interface CaseData {
+  ID?: number;
+  SignDate: string;
+  Note: string;
+  PatientID: number;
+  DepartmentID: number;
+  appointment_date?: string;  // ✅ new
+  TotalPrice?: number;     // ✅ new
+  Treatment?: Treatment[];
+  Patient?: any;
 
-  service?: ServiceRef;
-  patient?: Patient;
+  Department?: {
+    ID: number;
+    Position: string;
+    EmpType: string;
+    License: string;
+    CompRate: number;
+    Specialization: string;
+    StartDate: string;
+    PersonalData?: {
+      ID: number;
+      FirstName: string;
+      LastName: string;
+      Title?: string;
+      Gender?: string;
+    };
+  };
+
 }
 
-export interface ServiceRef {
-  id: number;
-  name: string;
-  price: number;
-}
-
-export interface HistoryPatien {
-  id: number;
-  patientID: number;
-  caseDataID: number; // อ้างอิงเคสจากอีกระบบ/อีกตาราง
-  note?: string;
-
-  patient?: Patient;
-  caseData?: CaseRef; // แนบรายละเอียดเคสตอน GET (optional)
-}
-
-export interface CaseRef {
-  id: number;
-  code: string;
-  title: string;
-  diagnosis?: string;
-  price?: number;
+export interface Treatment {
+  ID?: number;                // PK from DB
+  CaseDataID?: number;        // FK -> case
+  TreatmentName: string;
+  Price: number;
+  appointment_date?: string | null; // ISO string หรือ null
+  Photo?: string | null;     // url หรือ base64 (จาก backend)
+  Quadrants?: Quadrant[];    // ถ้ามี
+  // frontend-only (ก่อนอัปโหลด)
+  // selected_teeth?: string[]; // ตัวเลขฟันจาก UI
+  photo_upload?: any[];      // UploadFile[] หรือ File[] จาก AntD Upload
 }

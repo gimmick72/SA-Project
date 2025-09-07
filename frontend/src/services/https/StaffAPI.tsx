@@ -1,4 +1,4 @@
-//frontend/src/services/https/Staff.tsx 
+//frontend/src/services/https/StaffAPI.tsx 
 import axios from 'axios';
 const API_BASE = 'http://localhost:8080';
 import type { Department, NewStaffData, PersonalData, Staff } from '../../interface/Staff';
@@ -32,7 +32,7 @@ const mapToDepartment = (values: any, staff?: Staff): Department => ({
   StartDate: values.startDate ? values.startDate.toISOString() : new Date().toISOString(),
 });
 
-export const StaffController = {
+export const StaffAPI = {
   getAllStaff: async (): Promise<Staff[]> => {
     const response = await axios.get(`${API_BASE}/staff`);
     const data = response.data as any;
@@ -43,7 +43,7 @@ export const StaffController = {
       title: staff.PersonalData.Title,
       firstName: staff.PersonalData.FirstName,
       lastName: staff.PersonalData.LastName,
-      position: staff.Position,
+      position: staff.Position, 
 
     }));
   },

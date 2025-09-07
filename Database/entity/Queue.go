@@ -20,7 +20,6 @@ type Queue struct {
 	Timeslot   Timeslot `gorm:"foreignKey:TimeslotID;references:ID"`
 }
 
-
 type Timeslot struct{
 	gorm.Model
 	Slot time.Time

@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type DentistMenagement struct {
+type DentistManagement struct {
 	gorm.Model	`gorm:"primaryKey"`
 	Room string
 	Date time.Time

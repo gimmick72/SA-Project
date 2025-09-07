@@ -32,12 +32,27 @@ func main() {
 		c.Next()
 	})
 
-	// 5️⃣ Register routes
+	// Staff routes
 	r.GET("/staff", controllers.GetAllStaff)
 	r.GET("/staff/:id", controllers.GetStaffByID)
 	r.PUT("/staff/:id", controllers.UpdateStaff)
 	r.POST("/staff", controllers.AddStaff)
 	r.DELETE("/staff/:id", controllers.DeleteStaff) 
+	
+	caseRoutes := r.Group("/cases")
+	{
+		caseRoutes.GET("", controllers.GetCases)
+		caseRoutes.GET("/:id", controllers.GetCaseByID)
+		caseRoutes.POST("", controllers.CreateCase)
+		caseRoutes.PUT("/:id", controllers.UpdateCase)
+		caseRoutes.DELETE("/:id", controllers.DeleteCase)
+	}
+	patientRoutes := r.Group("/patients")
+{
+    patientRoutes.GET("", controllers.GetPatientByCitizenID) // <-- เพิ่ม
+}
+
+
 	r.Run(":8080")
 
 }

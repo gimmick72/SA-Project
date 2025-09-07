@@ -21,5 +21,5 @@ type RoomReservation struct {
 	Room   Room `gorm:"foreignKey:RoomID;references:ID"`
 
 	DentistMenagementID uint
-	DentistMenagement   DentistMenagement `gorm:"foreignKey:DentistMenagementID;references:ID"`
+	DentistMenagement   DentistManagement `gorm:"foreignKey:DentistMenagementID;references:ID"`
 }

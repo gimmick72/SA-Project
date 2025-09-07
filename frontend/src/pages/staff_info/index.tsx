@@ -4,7 +4,7 @@ import { Card, Input, Button, Row, Col, Typography, message, Drawer, Spin } from
 import { SearchOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AddStaffForm from './staffAdd';
-import { StaffController } from '../../services/https/StaffAPI';
+import { StaffAPI } from '../../services/https/StaffAPI';
 import type { NewStaffData, Staff } from '../../interface/Staff';
 const { Title } = Typography;
 
@@ -26,7 +26,7 @@ const StaffInfoPaeg: React.FC = () => {
     const fetchStaff = async () => {
       try {
         setLoading(true); // เริ่ม loading
-        const data = await StaffController.getAllStaff(); // fetch จาก backend
+        const data = await StaffAPI.getAllStaff(); // fetch จาก backend
 
         setStaffData(data); // set state
         setFilteredStaff(data); // set filtered 
@@ -81,10 +81,10 @@ const StaffInfoPaeg: React.FC = () => {
   const handleAddFormSubmit = async (newStaff: NewStaffData) => {
     try {
       setLoading(true);
-      await StaffController.addStaff(newStaff);  // เรียก service เพิ่มข้อมูล
+      await StaffAPI.addStaff(newStaff);  // เรียก service เพิ่มข้อมูล
 
       // โหลดข้อมูลล่าสุดทั้งหมดจาก backend
-      const allStaff = await StaffController.getAllStaff();
+      const allStaff = await StaffAPI.getAllStaff();
       setStaffData(allStaff);
       setFilteredStaff(allStaff);
 

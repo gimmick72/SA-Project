@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Button, Typography, Spin, Row, Col, Form, Input, Select, DatePicker, message, Popconfirm, Space } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { StaffController } from '../../services/https/StaffAPI';
+import { StaffAPI } from '../../services/https/StaffAPI';
 import type { Staff } from '../../interface/Staff';
 const { Title } = Typography;
 const { Option } = Select;
@@ -24,7 +24,7 @@ const StaffDetails: React.FC = () => {
 
       try {
         setLoading(true);
-        const data = await StaffController.getStaffByID(Number(Employee_ID));
+        const data = await StaffAPI.getStaffByID(Number(Employee_ID));
         setStaff(data);
       } catch (error) {
         message.error('ไม่พบข้อมูลบุคลากร');
@@ -42,7 +42,7 @@ const StaffDetails: React.FC = () => {
       if (!Employee_ID) return;
       setLoading(true);
       try {
-        const data = await StaffController.getStaffByID(Number(Employee_ID));
+        const data = await StaffAPI.getStaffByID(Number(Employee_ID));
         setStaff(data);
         if (isEditing) {
           form.setFieldsValue({ ...data, startDate: data.startDate ? dayjs(data.startDate) : null });
@@ -61,7 +61,7 @@ const StaffDetails: React.FC = () => {
     if (!staff) return;
 
     try {
-      const updatedStaff = await StaffController.updateStaff(
+      const updatedStaff = await StaffAPI.updateStaff(
         staff.Employee_ID,
         values,
         staff
@@ -99,7 +99,7 @@ const StaffDetails: React.FC = () => {
   const handleDeleteStaff = async () => {
     try {
       if (!staff) return; // กัน null
-      await StaffController.deleteStaff(staff.Employee_ID); // เรียก API
+      await StaffAPI.deleteStaff(staff.Employee_ID); // เรียก API
       message.success('ลบข้อมูลเรียบร้อย');
       navigate('/staff'); // กลับไปหน้า list หรือ refresh
     } catch (err) {
