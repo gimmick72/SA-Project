@@ -32,12 +32,15 @@ func Authorizes() gin.HandlerFunc {
 			Issuer:    "AuthService",
 		}
 
-		_, err := jwtWrapper.ValidateToken(clientToken)
+		claims, err := jwtWrapper.ValidateToken(clientToken)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
-
 		}
+
+		// Set user info in context for use in protected routes
+		c.Set("email", claims.Email)
+		c.Set("role", claims.Role)
 		c.Next()
 	}
 

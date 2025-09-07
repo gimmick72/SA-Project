@@ -1,16 +1,23 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Card, Typography, message } from "antd";
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, Typography, message, Select, DatePicker } from "antd";
+import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, BankOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
+import { AuthAPI, RegisterRequest } from "../../services/authApi";
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 interface RegisterFormData {
-  username: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phone: string;
   password: string;
   confirmPassword: string;
+  role: 'patient' | 'admin';
+  phone_number?: string;
+  date_of_birth?: string;
+  department?: string;
+  position?: string;
 }
 
 const RegisterPage: React.FC = () => {
@@ -20,13 +27,27 @@ const RegisterPage: React.FC = () => {
   const onFinish = async (values: RegisterFormData) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { confirmPassword, ...registerData } = values;
       
-      message.success("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");
-      navigate("/auth/login");
-    } catch (error) {
-      message.error("สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่");
+      // Convert date to proper ISO format if provided
+      if (registerData.date_of_birth) {
+        const date = new Date(registerData.date_of_birth);
+        registerData.date_of_birth = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      }
+      
+      const response = await AuthAPI.register(registerData as RegisterRequest);
+      
+      message.success("สมัครสมาชิกสำเร็จ! เข้าสู่ระบบอัตโนมัติ");
+      
+      // Navigate based on role
+      if (response.user.role === 'admin') {
+        navigate("/admin");
+      } else {
+        navigate("/"); // Redirect patients to home page
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || "สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่";
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -52,7 +73,7 @@ const RegisterPage: React.FC = () => {
           <Title level={2} style={{ color: "#722ED1", marginBottom: "8px" }}>
             สมัครสมาชิก
           </Title>
-          <Text type="secondary">สำหรับเจ้าหน้าที่ใหม่</Text>
+          <Text type="secondary">สำหรับผู้ดูแลระบบและผู้ป่วยใหม่</Text>
         </div>
 
         <Form
@@ -62,14 +83,38 @@ const RegisterPage: React.FC = () => {
           size="large"
         >
           <Form.Item
-            name="username"
-            rules={[{ required: true, message: "กรุณากรอกชื่อผู้ใช้!" }]}
+            name="role"
+            rules={[{ required: true, message: "กรุณาเลือกประเภทผู้ใช้!" }]}
           >
-            <Input 
-              prefix={<UserOutlined />} 
-              placeholder="ชื่อผู้ใช้"
-            />
+            <Select placeholder="เลือกประเภทผู้ใช้">
+              <Option value="admin">ผู้ดูแลระบบ (Admin)</Option>
+              <Option value="patient">ผู้ป่วย (Patient)</Option>
+            </Select>
           </Form.Item>
+
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Form.Item
+              name="first_name"
+              rules={[{ required: true, message: "กรุณากรอกชื่อ!" }]}
+              style={{ flex: 1 }}
+            >
+              <Input 
+                prefix={<UserOutlined />} 
+                placeholder="ชื่อ"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="last_name"
+              rules={[{ required: true, message: "กรุณากรอกนามสกุล!" }]}
+              style={{ flex: 1 }}
+            >
+              <Input 
+                prefix={<UserOutlined />} 
+                placeholder="นามสกุล"
+              />
+            </Form.Item>
+          </div>
 
           <Form.Item
             name="email"
@@ -85,13 +130,64 @@ const RegisterPage: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            name="phone"
-            rules={[{ required: true, message: "กรุณากรอกเบอร์โทรศัพท์!" }]}
+            noStyle
+            shouldUpdate={(prevValues, currentValues) => prevValues.role !== currentValues.role}
           >
-            <Input 
-              prefix={<PhoneOutlined />} 
-              placeholder="เบอร์โทรศัพท์"
-            />
+            {({ getFieldValue }) => {
+              const role = getFieldValue('role');
+              
+              if (role === 'patient') {
+                return (
+                  <>
+                    <Form.Item
+                      name="phone_number"
+                      rules={[{ required: true, message: "กรุณากรอกเบอร์โทรศัพท์!" }]}
+                    >
+                      <Input 
+                        prefix={<PhoneOutlined />} 
+                        placeholder="เบอร์โทรศัพท์"
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="date_of_birth"
+                      label="วันเกิด"
+                    >
+                      <DatePicker 
+                        style={{ width: '100%' }}
+                        placeholder="เลือกวันเกิด"
+                        format="YYYY-MM-DD"
+                      />
+                    </Form.Item>
+                  </>
+                );
+              } else if (role === 'admin') {
+                return (
+                  <>
+                    <Form.Item
+                      name="department"
+                      rules={[{ required: true, message: "กรุณากรอกแผนก!" }]}
+                    >
+                      <Input 
+                        prefix={<BankOutlined />} 
+                        placeholder="แผนก"
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="position"
+                      rules={[{ required: true, message: "กรุณากรอกตำแหน่ง!" }]}
+                    >
+                      <Input 
+                        prefix={<UserOutlined />} 
+                        placeholder="ตำแหน่ง"
+                      />
+                    </Form.Item>
+                  </>
+                );
+              }
+              return null;
+            }}
           </Form.Item>
 
           <Form.Item

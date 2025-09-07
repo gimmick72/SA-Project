@@ -8,16 +8,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// DB คือ global database connection
-var DB *gorm.DB
+// db คือ global database connection
+var db *gorm.DB
 
-// main.go หรือ configs/db.go
-
-// ConnectDatabase เชื่อมต่อฐานข้อมูล SQLite และเก็บ instance ไว้ที่ DB
+// ConnectDatabase เชื่อมต่อฐานข้อมูล SQLite และเก็บ instance ไว้ที่ db
 func ConnectDatabase() {
 	var err error
 	dsn := "DatabaseProject_SA.db?_pragma=foreign_keys(1)" // ใช้ไฟล์เดียวกับ main.go
-	DB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect database: ", err)
 	}
@@ -27,12 +25,28 @@ func ConnectDatabase() {
 func SetupDatbase() {
 
 	//Migrate the schema
-	DB.AutoMigrate(
+	db.AutoMigrate(
 		//Patient
 		&entity.Patient{},
 		&entity.Address{},
 		&entity.ContactPerson{},
 		&entity.HistoryPatien{},
 		&entity.InitialSymptomps{},
+		
+		//Payment System
+		&entity.Staff{},
+		&entity.Payment{},
+		&entity.Receipt{},
+		
+		//Attendance System
+		&entity.Attendance{},
+		
+		//Authentication System
+		&entity.User{},
 	)
+}
+
+// DB returns the database instance
+func DB() *gorm.DB {
+	return db
 }

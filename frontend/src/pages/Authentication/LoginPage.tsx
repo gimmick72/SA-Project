@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Card, Typography, message } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, Typography, message, Select } from "antd";
+import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
+import { AuthAPI, LoginRequest } from "../../services/authApi";
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 interface LoginFormData {
-  username: string;
+  email: string;
   password: string;
+  role: 'patient' | 'admin';
 }
 
 const LoginPage: React.FC = () => {
@@ -17,19 +20,19 @@ const LoginPage: React.FC = () => {
   const onFinish = async (values: LoginFormData) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any credentials
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("isLogin", "true");
-      localStorage.setItem("userRole", "admin");
-      localStorage.setItem("username", values.username);
+      const response = await AuthAPI.login(values);
       
       message.success("เข้าสู่ระบบสำเร็จ!");
-      navigate("/admin");
-    } catch (error) {
-      message.error("เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่");
+      
+      // Navigate based on role
+      if (response.user.role === 'admin') {
+        navigate("/admin");
+      } else {
+        navigate("/"); // Redirect patients to home page
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || "เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่";
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -55,7 +58,7 @@ const LoginPage: React.FC = () => {
           <Title level={2} style={{ color: "#722ED1", marginBottom: "8px" }}>
             เข้าสู่ระบบ
           </Title>
-          <Text type="secondary">สำหรับเจ้าหน้าที่คลินิก</Text>
+          <Text type="secondary">สำหรับผู้ดูแลระบบและผู้ป่วย</Text>
         </div>
 
         <Form
@@ -65,12 +68,15 @@ const LoginPage: React.FC = () => {
           size="large"
         >
           <Form.Item
-            name="username"
-            rules={[{ required: true, message: "กรุณากรอกชื่อผู้ใช้!" }]}
+            name="email"
+            rules={[
+              { required: true, message: "กรุณากรอกอีเมล!" },
+              { type: "email", message: "รูปแบบอีเมลไม่ถูกต้อง!" }
+            ]}
           >
             <Input 
-              prefix={<UserOutlined />} 
-              placeholder="ชื่อผู้ใช้"
+              prefix={<MailOutlined />} 
+              placeholder="อีเมล"
             />
           </Form.Item>
 
@@ -82,6 +88,16 @@ const LoginPage: React.FC = () => {
               prefix={<LockOutlined />} 
               placeholder="รหัสผ่าน"
             />
+          </Form.Item>
+
+          <Form.Item
+            name="role"
+            rules={[{ required: true, message: "กรุณาเลือกประเภทผู้ใช้!" }]}
+          >
+            <Select placeholder="เลือกประเภทผู้ใช้">
+              <Option value="admin">ผู้ดูแลระบบ (Admin)</Option>
+              <Option value="patient">ผู้ป่วย (Patient)</Option>
+            </Select>
           </Form.Item>
 
           <Form.Item>
@@ -121,7 +137,7 @@ const LoginPage: React.FC = () => {
           borderRadius: "4px"
         }}>
           <Text type="secondary" style={{ fontSize: "12px" }}>
-            Demo: ใช้ชื่อผู้ใช้และรหัสผ่านใดก็ได้เพื่อทดสอบ
+            ทดสอบ: admin@clinic.com / admin123 (Admin) หรือ patient@example.com / patient123 (Patient)
           </Text>
         </div>
       </Card>
