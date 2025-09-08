@@ -1,4 +1,4 @@
-import type {Patient} from "./patient";
+import type {Patient} from "./initailPatient/patient";
 
 export interface InitialSymptoms extends Patient {
     symptomps : string;

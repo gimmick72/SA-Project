@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Database/configs"
-	"Database/controllers"
+	"Database/controllers/initailPatient"
 )
 
 const PORT = "8080"

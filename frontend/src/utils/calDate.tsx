@@ -1,13 +1,15 @@
-const calcAge = (dateStr: string) => {
-    if (!dateStr) return 0;
-    const today = new Date();
-    const dob = new Date(dateStr); // yyyy-MM-dd จาก <input type="date" />
-    let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-      age--;
-    }
-    return Math.max(0, age);
-  };
-  
-  const todayStr = new Date().toISOString().slice(0, 10); // ใช้ set เป็น max ของ input date
+import dayjs, { Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// ตั้ง timezone ไทยเป็นค่า default
+dayjs.tz.setDefault("Asia/Bangkok");
+
+export const DateOnly = (d?: Dayjs | Date | string | null): string | undefined => {
+  if (!d) return undefined;
+  const t = dayjs.isDayjs(d) ? d : dayjs(d);
+  return t.isValid() ? t.tz("Asia/Bangkok").format("YYYY-MM-DD") : undefined;
+};

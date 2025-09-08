@@ -7,7 +7,7 @@ const PatientHeader = () => {
     <div className="header">
       <h2 
       style={{ fontWeight: "600" }}
-      onClick={() => navigate("/admin/patient/detail/${record.id}")}
+      onClick={() => navigate("/admin/patient/detail/${recortd.id}")}
       >ข้อมูลประจำตัว</h2>
       
       {/* <h3 className="header-element">
