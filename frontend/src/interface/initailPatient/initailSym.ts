@@ -1,4 +1,3 @@
-import { F } from "framer-motion/dist/types.d-Cjd591yU";
 
 export interface InitialSymtoms{
     symptomps: string;

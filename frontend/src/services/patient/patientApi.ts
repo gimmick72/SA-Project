@@ -91,8 +91,16 @@ export const Delete = async (url: string, requireAuth = true) => {
 export const PatientAPI = {
   getAll:  () => Get('/api/patients', false),
   getByID: (id:number) => Get(`/api/patients/${id}`),
-  create: (data: Patient) => Post('/api/patients', data, false),
+  createPatient: (data: Patient) => Post('/api/patients', data, false),
   update:  (id: number, data: Patient) => Update(`/api/patients/${id}`, data),
   delete:  (id: number) => Delete(`/api/patients/${id}`),
 };
+
+export const PatientSymptomsAPI = {
+  createSymtom: (id: number | string, data: any) =>Post(`/api/patients/${id}/symptoms`, data, false),
+}
+
+export const ServiceToSymtomsAPI = {
+  getService: () => Get('/api/services',false)
+}
 

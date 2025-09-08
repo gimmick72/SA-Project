@@ -8,6 +8,8 @@ import (
 
 	"Database/configs"
 	patientEntity "Database/entity/patient"
+	serviceEntity "Database/entity"
+	
 )
 
 // POST /symptoms
@@ -50,3 +52,17 @@ func CreateSymptom(c *gin.Context) {
 
 // 	c.JSON(http.StatusOK, symptoms)
 // }
+
+//Get Service
+func GetServicetoSymtompOption(c *gin.Context) {
+	var services []serviceEntity.Service
+	if err := configs.DB.
+		Model(&serviceEntity.Service{}).
+		Select("id", "name_service").          // ✅ ใช้คอลัมน์จริง
+		Order("name_service").
+		Find(&services).Error; err != nil {     // ✅ ใช้ Find กับ Model เดียวกัน
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, services) // ✅ คืนเป็น []Service เดิม ไม่ต้อง DTO
+}

@@ -1,144 +1,286 @@
+//Send Ok โหลด ข้อมูล OK
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./design/initial.css";
 
-import { Typography, Form, Input, DatePicker, InputNumber, Button, Row, Col, message } from "antd";
-import type { InitialSymtoms} from "../../../interface/initailPatient/initailSym";
-import { PatientAPI } from "../../../services/patient/patientApi";
-import { set } from "date-fns";
+import {
+  Typography,
+  Form,
+  Input,
+  DatePicker,
+  TimePicker,
+  InputNumber,
+  Button,
+  Row,
+  Col,
+  message,
+  Select,
+} from "antd";
+import dayjs from "dayjs";
+
+import type { InitialSymtoms } from "../../../interface/initailPatient/initailSym";
+import {
+  PatientAPI,
+  ServiceToSymtomsAPI,
+  PatientSymptomsAPI,
+} from "../../../services/patient/patientApi";
+import { splitToDateAndTime } from "../../../utils/dateTime";
+import { useSyncDateTime } from "../../hooks/syncDateTime";
 
 const { Title } = Typography;
 
 const InitialPage: React.FC = () => {
   const [symptomsForm] = Form.useForm<InitialSymtoms>();
   const [messageApi, contextHolder] = message.useMessage();
-  const [submitting, setSubmitting] = React.useState(false);
   const [loading, setLoading] = useState(true);
+  const [serviceOptions, setServiceOptions] = useState<
+    { label: string; value: number }[]
+  >([]);
   const { id } = useParams<{ id: string }>();
 
+  // ✅ รวม date+time → visit (local RFC3339) อัตโนมัติ
+  useSyncDateTime(symptomsForm, "visitDateOnly", "visitTimeOnly", "visit");
+
   useEffect(() => {
+    if (!id) return;
     fetchPatient();
-  }, []);
+    fetchService();
+  }, [id]);
 
   const fetchPatient = async () => {
     try {
       setLoading(true);
-      const response = await PatientAPI.getByID(Number(id));
-      symptomsForm.setFieldsValue(response.data || response);
-    } catch {
-      console.error();
-      messageApi.error("ไม่สามารถแสดงคนไข้ได้");
+      const resp = await PatientAPI.getByID(Number(id));
+      const data = resp?.data ?? resp ?? {};
+
+      // แตก visit เดิมให้ช่องวันที่/เวลาแยกแสดง
+      const v = data.visit ?? data.visitDate ?? data.Visit ?? data.visit_date;
+      const { dateOnly, timeOnly } = splitToDateAndTime(v);
+
+      symptomsForm.setFieldsValue({
+        ...data,
+        patientID: Number(id), // ✅ ให้ส่งไปกับฟอร์มด้วย
+        visitDateOnly: dateOnly,
+        visitTimeOnly: timeOnly,
+        // visit: ให้ hook คำนวณเองเมื่อมี date/time
+      });
+    } catch (e) {
+      console.error(e);
+      messageApi.error("ไม่มีข้อมูลคนไข้");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
- 
-  const onFinish = (values: any) => {
-    // TODO: ส่งค่าไป API ตามที่ต้องการ
-    console.log("FORM VALUES:", values);
+  const fetchService = async () => {
+    try {
+      setLoading(true);
+      const res = await ServiceToSymtomsAPI.getService(); // GET /api/services
+      const rows = Array.isArray(res) ? res : res?.data ?? [];
+      setServiceOptions(
+        rows.map((s: any) => ({
+          value: Number(s.ID),
+          label: s.NameService ?? "",
+        }))
+      );
+    } catch (e) {
+      console.error(e);
+      messageApi.error("ไม่มีบริการ");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onFinish = async (values: any) => {
+    try {
+      // ✅ ส่งค่าตรง ๆ ได้เลย เพราะชื่อฟิลด์ตรงกับ BE แล้ว
+      await PatientSymptomsAPI.createSymtom(id!, values);
+      messageApi.success("บันทึกอาการแล้ว");
+    } catch (e) {
+      console.error(e);
+      messageApi.error("บันทึกไม่สำเร็จ");
+    }
   };
 
   return (
     <div className="wrapper">
+      {contextHolder}
       <div className="header">
         <Title level={3}>อาการเบื้องต้น</Title>
       </div>
 
       <div style={{ paddingLeft: "3rem", paddingRight: "3rem" }}>
-     
-        <Form form={symptomsForm} layout="vertical" onFinish={onFinish}>
-          {/* แถวที่ 1 */}
+        <Form
+          form={symptomsForm}
+          layout="vertical"
+          onFinish={onFinish}
+          initialValues={{
+            ID: id ? Number(id) : undefined,
+            patientID: id ? Number(id) : undefined,
+          }}
+        >
+          {/* แถวที่ 1: แสดงข้อมูลคนไข้ */}
           <Row gutter={[24, 12]}>
-            <Col xs={20} sm={10} md={6}>
-              <Form.Item name="patientID" label="รหัสคนไข้">
-                <Input disabled></Input>
+            <Col md={4}>
+              <Form.Item name="ID" label="รหัสคนไข้">
+                <Input readOnly />
               </Form.Item>
             </Col>
-            <Col xs={20} sm={10} md={6}>
-              <Form.Item
-                name="citizenID"
-                label="เลขบัตรประชาชน"
-              >
-                <Input disabled></Input>
+            <Col md={5}>
+              <Form.Item name="citizenID" label="เลขบัตรประชาชน">
+                <Input readOnly />
               </Form.Item>
             </Col>
-          </Row>
 
-          {/* ข้อมูลส่วนตัว */}
-          <Row gutter={[24, 12]}>
-            <Col xs={24} sm={6} md={4}>
+            {/* ข้อมูลประจำตัว */}
+            <Col md={3}>
               <Form.Item name="prefix" label="คำนำหน้า">
-                <Input disabled></Input>
+                <Input readOnly />
               </Form.Item>
             </Col>
-            <Col xs={20} sm={10} md={6}>
-              <Form.Item name="firstname" label="ชื่อ" >
-                <Input disabled></Input>
+            <Col md={4}>
+              <Form.Item name="firstname" label="ชื่อ">
+                <Input readOnly />
               </Form.Item>
             </Col>
-            <Col xs={20} sm={10} md={6}>
+            <Col md={4}>
               <Form.Item name="lastname" label="นามสกุล">
-                <Input disabled></Input>
+                <Input readOnly />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={6} md={4}>
+            <Col md={4}>
               <Form.Item name="nickname" label="ชื่อเล่น">
-                <Input disabled></Input>
+                <Input readOnly />
               </Form.Item>
             </Col>
           </Row>
 
-          {/* บริการและชีพจร */}
+          <Form.Item name="patientID" hidden>
+            <Input type="hidden" />
+          </Form.Item>
+
+          {/* บริการและชีพจร / ความดัน */}
           <Row gutter={[24, 12]}>
-            <Col xs={24} sm={12} md={8}>
-              <Form.Item name="service" label="บริการทันตกรรม">
-                <Input placeholder="เช่น อุดฟัน ขูดหินปูน ถอนฟัน" allowClear />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} md={8}>
+            <Col xs={14} sm={8} md={6}>
+              {/* ✅ ชื่อฟิลด์ให้ตรง BE: serviceID */}
               <Form.Item
-                name="heartRate"
-                label="อัตราการเต้นหัวใจ (ครั้ง/นาที)"
-                rules={[
-                  { type: "number", min: 30, max: 220, transform: (v) => (v === "" ? undefined : Number(v)) },
-                ]}
+                name="serviceID"
+                label="บริการทันตกรรม"
+                rules={[{ required: true, message: "กรุณาเลือกบริการ" }]}
               >
-                <InputNumber style={{ width: "100%" }} placeholder="เช่น 72" />
+                <Select
+                  placeholder="เลือกบริการทันตกรรม"
+                  options={serviceOptions}
+                  optionFilterProp="label"
+                  showSearch
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={14} sm={8} md={5}>
+              {/* ✅ ชื่อฟิลด์ให้ตรง BE: heartrate (เป็น string) */}
+              <Form.Item name="heartrate" label="Heart Rate">
+                <Input placeholder="ครั้ง/นาที" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={14} sm={8} md={5}>
+              <Form.Item name="systolic" label="Systolic">
+                <InputNumber style={{ width: "100%" }} placeholder="mmHg" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={14} sm={8} md={5}>
+              <Form.Item name="diastolic" label="Diastolic">
+                <InputNumber style={{ width: "100%" }} placeholder="mmHg" />
               </Form.Item>
             </Col>
           </Row>
 
-          {/* วันที่และความดัน */}
+          {/* วันที่ + เวลา (แยกช่อง) */}
           <Row gutter={[24, 12]}>
-            <Col xs={24} sm={12} md={8}>
-              <Form.Item name="visitDate" label="วันที่เข้ารับบริการ" rules={[{ required: true, message: "เลือกวันและเวลา" }]}>
-                <DatePicker showTime style={{ width: "100%" }} placeholder="เลือกวันและเวลา" />
+            <Col md={3}>
+              <Form.Item
+                name="weight"
+                label="น้ำหนัก"
+                rules={[{ required: true, message: "กรุณากรอกน้ำหนัก" }]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  placeholder="kg"
+                  min={0}
+                />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={8}>
-              <Form.Item name="bloodPressure" label="ความดัน (mmHg) เช่น 120/80">
-                <Input placeholder="เช่น 120/80" allowClear />
+
+            <Col md={3}>
+              {/* ✅ hight -> height */}
+              <Form.Item
+                name="height"
+                label="ส่วนสูง"
+                rules={[{ required: true }]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  placeholder="เซนติเมตร"
+                  min={0}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={14} sm={8} md={5}>
+              <Form.Item
+                name="visitDateOnly"
+                label="วันที่เข้ารับบริการ"
+                rules={[{ required: true, message: "เลือกวันที่" }]}
+                getValueProps={(v) => ({ value: v ? dayjs(v) : v })}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  placeholder="เลือกวันที่"
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={14} sm={8} md={5}>
+              <Form.Item
+                name="visitTimeOnly"
+                label="เวลาเข้ารับบริการ"
+                rules={[{ required: true, message: "เลือกเวลา" }]}
+                getValueProps={(v) => ({ value: v ? dayjs(v) : v })}
+              >
+                <TimePicker
+                  style={{ width: "100%" }}
+                  placeholder="เลือกเวลา"
+                  format="HH:mm"
+                />
               </Form.Item>
             </Col>
           </Row>
 
-          {/* อาการเบื้องต้น */}
+          <Form.Item name="visit" hidden>
+            <Input type="hidden" />
+          </Form.Item>
+
+          {/* อาการเบื้องต้น (ชื่อตรง BE: symptomps) */}
           <Row gutter={[24, 12]}>
             <Col xs={24} md={16}>
-              <Form.Item name="initialSymptoms" label="อาการ">
-                <Input.TextArea rows={3} placeholder="เช่น ปวดฟันซี่ล่างขวา เสียวฟัน เวลาทานของเย็น" />
+              <Form.Item name="symptomps" label="อาการ">
+                <Input.TextArea
+                  rows={3}
+                  placeholder="เช่น ปวดฟันซี่ล่างขวา เสียวฟัน เวลาทานของเย็น"
+                />
               </Form.Item>
             </Col>
           </Row>
 
-          {/* ปุ่มบันทึก/ยกเลิก */}
           <Form.Item>
-            <div className="button-contact" style={{ display: "flex", gap: 12 }}>
-              <Button type="primary" htmlType="submit" className="save-button">
+            <div style={{ display: "flex", gap: 12 }}>
+              <Button type="primary" htmlType="submit">
                 บันทึก
               </Button>
-              <Button htmlType="button" className="cancel-button" onClick={() => window.history.back()}>
+              <Button htmlType="button" onClick={() => window.history.back()}>
                 ยกเลิก
               </Button>
             </div>
@@ -150,4 +292,3 @@ const InitialPage: React.FC = () => {
 };
 
 export default InitialPage;
-

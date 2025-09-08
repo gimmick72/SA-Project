@@ -48,7 +48,7 @@ const AddPatientPage: React.FC = () => {
 
       console.log("[handleSubmit] values:", patient);
 
-      await PatientAPI.create(patient);
+      await PatientAPI.createPatient(patient);
       messageApi.success("บันทึกข้อมูลสำเร็จ");
       form.resetFields();
     } catch (error: any) {
