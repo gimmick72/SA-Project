@@ -1,7 +1,7 @@
 //Send Ok โหลด ข้อมูล OK
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./design/initial.css";
 
 import {
@@ -38,6 +38,7 @@ const InitialPage: React.FC = () => {
     { label: string; value: number }[]
   >([]);
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   // ✅ รวม date+time → visit (local RFC3339) อัตโนมัติ
   useSyncDateTime(symptomsForm, "visitDateOnly", "visitTimeOnly", "visit");
@@ -123,8 +124,8 @@ const InitialPage: React.FC = () => {
           {/* แถวที่ 1: แสดงข้อมูลคนไข้ */}
           <Row gutter={[24, 12]}>
             <Col md={4}>
-              <Form.Item name="ID" label="รหัสคนไข้">
-                <Input readOnly />
+              <Form.Item label="รหัสคนไข้">
+                <Input value={id} readOnly />
               </Form.Item>
             </Col>
             <Col md={5}>
@@ -215,7 +216,6 @@ const InitialPage: React.FC = () => {
             </Col>
 
             <Col md={3}>
-              {/* ✅ hight -> height */}
               <Form.Item
                 name="height"
                 label="ส่วนสูง"
@@ -277,7 +277,11 @@ const InitialPage: React.FC = () => {
 
           <Form.Item>
             <div style={{ display: "flex", gap: 12 }}>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                onClick={() => navigate('/admin/patient')}
+              >
                 บันทึก
               </Button>
               <Button htmlType="button" onClick={() => window.history.back()}>

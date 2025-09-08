@@ -18,6 +18,6 @@ type InitialSymptomps struct {
 
 	ServiceID uint     `json:"serviceID" gorm:"index"`
 	PatientID uint     `json:"patientID" gorm:"index"`
-	Patient   *Patient `json:"patient,omitempty" gorm:"foreignKey:PatientID;references:ID"`
+	
 
 }

@@ -1,4 +1,4 @@
-//Okay but ยังไม่ได้จตรวจสอบดีๆ 
+//Okay but ยังไม่ได้จตรวจสอบดีๆ
 
 import "../patient_info/design/pateint.css";
 import React, { useState } from "react";
@@ -19,10 +19,10 @@ import {
   Col,
   Row,
   Space,
-  Card
+  Card,
 } from "antd";
 import dayjs from "dayjs";
-import  type {DateOnly} from "../../../utils/calDate"
+import type { DateOnly } from "../../../utils/calDate";
 
 const { Option } = Select;
 
@@ -68,7 +68,6 @@ const AddPatientPage: React.FC = () => {
     <div className="form-shell">
       <div className="form-scroll">
         <div className="wrapper">
-
           {contextHolder}
           <h2 style={{ fontWeight: 600 }}>ข้อมูลประจำตัว</h2>
           <Form
@@ -270,56 +269,65 @@ const AddPatientPage: React.FC = () => {
               </Col>
             </Row>
 
-           {/* แถบแพ้ยา */}
-<Form.Item label="แพ้ยา" colon={false} style={{ marginBottom: 8 }}>
-  <Space align="center" wrap>
-    {/* เลือกแพ้/ไม่แพ้ */}
-    <Form.Item name="drugAllergyType" noStyle>
-      <Radio.Group
-        onChange={({ target }) => {
-          if (target.value === "noAllergy") {
-            form.setFieldsValue({ drug_allergy: "" });
-          }
-        }}
-      >
-        <Radio value="noAllergy" style={{ marginRight: 16 }}>
-          ปฏิเสธการแพ้ยา
-        </Radio>
-        <Radio value="hasAllergy">แพ้ยา</Radio>
-      </Radio.Group>
-    </Form.Item>
+            {/* แถบแพ้ยา */}
+            <Form.Item label="แพ้ยา" colon={false} style={{ marginBottom: 8 }}>
+              <Space align="center" wrap>
+                {/* เลือกแพ้/ไม่แพ้ */}
+                <Form.Item name="drugAllergyType" noStyle>
+                  <Radio.Group
+                    onChange={({ target }) => {
+                      if (target.value === "noAllergy") {
+                        form.setFieldsValue({ drug_allergy: "" });
+                      }
+                    }}
+                  >
+                    <Radio value="noAllergy" style={{ marginRight: 16 }}>
+                      ปฏิเสธการแพ้ยา
+                    </Radio>
+                    <Radio value="hasAllergy">แพ้ยา</Radio>
+                  </Radio.Group>
+                </Form.Item>
 
-    {/* ช่องกรอกชื่อยาอยู่ชิดต่อท้าย Radio */}
-    <Form.Item noStyle shouldUpdate={(prev, cur) => prev.drugAllergyType !== cur.drugAllergyType}>
-      {({ getFieldValue }) => {
-        const disabled = getFieldValue("drugAllergyType") !== "hasAllergy";
-        return (
-          <Form.Item
-            name="drug_allergy"
-            noStyle
-            rules={[
-              () => ({
-                validator(_, value) {
-                  if (getFieldValue("drugAllergyType") === "hasAllergy" && !value) {
-                    return Promise.reject("กรุณากรอกชื่อยาที่แพ้");
+                {/* ช่องกรอกชื่อยาอยู่ชิดต่อท้าย Radio */}
+                <Form.Item
+                  noStyle
+                  shouldUpdate={(prev, cur) =>
+                    prev.drugAllergyType !== cur.drugAllergyType
                   }
-                  return Promise.resolve();
-                },
-              }),
-            ]}
-          >
-            <Input
-              placeholder="ชื่อยาที่แพ้ (เช่น เพนิซิลลิน)"
-              disabled={disabled}
-              style={{ width: 260 }} // ปรับความกว้างตามใจ
-            />
-          </Form.Item>
-        );
-      }}
-    </Form.Item>
-  </Space>
-</Form.Item>
-
+                >
+                  {({ getFieldValue }) => {
+                    const disabled =
+                      getFieldValue("drugAllergyType") !== "hasAllergy";
+                    return (
+                      <Form.Item
+                        name="drug_allergy"
+                        noStyle
+                        rules={[
+                          () => ({
+                            validator(_, value) {
+                              if (
+                                getFieldValue("drugAllergyType") ===
+                                  "hasAllergy" &&
+                                !value
+                              ) {
+                                return Promise.reject("กรุณากรอกชื่อยาที่แพ้");
+                              }
+                              return Promise.resolve();
+                            },
+                          }),
+                        ]}
+                      >
+                        <Input
+                          placeholder="ชื่อยาที่แพ้ (เช่น เพนิซิลลิน)"
+                          disabled={disabled}
+                          style={{ width: 260 }} // ปรับความกว้างตามใจ
+                        />
+                      </Form.Item>
+                    );
+                  }}
+                </Form.Item>
+              </Space>
+            </Form.Item>
 
             {/* ผู้ที่ติดต่อได้ */}
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>

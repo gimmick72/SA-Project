@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	// "gorm.io/gorm"
@@ -11,32 +12,42 @@ import (
 	serviceEntity "Database/entity"
 	
 )
-
-// POST /symptoms
+// POST /api/patients/:id/symptoms
 func CreateSymptom(c *gin.Context) {
-	var symptom patientEntity.InitialSymptomps
-	if err := c.ShouldBindJSON(&symptom); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    var symptom patientEntity.InitialSymptomps
+    if err := c.ShouldBindJSON(&symptom); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	DB := configs.DB
+    // กำหนด PatientID จากพาธชัดเจน (กัน user ยัดค่ามั่ว)
+    if pid, err := strconv.Atoi(c.Param("id")); err == nil {
+        symptom.PatientID = uint(pid)
+    } else {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid patient id"})
+        return
+    }
 
-	//บันทึกลงฐานข้อมูล
-	if err := DB.Model(&patientEntity.InitialSymptomps{}).Create(&symptom).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    // กัน payload ส่ง ID (ของอาการ) มาด้วย
+    symptom.ID = 0
 
-	//preload patient data
+    if err := configs.DB.Create(&symptom).Error; err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	if err := DB.Preload("Patient").First(&symptom, symptom.ID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    // preload ที่ต้องใช้แสดงผล
+    if err := configs.DB.
+        Preload("Patient").
+        Preload("Service").
+        First(&symptom, symptom.ID).Error; err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	c.JSON(http.StatusCreated, symptom)
+    c.JSON(http.StatusCreated, symptom)
 }
+
 
 
 // //GET /symptoms by patient_id
