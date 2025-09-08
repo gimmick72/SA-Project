@@ -43,21 +43,23 @@ func main() {
 		router.DELETE("/dentistmanagement_controller/:id", controllers.DeleteDentistManagement)
 
 		// Service
-		router.GET("/services", controllers.ListServices)
-		router.POST("/services", controllers.CreateService)
-		router.PUT("/services/:id", controllers.UpdateService)
-		router.DELETE("/services/:id", controllers.DeleteService)
+		router.GET("/Service_controller", controllers.GetServiceByCategory) // GET /api/service_controller?category_id=1
+		router.POST("/Service_controller", controllers.CreateService)       // POST /api/service_controller
+		router.PUT("/Service_controller/:id", controllers.UpdateService)    // PUT /api/service_controller/1
+		router.DELETE("/Service_controller/:id", controllers.DeleteService) // DELETE /api/service_controller/1
 
 		// Category
-		router.GET("/categories", controllers.ListCategories)
-		router.POST("/categories", controllers.CreateCategory)
+		router.GET("/category_controller", controllers.ListCategories)        // GET /api/category_controller
+		router.POST("/category_controller", controllers.CreateCategory)       // POST /api/category_controller
+		router.PUT("/category_controller/:id", controllers.UpdateCategory)    // PUT /api/category_controller/1
+		router.DELETE("/category_controller/:id", controllers.DeleteCategory) // DELETE /api/category_controller/1
 
 		// Promotion
-		router.GET("/promotions", controllers.ListPromotions)
-		router.POST("/promotions", controllers.CreatePromotion)
-		router.PUT("/promotions/:id", controllers.UpdatePromotion)
-		router.DELETE("/promotions/:id", controllers.DeletePromotion)
-
+		router.GET("/promotion_controller", controllers.ListPromotions)         // GET /api/promotion_controller
+		router.POST("/promotion_controller", controllers.CreatePromotion)       // POST /api/promotion_controller
+		router.PUT("/promotion_controller/:id", controllers.UpdatePromotion)    // PUT /api/promotion_controller/1
+		router.DELETE("/promotion_controller/:id", controllers.DeletePromotion) // DELETE /api/promotion_controller/1
+		
 	}
 
 	migrateAll()
@@ -104,10 +106,14 @@ func migrateAll() {
 	// ตาราง DentistManagement
 	must(configs.DB.AutoMigrate(
 		&entity.DentistManagement{},
-
 	))
 
-
+	// ตาราง Service และ Category และ promotion
+	must(configs.DB.AutoMigrate(
+		&entity.Category{},
+		&entity.Service{},
+		&entity.Promotion{},
+	))
 
 	// เพิ่ม mock data สำหรับ DentistManagement ถ้ายังว่าง
 	var count int64
@@ -122,6 +128,44 @@ func migrateAll() {
 		log.Println("⚡ DentistManagement table already has data")
 	}
 
+	// เพิ่ม mock data สำหรับ Category
+	var countCategory int64
+	configs.DB.Model(&entity.Category{}).Count(&countCategory)
+	if countCategory == 0 {
+		mockData := controllers.GetMockCategories()
+		for _, d := range mockData {
+			configs.DB.Create(&d)
+		}
+		log.Println("✅ Added mock Category data")
+	} else {
+		log.Println("⚡ Category table already has data")
+	}
+
+	// เพิ่ม mock data สำหรับ Service
+	var countService int64
+	configs.DB.Model(&entity.Service{}).Count(&countService)
+	if countService == 0 {
+		mockData := controllers.GetMockServices()
+		for _, d := range mockData {
+			configs.DB.Create(&d)
+		}
+		log.Println("✅ Added mock Service data")
+	} else {
+		log.Println("⚡ Category table already has data")
+	}
+
+	// เพิ่ม mock data สำหรับ Promotion ถ้ายังว่าง
+	var countPromotion int64
+	configs.DB.Model(&entity.Promotion{}).Count(&countPromotion)
+	if countPromotion == 0 {
+		mockData := controllers.GetMockPromotions()
+		for _, d := range mockData {
+			configs.DB.Create(&d)
+		}
+		log.Println("✅ Added mock Promotion data")
+	} else {
+		log.Println("⚡ Ppromotion table already has data")
+	}
 
 	// เพิ่ม mock data สำหรับ Supplies ถ้ายังว่าง
 	configs.DB.Model(&entity.Supply{}).Count(&count)
@@ -130,11 +174,10 @@ func migrateAll() {
 		for _, d := range mockData {
 			configs.DB.Create(&d)
 		}
-		log.Println("✅ Added mock DentistManagement data")
+		log.Println("✅ Added mock Supply data")
 	} else {
-		log.Println("⚡ DentistManagement table already has data")
+		log.Println("⚡ Supply table already has data")
 	}
-
 
 	// เพิ่ม mock data สำหรับ Appointments ถ้ายังว่าง
 	configs.DB.Model(&entity.Appointment{}).Count(&count)
@@ -143,11 +186,10 @@ func migrateAll() {
 		for _, d := range mockData {
 			configs.DB.Create(&d)
 		}
-		log.Println("✅ Added mock DentistManagement data")
+		log.Println("✅ Added mock Appointment data")
 	} else {
-		log.Println("⚡ DentistManagement table already has data")
+		log.Println("⚡ Appointment table already has data")
 	}
-
 
 	// (ตัวเลือก) ถ้าจะใช้ตารางผู้ป่วยจริงด้านล่างนี้ ให้เปิดคอมเมนต์
 	// must(configs.DB.AutoMigrate(&entity.Patient{}, &entity.ContactPerson{}, &entity.Address{}, &entity.InitialSymptomps{}, &entity.HistoryPatien{}))

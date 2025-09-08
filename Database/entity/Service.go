@@ -2,37 +2,35 @@ package entity
 
 import (
 	"time"
-	"gorm.io/gorm"
 )
 
 type Service struct{
-	gorm.Model
-	NameService string
-	DetailService string
-	Cost float32
+	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	NameService string  `json:"name_service"`
+	DetailService string  `json:"detail_service`
+	Cost float32  `json:"cost"`
 
-	CategoryID uint
+	CategoryID uint `json:"category_id"`
 	Category Category
 }
 
 type Category struct{
-	gorm.Model
-	NameCategory string
+	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	NameCategory string `json:"name_category"`
 }
 
 
-
 type Promotion struct{
-	gorm.Model
-	NamePromotion string
+	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	NamePromotion string  `json:"name_promotion"`
 
-	ServiceID uint
+	ServiceID uint  `json:"service_id"`
 	Service Service
 
-	PromotionDetail string
-	Cost int
+	PromotionDetail string  `json:"promotion_detail"`
+	Cost float32  `json:"cost"`
 	
-	DateStart time.Time
-	DateEnd time.Time
+	DateStart time.Time  `json:"date_start"`
+	DateEnd time.Time  `json:"date_end"`
 
 }

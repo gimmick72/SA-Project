@@ -56,6 +56,22 @@ func GetMockServices() []entity.Service {
 
 
 
+// ------------------- Promotion --------------------
+func GetMockPromotions() []entity.Promotion{
+	return []entity.Promotion{
+		{NamePromotion: "ลด 10% ตรวจฟัน", ServiceID: 1, PromotionDetail: "ลด 10% ตรวจฟันทั่วไป", Cost: 450, DateStart: time.Date(2025, 9, 1, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 9, 30, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "ขูดหินปูนลด 200 บาท", ServiceID: 2, PromotionDetail: "ขูดหินปูนลดราคา 200 บาท", Cost: 600, DateStart: time.Date(2025, 9, 5, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 9, 25, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "ฟอกสีฟัน 20% Off", ServiceID: 3, PromotionDetail: "ลด 20% ฟอกสีฟัน", Cost: 1200, DateStart: time.Date(2025, 9, 10, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 10, 10, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "จัดฟัน 5% Off", ServiceID: 4, PromotionDetail: "จัดฟันลด 5%", Cost: 9500, DateStart: time.Date(2025, 9, 15, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 12, 31, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "ตรวจฟัน + ขูดหินปูน 15% Off", ServiceID: 1, PromotionDetail: "ตรวจฟันและขูดหินปูนลด 15%", Cost: 1150, DateStart: time.Date(2025, 9, 1, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 9, 30, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "ฟอกสีฟัน + ขูดหินปูน ลดรวม 500 บาท", ServiceID: 3, PromotionDetail: "ฟอกสีฟันและขูดหินปูนลด 500 บาท", Cost: 1800, DateStart: time.Date(2025, 9, 5, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 10, 5, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "ตรวจฟันฟรีคูปอง", ServiceID: 1, PromotionDetail: "รับคูปองตรวจฟันฟรี 1 ครั้ง", Cost: 0, DateStart: time.Date(2025, 9, 20, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 10, 20, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "จัดฟันลดเพิ่ม 1000 บาท", ServiceID: 4, PromotionDetail: "จัดฟันลดเพิ่ม 1000 บาทสำหรับลูกค้าใหม่", Cost: 9000, DateStart: time.Date(2025, 10, 1, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 12, 31, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "ขูดหินปูนฟรีวันเกิด", ServiceID: 2, PromotionDetail: "รับขูดหินปูนฟรีในวันเกิด", Cost: 0, DateStart: time.Date(2025, 1, 1, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 12, 31, 23, 59, 59, 0, time.Local)},
+		{NamePromotion: "ฟอกสีฟันลด 50%", ServiceID: 3, PromotionDetail: "ฟอกสีฟันลด 50% เฉพาะลูกค้าเก่า", Cost: 750, DateStart: time.Date(2025, 9, 15, 0, 0, 0, 0, time.Local), DateEnd: time.Date(2025, 10, 15, 23, 59, 59, 0, time.Local)},
+	}	
+}
+
 // -------------------- Supply --------------------
 func GetMockSupplies() []entity.Supply {
 	now := time.Now()

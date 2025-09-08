@@ -3,6 +3,7 @@ import Service from "../service/service";
 import "./switchpage.css"
 import Promotion from "../Promotion/promotion";
 import 'antd/dist/reset.css';
+import Servicecomponent from "../service/service";
 
 export default function SwitchPage() {
   const [tab, setTab] = useState("services"); // ค่าเริ่มต้นคือ "บริการ"
@@ -36,7 +37,7 @@ export default function SwitchPage() {
       {/* Content ด้านใน */}
       {tab === "services" && (
         <div className={ `margin 0 padding 0` }>
-          <Service />
+          <Servicecomponent />
         </div>
       )}
       {tab === "promotions" && (

@@ -1,72 +1,94 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import './service.css';
-import { Modal, Input, Button, Popconfirm, Card } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Modal, Input, Button, Card, Select } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css';
+import { updateService, getAllService, getAllCategory, createService, deleteService } from "@service/Service/Service";
 
-interface Item {
-    id: number;
-    name: string;
-    price: number;
-    detail: string;
-    category: string;
+
+interface Service {
+    id?: number;
+    name_service: string;
+    detail_service: string;
+    cost: number;
+    category_id: number;
 }
 
-// option select catagory service
-const categoryOptions = [
-    { value: "รักษาฮากแข่ว", label: "รักษาฮากแข่ว" },
-    { value: "จัดแข่ว", label: "จัดแข่ว" },
-    { value: "แข่วปลอม", label: "แข่วปลอม" },
-];
 
-const Service = () => {
+interface Category {
+    id?: number;
+    name_category: string;
+}
 
-    // moc up datda test
-    const [items, setItems] = useState<Item[]>([
-        { id: 1, name: "ขูดหินปูน", price: 800, detail: "ขูดหินปูนและขัดฟัน", category: "รักษาฮากแข่ว" },
-        { id: 2, name: "อุดฟัน", price: 1200, detail: "อุดฟันด้วยวัสดุเรซินคอมโพสิต", category: "รักษาฮากแข่ว" },
-        { id: 3, name: "ถอนฟัน", price: 500, detail: "ถอนฟันสำหรับเด็กและผู้ใหญ่", category: "รักษาฮากแข่ว" },
-        { id: 4, name: "ฟอกฟันขาว", price: 2500, detail: "ฟอกฟันขาวด้วย Zoom Whitening", category: "รักษาฮากแข่ว" },
-        { id: 5, name: "จัดฟันโลหะ", price: 15000, detail: "จัดฟันโลหะมาตรฐาน", category: "จัดแข่ว" },
-        { id: 6, name: "จัดฟันใส Invisalign", price: 45000, detail: "จัดฟันใส Invisalign", category: "จัดแข่ว" },
-        { id: 7, name: "รีเทนเนอร์", price: 2500, detail: "รีเทนเนอร์หลังจัดฟัน", category: "จัดแข่ว" },
-        { id: 8, name: "ฟันปลอมถอดได้", price: 4000, detail: "ฟันปลอมถอดได้บางส่วน", category: "แข่วปลอม" },
-        { id: 9, name: "ฟันปลอมทั้งปาก", price: 12000, detail: "ฟันปลอมทั้งปากบนหรือล่าง", category: "แข่วปลอม" },
-        { id: 10, name: "รากฟันเทียม", price: 35000, detail: "รากฟันเทียมมาตรฐาน", category: "แข่วปลอม" },
-    ]);
 
-    const [currentCategory, setCurrentCategory] = useState<string>("");
+const Servicecomponent = () => {
+    const [service, setService] = useState<Service[]>([]);
+    const [category, setCategory] = useState<Category[]>([]);
+    const [searchText, setSearchText] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
-    const [search, setSearch] = useState<string>("");
-    const [newItem, setNewItem] = useState<Omit<Item, 'id'>>({
-        name: "",
-        price: 0,
-        detail: "",
-        category: "",
+    const [newItem, setNewItem] = useState<Omit<Service, 'id'>>({
+        name_service: "",
+        cost: undefined!,
+        detail_service: "",
+        category_id: undefined!,
     });
-
+    const [items, setItems] = useState<Service[]>([]);
     const [modal, setModal] = useState<{
         visible: boolean;
         type: 'add' | 'view' | null;
         detail: string;
         itemIndex: number | null;
-    }>({
-        visible: false,
-        type: null,
-        detail: '',
-        itemIndex: null,
-    });
+    }>({ visible: false, type: null, detail: '', itemIndex: null });
 
-    const filteredItems = items.filter(item => {
-        const matchCategory = currentCategory ? item.category === currentCategory : true;
-        const matchSearch = search.trim() === "" ? true : (
-            item.name.toLowerCase().includes(search.toLowerCase()) ||
-            item.detail.toLowerCase().includes(search.toLowerCase())
-        );
-        return matchCategory && matchSearch;
-    });
+    // สำหรับ confirm delete
+    const [isCardVisible, setIsCardVisible] = useState(false);
+    const [itemIdToDelete, setItemIdToDelete] = useState<null | number>(null);
 
-    const handleChange = (field: keyof Item, value: any, index?: number) => {
+    // ดึงข้อมูล Service และ Category
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const servicesData = await getAllService();
+                const categoriesData = await getAllCategory();
+
+                // console.log("Raw servicesData:", servicesData);
+                // console.log("Raw categoriesData:", categoriesData);
+
+                // เก็บเฉพาะ field ที่จำเป็นสำหรับ Service
+                const formattedServices = servicesData.map(s => ({
+                    id: s.id,
+                    name_service: s.name_service,
+                    detail_service: s.detail_service,
+                    cost: s.cost,
+                    category_id: s.category_id,
+                }));
+
+                // เก็บเฉพาะ field ที่จำเป็นสำหรับ Category
+                const formattedCategories = categoriesData.map(c => ({
+                    id: c.id,
+                    name_category: c.name_category,
+                }));
+
+                setService(formattedServices);
+                setCategory(formattedCategories);
+                setItems(formattedServices); // สำหรับ edit/delete/add
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // ฟังก์ชันหาชื่อหมวดหมู่จาก ID
+    const getCategoryName = (id: number) => {
+        const foundCategory = category.find(cat => cat.id === id);
+        return foundCategory ? foundCategory.name_category : "-";
+
+    };
+
+    // ฟังก์ชันเปลี่ยนค่า field ของ service
+    const handleChange = (field: keyof Service, value: any, index?: number) => {
         if (index === undefined) {
             setNewItem(prev => ({ ...prev, [field]: value }));
         } else {
@@ -76,76 +98,108 @@ const Service = () => {
         }
     };
 
-    // เพิ่มข้อมูล
-    const handleAddItem = () => {
-        if (!newItem.name || isNaN(newItem.price) || !newItem.category) return;
-        setItems([...items, {
-            ...newItem,
-            id: Date.now(),
-        }]);
-        setNewItem({ name: '', price: 0, detail: '', category: '' });
-    };
+    const handleAddItem = async () => {
+        try {
+            if (!newItem.name_service || !newItem.category_id || isNaN(newItem.cost)) {
+                return;
+            }
+            // 🔥 เรียก API ไปสร้าง service จริงใน backend
+            const createdService = await createService(newItem);
 
-    //  ลบข้อมูล
-    const [isCardVisible, setIsCardVisible] = useState(false);
-    const [itemIdToDelete, setItemIdToDelete] = useState<null | Number>(null);
+            // เอาที่ backend ตอบกลับ (มี id จริงจาก DB) มาใส่ใน items
+            setItems([...items, createdService]);
 
-    const handleDelete = (id: number) => {
-        setItems(prev => prev.filter(item => item.id !== id));
-        setIsCardVisible(false);
-    };
-
-    // ยืนยันการลบ
-    const confirmDelete = (id: number) => {
-        setItemIdToDelete(id);
-        setIsCardVisible(true);
-    };
-    const handleOk = () => {
-        // Filter out the item with the stored ID
-        setItems(prev => prev.filter(item => item.id !== itemIdToDelete));
-
-        // Clean up state
-        setIsCardVisible(false);
-        setItemIdToDelete(null);
-    };
-    const handleCancel = () => {
-        setIsCardVisible(false);
-        setItemIdToDelete(null);
+            // reset ฟอร์ม
+            setNewItem({
+                name_service: '',
+                cost: undefined!,
+                detail_service: '',
+                category_id: undefined!,
+            });
+        } catch (error) {
+            console.error("❌ Failed to create service:", error);
+        }
     };
 
     // แก้ไขข้อมูล
     const handleEdit = (index: number) => setEditIndex(index);
 
-    const handleSave = () => setEditIndex(null);
+    const handleSave = async () => {
+        if (editIndex !== null) {
+            const item = items[editIndex];
+            try {
+                const updatedService = await updateService(item.id!, item);
+                const updatedItems = [...items];
+                updatedItems[editIndex] = updatedService;
+                setItems(updatedItems);
+            } catch (error) {
+                console.error('Failed to update service:', error);
+            }
+        }
+        setEditIndex(null);
+    };
 
+
+    // ลบข้อมูล
+    const confirmDelete = (id: number) => {
+        setItemIdToDelete(id);
+        setIsCardVisible(true);
+    };
+
+    const handleOk = async () => {
+        if (itemIdToDelete !== null) {
+            try {
+                await deleteService(itemIdToDelete); // เรียก API ลบ
+                setItems(prev => prev.filter(item => item.id !== itemIdToDelete)); // อัปเดตรายการใน frontend
+            } catch (error) {
+                console.error('Failed to delete service:', error);
+            }
+        }
+        setItemIdToDelete(null);
+        setIsCardVisible(false);
+    };
+
+
+    const handleCancel = () => {
+        setItemIdToDelete(null);
+        setIsCardVisible(false);
+    };
+
+    // modal add/view
     const openModal = (type: 'add' | 'view', index: number | null) => {
         if (type === 'add') {
             setModal({ visible: true, type, detail: '', itemIndex: null });
         } else if (index !== null) {
-            setModal({
-                visible: true,
-                type,
-                detail: items[index].detail,
-                itemIndex: index
-            });
+            setModal({ visible: true, type, detail: items[index].detail_service, itemIndex: index });
         }
     };
-
-    //บันทึกบริการ
     const handleModalSave = () => {
-        if (modal.type === 'add') {
-            setNewItem(prev => ({ ...prev, detail: modal.detail }));
-        } else if (modal.type === 'view' && modal.itemIndex !== null) {
+        if (modal.type === 'view' && modal.itemIndex !== null) {
             const updated = [...items];
-            updated[modal.itemIndex].detail = modal.detail;
+            updated[modal.itemIndex].detail_service = modal.detail;
             setItems(updated);
         }
         setModal({ visible: false, type: null, detail: '', itemIndex: null });
     };
 
+    // filter service ตาม search + category
+    const filteredServices = items.filter(s => {
+        const matchesSearch =
+            (s.name_service?.toLowerCase() ?? "").includes(searchText.toLowerCase()) ||
+            (s.detail_service?.toLowerCase() ?? "").includes(searchText.toLowerCase());
+
+        const matchesCategory =
+            selectedCategory === null || s.category_id === selectedCategory;
+
+        return matchesSearch && matchesCategory;
+    });
+
+
+    // const editcategory = () => {
+
+    // }
 
     return (
-
         // กล่องใหญ่ครอบทั้งหมด
         <div style={{
             width: '100%',
@@ -174,8 +228,8 @@ const Service = () => {
                     <Input.Search
                         placeholder="ค้นหาบริการหรือรายละเอียด..."
                         allowClear
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
+                        value={searchText}
+                        onChange={e => setSearchText(e.target.value)}
                         style={{ width: 300, marginLeft: 0 }}
                     />
 
@@ -184,15 +238,23 @@ const Service = () => {
                         <div style={{ fontSize: '18px', fontWeight: 'bold' }}>หมวดหมู่</div>
                         <select
                             className="select_category"
-                            value={currentCategory}
-                            onChange={(e) => setCurrentCategory(e.target.value)}
+                            value={selectedCategory ?? ""}
+                            onChange={e => setSelectedCategory(e.target.value ? Number(e.target.value) : null)}
                         >
                             <option value="">-- แสดงทั้งหมด --</option>
-                            {categoryOptions.map(cat => (
-                                <option key={cat.value} value={cat.value}>{cat.label}</option>
+                            {category.map(cat => (
+                                <option key={cat.id} value={cat.id}>{cat.name_category}</option>
                             ))}
                         </select>
+                        {/* <Button
+                            className="edit_category"
+                            type="primary"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEdit(item.id)} // ใส่ฟังก์ชันที่ต้องการ
+                        >
+                        </Button> */}
                     </div>
+
                 </div>
 
                 {/* ปุ่มเพิ่มรายการ */}
@@ -207,34 +269,34 @@ const Service = () => {
                 <table className="item-table">
                     <thead style={{ display: "flix" }}>
                         <tr >
-                            <th style={{ width: '28%' }}>บริการ</th>
-                            <th style={{ width: '25%' }}>ราคา</th>
-                            <th style={{ width: '19%' }}>หมวดหมู่</th>
-                            <th style={{ width: '19%' }}>รายละเอียด</th>
-                            <th style={{ width: '19%' }}>การจัดการ</th>
+                            <th style={{ width: '26%' }}>บริการ</th>
+                            <th style={{ width: '20%' }}>ราคา</th>
+                            <th style={{ width: '18%' }}>หมวดหมู่</th>
+                            <th style={{ width: '18%' }}>รายละเอียด</th>
+                            <th style={{ width: '18%' }}>การจัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredItems.map((item, index) => (
-                            <tr key={item.id}>
+                        {filteredServices.map((service, index) => (
+                            <tr key={service.id}>
                                 <td>
                                     {editIndex === index ? (
                                         <Input
-                                            value={item.name}
-                                            onChange={(e) => handleChange('name', e.target.value, index)}
+                                            value={service.name_service}
+                                            onChange={(e) => handleChange('name_service', e.target.value, index)}
                                         />
-                                    ) : item.name}
+                                    ) : service.name_service}
                                 </td>
                                 <td>
                                     {editIndex === index ? (
                                         <Input
                                             type="number"
-                                            value={item.price}
-                                            onChange={(e) => handleChange('price', Number(e.target.value), index)}
+                                            value={service.cost}
+                                            onChange={(e) => handleChange('cost', Number(e.target.value), index)}
                                         />
-                                    ) : item.price}
+                                    ) : service.cost}
                                 </td>
-                                <td>{item.category}</td>
+                                <td>{getCategoryName(service.category_id)}</td>
                                 <td>
                                     <Button onClick={() => openModal('view', index)}>ดูรายละเอียด</Button>
                                 </td>
@@ -242,7 +304,7 @@ const Service = () => {
                                 <td style={{ textAlign: "center", verticalAlign: "middle" }}>
 
                                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                        <Button danger onClick={() => confirmDelete(item.id)}><DeleteOutlined /> ลบ </Button>
+                                        <Button danger onClick={() => confirmDelete(service.id!)}><DeleteOutlined /> ลบ </Button>
 
                                         {editIndex === index ? (
                                             <Button style={{ marginLeft: "10px" }}
@@ -319,30 +381,30 @@ const Service = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         <Input
                             placeholder="ชื่อบริการ"
-                            value={newItem.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
+                            value={newItem.name_service}
+                            onChange={(e) => handleChange('name_service', e.target.value)}
                         />
                         <Input
                             type="number"
                             placeholder="ราคา"
-                            value={newItem.price}
-                            onChange={(e) => handleChange('price', Number(e.target.value))}
+                            value={newItem.cost}
+                            onChange={(e) => handleChange('cost', Number(e.target.value))}
                         />
-                        <select
-                            value={newItem.category}
-                            onChange={e => handleChange('category', e.target.value)}
-                            style={{ padding: 8, borderRadius: 4 }}
+                        <Select
+                            placeholder="เลือกหมวดหมู่"
+                            value={newItem.category_id}
+                            onChange={(value: number) => setNewItem({ ...newItem, category_id: value })}
                         >
-                            <option value="">เลือกหมวดหมู่</option>
-                            {categoryOptions.map(cat => (
-                                <option key={cat.value} value={cat.value}>{cat.label}</option>
+                            <Select.Option value={0}>เลือกหมวดหมู่</Select.Option>
+                            {category.map(cat => (
+                                <Select.Option key={cat.id} value={cat.id}>{cat.name_category}</Select.Option>
                             ))}
-                        </select>
+                        </Select>
                         <Input.TextArea
                             rows={4}
                             placeholder="รายละเอียด"
-                            value={newItem.detail}   // ใช้ newItem.detail
-                            onChange={e => handleChange('detail', e.target.value)}
+                            value={newItem.detail_service}   // ใช้ newItem.detail
+                            onChange={e => handleChange('detail_service', e.target.value)}
                         />
                     </div>
                 ) : (
@@ -358,4 +420,4 @@ const Service = () => {
     );
 };
 
-export default Service;
+export default Servicecomponent;

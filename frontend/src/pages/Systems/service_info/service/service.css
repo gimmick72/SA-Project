@@ -5,7 +5,7 @@
     cursor: pointer;
 }
 
-.option_category{
+.option_category {
     cursor: pointer;
 }
 
@@ -21,9 +21,9 @@
 }
 
 .item-table {
-    width: 100%;
     table-layout: fixed;
-    border-collapse: separate;
+    border-collapse: collapse;
+    overflow: auto;
 }
 
 .item-table th,
@@ -59,3 +59,14 @@
     background-color: #6f63e8 !important;
 }
 
+/* ปุ่มจัดการ category */
+.edit_category {
+    width: 25px !important;
+    height: 25px !important;
+    margin-left: -10px !important;
+    background-color: #9288ff !important;
+}
+
+.edit_category:hover {
+     background-color: #6f63e8 !important;
+}
