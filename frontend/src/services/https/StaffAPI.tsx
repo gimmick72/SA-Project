@@ -3,6 +3,7 @@ import axios from 'axios';
 const API_BASE = 'http://localhost:8080';
 import type { Department, NewStaffData, PersonalData, Staff } from '../../interface/Staff';
 
+
 const mapToPersonalData = (values: any): PersonalData => {
   const addr = values.address?.split(',').map((x: string) => x.trim()) || [];
   return {
@@ -44,6 +45,7 @@ export const StaffAPI = {
       firstName: staff.PersonalData.FirstName,
       lastName: staff.PersonalData.LastName,
       position: staff.Position, 
+      idCard: staff.idCard,
 
     }));
   },

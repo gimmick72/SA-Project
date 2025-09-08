@@ -1,10 +1,10 @@
-// // // frontend/src/pages/treatment_info/index.tsx
+// // frontend/src/pages/treatment_info/index.tsx
 // import React, { type ChangeEvent, useEffect, useState } from "react";
 // import { Card, Button, Typography, Modal, Form, Input, message, Popconfirm, Row, Col, DatePicker, Upload, InputNumber, Select, } from "antd";
 // import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 // import type { UploadFile } from "antd/lib/upload/interface";
 // import dayjs from "dayjs";
-// import type { CaseData as CaseDataIface, Treatment as TreatmentIface, Quadrant as QuadrantIface, } from "../../interface/patient";
+// import type { CaseData as CaseDataIface, Treatment as TreatmentIface, } from "../../interface/patient";
 // import { CaseAPI } from "../../services/https/CaseAPI";
 // // import { data } from "react-router-dom";    
 
@@ -12,24 +12,6 @@
 
 // const { Title } = Typography;
 // const { TextArea } = Input;
-
-// // // แปลง UploadFile[] -> string[] (base64 หรือ url)
-// // const filesToBase64 = async (files: UploadFile[] = []): Promise<string[]> => {
-// //     const arr = await Promise.all(
-// //         files.map(async (f) => {
-// //             // originFileObj เป็น File เมื่อลูกค้าอัปโหลดใหม่
-// //             if (f.originFileObj) {
-// //                 return await getBase64(f.originFileObj as File);
-// //             }
-// //             // ถ้าเป็น url หรือ preview อยู่แล้ว ให้ใช้
-// //             if (typeof f.url === "string" && f.url) return f.url;
-// //             if (typeof f.preview === "string" && f.preview) return f.preview;
-// //             return null;
-// //         })
-// //     );
-// //     return arr.filter(Boolean) as string[];
-// // };
-
 
 // type CaseRow = {
 //     id: number;
@@ -51,9 +33,9 @@
 //     const [editingCase, setEditingCase] = useState<CaseRow | null>(null);
 
 //     const [form] = Form.useForm();
-//     const [previewVisible, setPreviewVisible] = useState(false);
-//     const [previewImage, setPreviewImage] = useState("");
-//     const [previewTitle, setPreviewTitle] = useState("");
+//     // const [previewVisible, setPreviewVisible] = useState(false);
+//     // const [previewImage, setPreviewImage] = useState("");
+//     // const [previewTitle, setPreviewTitle] = useState("");
 //     const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
 
 //     const [dynamicFileLists, setDynamicFileLists] = useState<{ [key: string]: UploadFile[] }>({});
@@ -64,17 +46,6 @@
 //     // derived patient list from cases (unique)
 //     const [patientsList, setPatientsList] = useState<any[]>([]);
 //     const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
-
-//     // toggle tooth selection for a treatment index
-//     const toggleTooth = (index: number, num: string) => {
-//         setDynamicSelectedTeeth((prev) => {
-//             const current = prev[index] || [];
-//             return {
-//                 ...prev,
-//                 [index]: current.includes(num) ? current.filter((n) => n !== num) : [...current, num],
-//             };
-//         });
-//     };
 
 //     // fetch cases on mount
 //     useEffect(() => {
@@ -109,7 +80,6 @@
 //         };
 //         void fetchData();
 //     }, []);
-
 //     // search / filter
 //     useEffect(() => {
 //         const trimmedText = searchText.trim();
@@ -137,135 +107,102 @@
 //         });
 //         setFilteredCases(filtered);
 //     }, [searchText, cases, patientsList]);
-
 //     // // prepare modal for creating new
-// const handleAddClick = async () => {
-//   try {
-//     // 1️⃣ reset form และ state
-//     setEditingCase(null);
-//     setSelectedPatient(null);
-//     form.resetFields();
-//     // setIsSubmitDisabled(true);
-//     setIsModalVisible(true);
+//     const handleAddClick = async () => {
+//         try {
+//             // 1️⃣ reset form และ state
+//             setEditingCase(null);
+//             setSelectedPatient(null);
+//             form.resetFields();
+//             // setIsSubmitDisabled(true);
+//             setIsModalVisible(true);
 
-//     // 2️⃣ ดึงค่า CitizenID จาก form ถ้ามี (หรือให้ user กรอกทีหลังก็ได้)
-//     const citizenId = form.getFieldValue("citizenId"); // สมมติ form มี input field ชื่อ citizenId
-//     if (!citizenId) return; // ถ้าไม่มี ให้ user กรอกก่อน
+//             // 2️⃣ ดึงค่า CitizenID จาก form ถ้ามี (หรือให้ user กรอกทีหลังก็ได้)
+//             const citizenId = form.getFieldValue("citizenId"); // สมมติ form มี input field ชื่อ citizenId
+//             if (!citizenId) return; // ถ้าไม่มี ให้ user กรอกก่อน
 
-//     // 3️⃣ เรียก API ไปหา patient
-//     const patient = await CaseAPI.getPatientByCitizenId(citizenId);
+//             // 3️⃣ เรียก API ไปหา patient
+//             const patient = await CaseAPI.getPatientByCitizenId(citizenId);
 
-//     if (patient) {
-//       message.success("พบข้อมูลคนไข้");
+//             if (patient) {
+//                 message.success("พบข้อมูลคนไข้");
 
-//       // 4️⃣ เติมข้อมูล patient ลง form
-//       form.setFieldsValue({
-//         patientId: patient.ID,
-//         patientName: `${patient.FirstName} ${patient.LastName}`,
-//         age: patient.Age,
-//         phoneNumber: patient.PhoneNumber,
-//         // preExistingConditions: patient.CongenitaDisease,
-//         allergyHistory: patient.DrugAllergy,
-//         // bloodType: patient.BloodType,
-//         // ...map ฟิลด์อื่นๆ ตามต้องการ
-//       });
+//                 // 4️⃣ เติมข้อมูล patient ลง form
+//                 form.setFieldsValue({
+//                     patientId: patient.ID,
+//                     patientName: `${patient.FirstName} ${patient.LastName}`,
+//                     age: patient.Age,
+//                     phoneNumber: patient.PhoneNumber,
+//                     // preExistingConditions: patient.CongenitaDisease,
+//                     allergyHistory: patient.DrugAllergy,
+//                     // bloodType: patient.BloodType,
+//                     // ...map ฟิลด์อื่นๆ ตามต้องการ
+//                 });
 
-//       setSelectedPatient(patient);
-//       setIsSubmitDisabled(false); // Enable ปุ่ม submit
-//     } else {
-//       message.error("ไม่พบข้อมูลคนไข้");
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     message.error("เกิดข้อผิดพลาดในการค้นหาผู้ป่วย");
-//   }
-// };
-
-
+//                 setSelectedPatient(patient);
+//                 setIsSubmitDisabled(false); // Enable ปุ่ม submit
+//             } else {
+//                 message.error("ไม่พบข้อมูลคนไข้");
+//             }
+//         } catch (err) {
+//             console.error(err);
+//             message.error("เกิดข้อผิดพลาดในการค้นหาผู้ป่วย");
+//         }
+//     };
 
 //     const handleCancel = () => {
 //         setIsModalVisible(false);
 //     };
-// const handleSearchPatient = async () => {
-//   try {
-//     const citizenId = form.getFieldValue("citizenId"); // เอาค่า citizenId จาก form
-//     if (!citizenId) {
-//       message.error("กรุณากรอกเลขบัตรประชาชน");
-//       return;
-//     }
-
-//     const patient = await CaseAPI.getPatientByCitizenId(citizenId);
-//     if (patient) {
-//       message.success("พบข้อมูลคนไข้");
-//       // เติมค่า patientId ลง form ให้ Case รู้ว่าเป็นของคนไข้คนไหน
-//       form.setFieldsValue({
-//         patientId: patient.ID,
-//         patientName: `${patient.FirstName} ${patient.LastName}`,
-//         age: patient.Age,
-//         phoneNumber: patient.PhoneNumber,
-//         // จะ map ฟิลด์อื่นๆ ตามต้องการก็ได้
-//       });
-//     } else {
-//       message.error("ไม่พบข้อมูลคนไข้");
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     message.error("เกิดข้อผิดพลาดในการค้นหา");
-//   }
-// };
-
-
 //     // When National ID changes on form, try to find patient and populate fields
 //     const handleNationalIdChange = async (e: ChangeEvent<HTMLInputElement> | string) => {
-//     const val = typeof e === "string" ? e : e.target.value;
-//     form.setFieldValue("NationalID", val);
+//         console.log("NationalIDChange")
+//         const val = typeof e === "string" ? e : e.target.value;
+//         form.setFieldValue("NationalID", val);
 
-//     const nid = String(val || "").trim();
-//     if (nid.length === 13) {
-//         try {
-//             // เรียก API ดึง patient ตัวเต็ม
-//             const found = await CaseAPI.getPatientByCitizenId(nid); 
-            
-//             if (found) {
-//                 setSelectedPatient(found);
+//         const nid = String(val || "").trim();
+//         if (nid.length === 13) {
+//             try {
+//                 // เรียก API ดึง patient ตัวเต็ม
+//                 const found = await CaseAPI.getPatientByCitizenId(nid);
 
-//                 // ดึง InitialSymptomps ตัวแรกเหมือน handleEditClick
-//                 const init = found.InitialSymptomps && found.InitialSymptomps.length
-//                     ? found.InitialSymptomps[0]
-//                     : null;
+//                 if (found) {
+//                     setSelectedPatient(found);
 
-//                 form.setFieldsValue({
-//                     fullName: `${found.Prefix ?? ""} ${found.FirstName ?? ""} ${found.LastName ?? ""}`.trim(),
-//                     age: found.Age ?? "",
-//                     preExistingConditions: found.CongenitaDisease ?? "",
-//                     phone: found.PhoneNumber ?? "",
-//                     allergyHistory: found.DrugAllergy ?? "",
-//                     symptomps: init?.Symptomps ?? "",
-//                     bloodPressure: init?.BloodPressure ?? "",
-//                     heartRate: init?.HeartRate ?? "",
-//                     weight: init?.Weight ?? "",
-//                     height: init?.Height ?? "",
-//                     bloodType: found.BloodType ?? "",
-//                 });
-//                 setIsSubmitDisabled(false);
-//             } else {
-//                 message.error("ไม่พบหมายเลขบัตรประชาชนนี้");
+//                     // ดึง InitialSymptomps ตัวแรกเหมือน handleEditClick
+//                     const init = found.InitialSymptomps && found.InitialSymptomps.length
+//                         ? found.InitialSymptomps[0]
+//                         : null;
+
+//                     form.setFieldsValue({
+//                         fullName: `${found.Prefix ?? ""} ${found.FirstName ?? ""} ${found.LastName ?? ""}`.trim(),
+//                         age: found.Age ?? "",
+//                         preExistingConditions: found.CongenitaDisease ?? "",
+//                         phone: found.PhoneNumber ?? "",
+//                         allergyHistory: found.DrugAllergy ?? "",
+//                         symptomps: init?.Symptomps ?? "",
+//                         bloodPressure: init?.BloodPressure ?? "",
+//                         heartRate: init?.HeartRate ?? "",
+//                         weight: init?.Weight ?? "",
+//                         height: init?.Height ?? "",
+//                         bloodType: found.BloodType ?? "",
+//                     });
+//                     setIsSubmitDisabled(false);
+//                 } else {
+//                     message.error("ไม่พบหมายเลขบัตรประชาชนนี้");
+//                     setIsSubmitDisabled(true);
+//                 }
+//             } catch (err) {
+//                 console.error(err);
+//                 message.error("เกิดข้อผิดพลาดในการค้นหาคนไข้");
 //                 setIsSubmitDisabled(true);
 //             }
-//         } catch (err) {
-//             console.error(err);
-//             message.error("เกิดข้อผิดพลาดในการค้นหาคนไข้");
+//         } else {
 //             setIsSubmitDisabled(true);
 //         }
-//     } else {
-//         setIsSubmitDisabled(true);
-//     }
-// };
-
-
-
+//     };
 //     // edit existing case (row)
 //     const handleEditClick = async (row: CaseRow) => {
+
 //         console.log("🟢 คลิกแก้ไข Row:", row);
 //         setEditingCase(row);
 //         // prefer patient from row; avoid relying on async setSelectedPatient
@@ -334,32 +271,40 @@
 //                 message.error("กรุณาเลือกผู้ป่วยที่ถูกต้อง (National ID)");
 //                 return;
 //             }
+//             const parseDate = (val?: string | null) => {
+//                 if (!val || val.startsWith("0001-01-01")) return null;
+//                 return dayjs(val);
+//             };
+
+//             const cleanISOString = (val?: any) => {
+//                 if (!val) return null;
+//                 const iso = typeof val === "string" ? val : val.toISOString?.();
+//                 if (!iso || iso.startsWith("0001-01-01")) return null;
+//                 return iso;
+//             };
 
 //             const payload: Partial<CaseDataIface> = {
-//                 appointment_date: values.appointment_date ? values.appointment_date.toISOString() : null,
-//                 SignDate: values.SignDate ? values.SignDate.toISOString() : null,
+//                 appointment_date: cleanISOString(values.appointment_date) || undefined,
+//                 SignDate: cleanISOString(values.SignDate) || undefined,
 //                 Note: values.note || values.notes || "",
 //                 PatientID: patientIdToUse,
 //                 DepartmentID: values.departmentId || 1, // choose default or form field
 //                 Treatment: (values.treatments || []).map((t: any, idx: number) => {
 //                     const treatmentObj: any = {
-//                         TreatmentDate: t.treatment_date ? t.treatment_date.toISOString() : new Date().toISOString(),
+//                         // TreatmentDate: t.treatment_date ? t.treatment_date.toISOString() : new Date().toISOString(),
 //                         TreatmentName: t.treatment_name,
 //                         Price: Number(t.price || 0),
 //                         // include selected teeth and photos as fields for frontend->backend (backend should accept or ignore)
 //                         selected_teeth: dynamicSelectedTeeth[idx] || [],
-//                         photo_upload: (dynamicFileLists[`treatments_${idx}`] || []).map((f) => f.originFileObj ? (f.originFileObj as File) : f),
+//                         // photo_upload: (dynamicFileLists[`treatments_${idx}`] || []).map((f) => f.originFileObj ? (f.originFileObj as File) : f),
 //                         // Quadrants mapping if you want:
-//                         Quadrants: (dynamicSelectedTeeth[idx] || []).map((tooth: string) => ({ Quadrant: tooth })),
+//                         // Quadrants: (dynamicSelectedTeeth[idx] || []).map((tooth: string) => ({ Quadrant: tooth })),
 
 //                     };
 //                     return treatmentObj;
 //                 }),
 //             };
-//             const parseDate = (val?: string | null) => {
-//                 if (!val || val.startsWith("0001-01-01")) return null;
-//                 return dayjs(val);
-//             };
+
 //             if (editingCase) {
 //                 console.log("editingMode");
 //                 // update existing
@@ -436,19 +381,18 @@
 //         }
 //     };
 
+//     // const handlePreview = async (file: UploadFile) => {
+//     //     if (!file.url && !file.preview && file.originFileObj) {
+//     //         file.preview = await getBase64(file.originFileObj as File);
+//     //     }
+//     //     setPreviewImage(file.url || (file.preview as string));
+//     //     setPreviewTitle(file.name || "");
+//     //     setPreviewVisible(true);
+//     // };
 
-//     const handlePreview = async (file: UploadFile) => {
-//         if (!file.url && !file.preview && file.originFileObj) {
-//             file.preview = await getBase64(file.originFileObj as File);
-//         }
-//         setPreviewImage(file.url || (file.preview as string));
-//         setPreviewTitle(file.name || "");
-//         setPreviewVisible(true);
-//     };
-
-//     const handleDynamicChange = (index: number) => ({ fileList }: { fileList: UploadFile[] }) => {
-//         setDynamicFileLists((prev) => ({ ...prev, [`treatments_${index}`]: fileList }));
-//     };
+//     // const handleDynamicChange = (index: number) => ({ fileList }: { fileList: UploadFile[] }) => {
+//     //     setDynamicFileLists((prev) => ({ ...prev, [`treatments_${index}`]: fileList }));
+//     // };
 //     return (
 //         <div style={{ padding: "16px", height: "95%", display: "flex", flexDirection: "column" }}>
 //             <Title level={2} style={{ fontWeight: "bold", marginBottom: "20px", marginTop: "0px" }}>
@@ -735,7 +679,7 @@
 //                                             {/* ... keep same markup as you had for tooth selection ... */}
 //                                             {/* For brevity, omitted here — keep your current tooth selector code */}
 //                                             {/* Photo upload */}
-//                                             <Form.Item style={{ marginTop: 10 }} label="อัปโหลดรูปภาพ">
+//                                             {/* <Form.Item style={{ marginTop: 10 }} label="อัปโหลดรูปภาพ">
 //                                                 <Upload
 //                                                     listType="picture-card"
 //                                                     fileList={dynamicFileLists[`treatments_${index}`] || []}
@@ -754,7 +698,7 @@
 //                                                         </div>
 //                                                     )}
 //                                                 </Upload>
-//                                             </Form.Item>
+//                                             </Form.Item> */}
 //                                         </div>
 //                                     ))}
 
@@ -770,15 +714,15 @@
 //                 </Form>
 //             </Modal>
 
-//             <Modal open={previewVisible} title={previewTitle} footer={null} onCancel={() => setPreviewVisible(false)}>
+//             {/* <Modal open={previewVisible} title={previewTitle} footer={null} onCancel={() => setPreviewVisible(false)}>
 //                 <img alt="preview" style={{ width: "100%" }} src={previewImage} />
-//             </Modal>
+//             </Modal> */}
 //         </div>
 //     );
 // };
 
 // export default TreatmentInfoPage;
-// function getBase64(_arg0: File): any {
-//     throw new Error("Function not implemented.");
-// }
+// // function getBase64(_arg0: File): any {
+// //     throw new Error("Function not implemented.");
+// // }
 

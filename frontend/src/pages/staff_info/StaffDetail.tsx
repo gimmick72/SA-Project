@@ -1,7 +1,7 @@
 //frontend/src/pages/staff_info/StaffDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Button, Typography, Spin, Row, Col, Form, Input, Select, DatePicker, message, Popconfirm, Space } from 'antd';
+import { Card, Descriptions, Button, Typography, Spin, Row, Col, Form, Input, Select, DatePicker, message, Popconfirm, Space, InputNumber } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { StaffAPI } from '../../services/https/StaffAPI';
@@ -195,22 +195,21 @@ const StaffDetails: React.FC = () => {
           // VIEW MODE
           <>
             <Descriptions bordered column={1}>
-              <Descriptions.Item label="รหัสพนักงาน">{String(staff.Employee_ID).padStart(2, '0')}</Descriptions.Item> 
+              <Descriptions.Item label="รหัสพนักงาน">{String(staff.Employee_ID).padStart(2, '0')}</Descriptions.Item>
 
-              <Descriptions.Item label="เลขบัตรประชาชน">{staff.idCard}</Descriptions.Item>        
+              <Descriptions.Item label="เลขบัตรประชาชน">{staff.idCard}</Descriptions.Item>
               <Descriptions.Item label="เพศ">{staff.gender}</Descriptions.Item>
               <Descriptions.Item label="อายุ">{staff.age}</Descriptions.Item>
-              <Descriptions.Item label="ที่อยู่">                   {staff.address}                     </Descriptions.Item>
-              <Descriptions.Item label="อีเมล">{staff.email}</Descriptions.Item>              
-              <Descriptions.Item label="เบอร์โทรศัพท์">{staff.phone}</Descriptions.Item>
-
+              <Descriptions.Item label="ที่อยู่">                   {staff.address}      </Descriptions.Item>
+              <Descriptions.Item label="อีเมล">{staff.email}</Descriptions.Item>
+              <Descriptions.Item label="เบอร์โทรศัพท์">  {staff.phone ? staff.phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3') : '-'}</Descriptions.Item>
               <Descriptions.Item label="วันที่เริ่มงาน">{staff.startDate}</Descriptions.Item>
               <Descriptions.Item label="ตำแหน่งงาน">{staff.position}</Descriptions.Item>
               <Descriptions.Item label="ประเภทพนักงาน">{staff.employeeType}</Descriptions.Item>
-              <Descriptions.Item label="เงินเดือนสุทธิ">{staff.CompRate}</Descriptions.Item>
+              <Descriptions.Item label="เงินเดือนสุทธิ">                {staff.CompRate ? Number(staff.CompRate).toLocaleString() : "-"} บาท   </Descriptions.Item>
               <Descriptions.Item label="หมายเลขใบประกอบวิชาชีพ">   {staff.licenseNumber || "ไม่มี"}     </Descriptions.Item>
               <Descriptions.Item label="เฉพาะทางด้าน">            {staff.Specialization || "ไม่มี"}     </Descriptions.Item>
-              
+
             </Descriptions>
           </>
         ) : (
@@ -267,45 +266,42 @@ const StaffDetails: React.FC = () => {
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <Form.Item
-  name="idCard"
-  label="เลขบัตรประชาชน"
-  rules={[
-    { required: true, message: 'กรุณากรอกเลขบัตรประชาชน' },
-    { pattern: /^\d{1,13}$/, message: 'กรอกได้เฉพาะตัวเลขและไม่เกิน 13 หลัก' },
-  ]}
->
-  <Input
-    placeholder="ใส่เลขบัตรประชาชน"
-    maxLength={13} // จำกัด input
-    onKeyPress={(event) => {
-      if (!/[0-9]/.test(event.key)) {
-        event.preventDefault(); // ห้ามพิมพ์ตัวอักษร
-      }
-    }}
-  />
-</Form.Item>
+                  name="idCard"
+                  label="เลขบัตรประชาชน"
+                  rules={[
+                    { required: true, message: 'กรุณากรอกเลขบัตรประชาชน' },
+                    { pattern: /^\d{1,13}$/, message: 'กรอกได้เฉพาะตัวเลขและไม่เกิน 13 หลัก' },
+                  ]}
+                >
+                  <Input
+                    placeholder="ใส่เลขบัตรประชาชน"
+                    maxLength={13} // จำกัด input
+
+                  />
+                </Form.Item>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <Form.Item
-  name="phone"
-  label="เบอร์โทรศัพท์"
-  rules={[
-    { required: true, message: 'กรุณาใส่เบอร์โทรศัพท์' },
-    { pattern: /^\d*$/, message: 'กรอกได้เฉพาะตัวเลขเท่านั้น' },
-  ]}
->
-  <Input
-    placeholder="ใส่เบอร์โทรศัพท์"
-    maxLength={10} // ถ้าต้องการจำกัดความยาว เช่น 10 หลัก
-    onKeyPress={(event) => {
-      if (!/[0-9]/.test(event.key)) {
-        event.preventDefault(); // ห้ามพิมพ์ตัวอักษร
-      }
-    }}
-  />
-</Form.Item>
-
+                  name="phone"
+                  label="เบอร์โทรศัพท์"
+                  rules={[
+                    { required: true, message: 'กรุณาใส่เบอร์โทรศัพท์' },
+                    { pattern: /^\d+$/, message: 'กรอกได้เฉพาะตัวเลขเท่านั้น' },
+                    { min: 10, max: 10, message: 'เบอร์โทรศัพท์ต้องมี 10 หลัก' },
+                  ]}
+                >
+                  <Input
+                    placeholder="ใส่เบอร์โทรศัพท์"
+                    maxLength={10}
+                    inputMode="numeric"
+                    onChange={(e) => {
+                      const onlyNumbers = e.target.value.replace(/\D/g, ""); // ลบทุกตัวที่ไม่ใช่เลข
+                      e.target.value = onlyNumbers;
+                    }}
+                  />
+                </Form.Item>
               </Col>
+
 
             </Row>
             <Form.Item name="email" label="อีเมล" rules={[{ required: true, message: 'กรุณากรอกอีเมล', type: 'email' }]}>
@@ -349,40 +345,69 @@ const StaffDetails: React.FC = () => {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={6}>
-                <Form.Item name="CompRate" label="เงินเดือนสุทธิ" rules={[{ required: true, message: 'กรุณากรอกเงินเดือนสุทธิ' }]}>
-                  <Input placeholder="ใส่เงินเดือนสุทธิ" />
+                <Form.Item
+                  name="CompRate"
+                  label="เงินเดือนสุทธิ"
+                  rules={[{ required: true, message: 'กรุณากรอกเงินเดือนสุทธิ' }]}
+                >
+                  <InputNumber
+                    placeholder="ใส่เงินเดือนสุทธิ"
+                    style={{ width: "100%" }}
+                    min={0}
+                    formatter={(value) =>
+                      value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
+                    }
+                    parser={((value?: string) => (value ? Number(value.replace(/,/g, "")) : 0)) as any}
+                  />
                 </Form.Item>
               </Col>
 
+
             </Row>
-
-
-
-
-
           </Form>
         )}
       </Card>
 
       {!isEditing ? (
-        <Button onClick={() => navigate('/staff')}>ย้อนกลับ</Button>
+        <Button style={{
+          // width: 120,
+          height: 50,
+          // backgroundColor: "#fefefeff",
+          // borderColor: "#3b3a3aff",
+          color: "black ",
+          // borderRadius: '25px',
+        }}
+          onClick={() => navigate('/staff')}>ย้อนกลับ</Button>
       ) : (
-        <>
+        <><div style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
+          <Button
+            style={{
+              width: 120,
+              height: 40,
+              borderRadius: '25px',
+            }}
+            onClick={handleCancelEdit}
+          >
+            ยกเลิก
+          </Button>
           <Button
             type="primary"
             htmlType="submit"
-            form="staffForm"   // ✅ ชี้ไปที่ form id
+            form="staffForm"
             style={{
+              width: 120,
+              height: 40,
               backgroundColor: "#52c41a",
               borderColor: "#52c41a",
               color: "white",
-              marginLeft: 8,
+              borderRadius: '25px',
             }}
           >
             บันทึกข้อมูล
           </Button>
-          <Button  style={{marginTop : 18}} onClick={handleCancelEdit}>ยกเลิก
-          </Button>
+
+        </div>
+
 
         </>
       )}

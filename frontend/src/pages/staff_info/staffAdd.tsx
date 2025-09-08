@@ -90,16 +90,16 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
           </Form.Item>
         </Col>
       </Row>
-<Col xs={24} sm={12} md={24}>
-      {/* ====== อีเมล / ที่อยู่ ====== */}
-      <Form.Item name="email" label="อีเมล" rules={[{ required: true, message: 'กรุณากรอกอีเมล', type: 'email' }]}>
-        <Input placeholder="อีเมล" />
-      </Form.Item>
+      <Col xs={24} sm={12} md={24}>
+        {/* ====== อีเมล / ที่อยู่ ====== */}
+        <Form.Item name="email" label="อีเมล" rules={[{ required: true, message: 'กรุณากรอกอีเมล', type: 'email' }]}>
+          <Input placeholder="อีเมล" />
+        </Form.Item>
 
-      <Form.Item name="address" label="ที่อยู่" rules={[{ required: true, message: 'กรุณากรอกที่อยู่' }]}>
-        <Input placeholder="ใส่ที่อยู่" />
-      </Form.Item>
-</Col>
+        <Form.Item name="address" label="ที่อยู่" rules={[{ required: true, message: 'กรุณากรอกที่อยู่' }]}>
+          <Input placeholder="ใส่ที่อยู่" />
+        </Form.Item>
+      </Col>
       {/* ====== ตำแหน่ง / ประเภทพนักงาน ====== */}
       <Row gutter={24}>
         <Col xs={24} sm={12}>
@@ -137,9 +137,23 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
           </Form.Item>
         </Col>
         <Col xs={24} sm={6}>
-          <Form.Item name="CompRate" label="เงินเดือนสุทธิ">
-            <Input placeholder="เงินเดือนสุทธิ" />
+
+          <Form.Item
+            name="CompRate"
+            label="เงินเดือนสุทธิ"
+            rules={[{ required: true, message: 'กรุณากรอกเงินเดือนสุทธิ' }]}
+          >
+            <InputNumber
+              placeholder="ใส่เงินเดือนสุทธิ"
+              style={{ width: "100%" }}
+              min={0}
+              formatter={(value) =>
+                value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
+              }
+              parser={((value?: string) => (value ? Number(value.replace(/,/g, "")) : 0)) as any}
+            />
           </Form.Item>
+
         </Col>
       </Row>
 
@@ -147,15 +161,24 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
       <Form.Item>
 
         <Row justify="end" gutter={16} >
-           <Space size="middle">
-          <Button htmlType="button" onClick={() => { form.resetFields(); onFormCancel(); }}>ยกเลิก</Button>
-          <Button type="primary" htmlType="submit" style={{
-            backgroundColor: '#52c41a',
-            borderColor: '#52c41a',
-            color: 'white',
-          }}>
-            บันทึกข้อมูล
-          </Button>
+          <Space size="middle">
+            <Button htmlType="button" style={{
+              width: 120,
+              height: 40,
+              borderRadius: '25px',
+            }} onClick={() => { form.resetFields(); onFormCancel(); }}>ยกเลิก
+            </Button>
+
+            <Button type="primary" htmlType="submit" style={{
+              width: 120,
+              height: 40,
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              color: "white",
+              borderRadius: '25px',
+            }}>
+              บันทึกข้อมูล
+            </Button>
           </Space>
         </Row>
       </Form.Item>

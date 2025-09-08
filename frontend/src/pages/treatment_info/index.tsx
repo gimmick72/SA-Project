@@ -1,12 +1,12 @@
 // frontend/src/pages/treatment_info/index.tsx
 import React, { type ChangeEvent, useEffect, useState } from "react";
-import { Card, Button, Typography, Modal, Form, Input, message, Popconfirm, Row, Col, DatePicker, Upload, InputNumber, Select, } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Card, Button, Typography, Modal, Form, Input, message, Popconfirm, Row, Col, DatePicker, InputNumber, Select, } from "antd";
+import { PlusOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/lib/upload/interface";
 import dayjs from "dayjs";
-import type { CaseData as CaseDataIface, Treatment as TreatmentIface, } from "../../interface/patient";
+import type { CaseData as CaseDataIface, Treatment as TreatmentIface, } from "../../interface/Patient";
 import { CaseAPI } from "../../services/https/CaseAPI";
-// import { data } from "react-router-dom";    
+// import { StaffAPI } from '../../services/https/StaffAPI';
 
 const { getAllCases, getCaseByID, addCaseFormData, updateCase, deleteCase } = CaseAPI;
 
@@ -28,26 +28,26 @@ const TreatmentInfoPage: React.FC = () => {
     const [cases, setCases] = useState<CaseRow[]>([]);
     const [filteredCases, setFilteredCases] = useState<CaseRow[]>([]);
     const [, setLoading] = useState<boolean>(false);
-
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [editingCase, setEditingCase] = useState<CaseRow | null>(null);
-
     const [form] = Form.useForm();
-    const [previewVisible, setPreviewVisible] = useState(false);
-    const [previewImage, setPreviewImage] = useState("");
-    const [previewTitle, setPreviewTitle] = useState("");
     const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
-
     const [dynamicFileLists, setDynamicFileLists] = useState<{ [key: string]: UploadFile[] }>({});
     const [dynamicSelectedTeeth, setDynamicSelectedTeeth] = useState<{ [key: number]: string[] }>({});
-
     const [searchText, setSearchText] = useState<string>("");
-
-    // derived patient list from cases (unique)
     const [patientsList, setPatientsList] = useState<any[]>([]);
     const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
+    const [departments, setDepartments] = useState<any[]>([]);
 
-    // fetch cases on mount
+    useEffect(() => {
+        // 🔹 ดึงข้อมูล Department ทั้งหมดจาก /staff (หรือจะทำ API แยกก็ได้)
+        fetch("http://localhost:8080/staff")
+            .then(res => res.json())
+            .then(data => setDepartments(data))
+            .catch(err => console.error("Error fetching departments:", err));
+    }, []);
+
+    // fetch cases on mount 
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -80,6 +80,7 @@ const TreatmentInfoPage: React.FC = () => {
         };
         void fetchData();
     }, []);
+
     // search / filter
     useEffect(() => {
         const trimmedText = searchText.trim();
@@ -155,6 +156,7 @@ const TreatmentInfoPage: React.FC = () => {
     };
     // When National ID changes on form, try to find patient and populate fields
     const handleNationalIdChange = async (e: ChangeEvent<HTMLInputElement> | string) => {
+        console.log("NationalIDChange")
         const val = typeof e === "string" ? e : e.target.value;
         form.setFieldValue("NationalID", val);
 
@@ -201,6 +203,7 @@ const TreatmentInfoPage: React.FC = () => {
     };
     // edit existing case (row)
     const handleEditClick = async (row: CaseRow) => {
+
         console.log("🟢 คลิกแก้ไข Row:", row);
         setEditingCase(row);
         // prefer patient from row; avoid relying on async setSelectedPatient
@@ -216,6 +219,7 @@ const TreatmentInfoPage: React.FC = () => {
 
 
         const formValues: any = {
+            departmentID: data.DepartmentID ?? undefined,
             dentist_Name: data.Department?.PersonalData ? `${data.Department.PersonalData.FirstName} ${data.Department.PersonalData.LastName}` : "",
             NationalID: patient?.CitizenID || patient?.NationalID || undefined,
             fullName: patient ? `${patient.Prefix || ""} ${patient.FirstName || (patient as any).firstName || ""} ${patient.LastName || (patient as any).lastName || ""}` : "",
@@ -230,7 +234,7 @@ const TreatmentInfoPage: React.FC = () => {
             treatments: (row.treatments || []).map((t) => ({
                 treatment_name: t.TreatmentName || (t as any).treatment_name,
                 price: t.Price || (t as any).price || 0,
-                photo: t.Photo || (t as any).photo || null,
+                // photo: t.Photo || (t as any).photo || null,
             })),
             SignDate: data.SignDate ? dayjs(data.SignDate) : null,
 
@@ -263,38 +267,46 @@ const TreatmentInfoPage: React.FC = () => {
     // Create or update case (convert form values to backend shape)
     const handleFormSubmit = async (values: any) => {
         try {
+            if (!values.treatments || values.treatments.length === 0) {
+                message.error("กรุณาเพิ่มอย่างน้อย 1 รายการการรักษาก่อนบันทึก");
+                return;
+            }
             // build payload
             const patientIdToUse = selectedPatient?.ID || selectedPatient?.id || values.patientId || null;
             if (!patientIdToUse) {
                 message.error("กรุณาเลือกผู้ป่วยที่ถูกต้อง (National ID)");
                 return;
             }
-
-            const payload: Partial<CaseDataIface> = {
-                appointment_date: values.appointment_date ? values.appointment_date.toISOString() : null,
-                SignDate: values.SignDate ? values.SignDate.toISOString() : null,
-                Note: values.note || values.notes || "",
-                PatientID: patientIdToUse,
-                DepartmentID: values.departmentId || 1, // choose default or form field
-                Treatment: (values.treatments || []).map((t: any, idx: number) => {
-                    const treatmentObj: any = {
-                        TreatmentDate: t.treatment_date ? t.treatment_date.toISOString() : new Date().toISOString(),
-                        TreatmentName: t.treatment_name,
-                        Price: Number(t.price || 0),
-                        // include selected teeth and photos as fields for frontend->backend (backend should accept or ignore)
-                        selected_teeth: dynamicSelectedTeeth[idx] || [],
-                        photo_upload: (dynamicFileLists[`treatments_${idx}`] || []).map((f) => f.originFileObj ? (f.originFileObj as File) : f),
-                        // Quadrants mapping if you want:
-                        Quadrants: (dynamicSelectedTeeth[idx] || []).map((tooth: string) => ({ Quadrant: tooth })),
-
-                    };
-                    return treatmentObj;
-                }),
-            };
             const parseDate = (val?: string | null) => {
                 if (!val || val.startsWith("0001-01-01")) return null;
                 return dayjs(val);
             };
+
+            const cleanISOString = (val?: any) => {
+                if (!val) return null;
+                const iso = typeof val === "string" ? val : val.toISOString?.();
+                if (!iso || iso.startsWith("0001-01-01")) return null;
+                return iso;
+            };
+            const treatments = (values.treatments || []).map((t: any, idx: number) => ({
+                TreatmentName: t.treatment_name,
+                Price: Number(t.price || 0),
+                selected_teeth: dynamicSelectedTeeth[idx] || [],
+            }));
+
+            // คำนวณรวมราคา
+            const totalPrice = treatments.reduce((sum: any, t: { Price: any; }) => sum + t.Price, 0);
+
+            const payload: Partial<CaseDataIface> = {
+                appointment_date: cleanISOString(values.appointment_date) || undefined,
+                SignDate: cleanISOString(values.SignDate) || new Date().toISOString(),
+                Note: values.note || values.notes || "",
+                PatientID: patientIdToUse,
+                DepartmentID: values.departmentID ? Number(values.departmentID) : 1,
+                TotalPrice: totalPrice,
+                Treatment: treatments,
+            };
+
             if (editingCase) {
                 console.log("editingMode");
                 // update existing
@@ -337,19 +349,24 @@ const TreatmentInfoPage: React.FC = () => {
                 });
             } else {
                 // create new
-                const created = await addCaseFormData(payload as CaseDataIface);
-                // map created to CaseRow shape
-                const newRow: CaseRow = {
-                    id: (created.ID as number) || 0,
-                    patientId: created.PatientID as number,
-                    appointment_date: (created as any).FollowUpDate || null,
-                    treatments: created.Treatment || [],
-                    note: created.Note || "",
-                    patient: (created as any).Patient || selectedPatient,
-                    SignDate: created.SignDate || "",
+                await addCaseFormData(payload as CaseDataIface);
 
-                };
-                setCases((prev) => [...prev, newRow]);
+                // ดึงข้อมูลล่าสุดจาก backend
+                const latestCasesData = await getAllCases();
+
+                // แปลงข้อมูลจาก CaseData เป็น CaseRow
+                const latestCases: CaseRow[] = latestCasesData.map((c) => ({
+                    id: c.ID as number,
+                    patientId: c.PatientID as number,
+                    appointment_date: c.appointment_date || "",
+                    treatments: c.Treatment || [],
+                    note: c.Note || "",
+                    patient: c.Patient || null,
+                    SignDate: c.SignDate || "",
+                    totalPrice: c.TotalPrice || 0,
+                }));
+
+                setCases(latestCases);
                 message.success("เพิ่มการรักษาสำเร็จ");
             }
             setIsModalVisible(false);
@@ -371,18 +388,6 @@ const TreatmentInfoPage: React.FC = () => {
         }
     };
 
-    const handlePreview = async (file: UploadFile) => {
-        if (!file.url && !file.preview && file.originFileObj) {
-            file.preview = await getBase64(file.originFileObj as File);
-        }
-        setPreviewImage(file.url || (file.preview as string));
-        setPreviewTitle(file.name || "");
-        setPreviewVisible(true);
-    };
-
-    const handleDynamicChange = (index: number) => ({ fileList }: { fileList: UploadFile[] }) => {
-        setDynamicFileLists((prev) => ({ ...prev, [`treatments_${index}`]: fileList }));
-    };
     return (
         <div style={{ padding: "16px", height: "95%", display: "flex", flexDirection: "column" }}>
             <Title level={2} style={{ fontWeight: "bold", marginBottom: "20px", marginTop: "0px" }}>
@@ -391,10 +396,15 @@ const TreatmentInfoPage: React.FC = () => {
 
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 30 }}>
                 <Input
-                    placeholder="ค้นหาด้วยรหัสการรักษา, ชื่อผู้ป่วย, เลขบัตรประชาชน, หรือชื่อการรักษา"
+                    size="large"
+                    placeholder="   Search by ID, Name, ID Card"
+                    prefix={<SearchOutlined style={{ color: '#aaa' }} />}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
-                    style={{ width: 300, borderRadius: 25 }}
+                    style={{
+                        width: '350px',
+                        borderRadius: '25px',
+                    }}
                     allowClear
                 />
                 <Button
@@ -420,7 +430,7 @@ const TreatmentInfoPage: React.FC = () => {
                     alignItems: "center",
                     padding: "10px 16px",
                     backgroundColor: "#f8f8f8",
-                    borderRadius: "4px 4px 0 0",
+                    borderRadius: "20px 20px 0 0",
                     borderBottom: "1px solid #e0e0e0",
                     fontWeight: "bold",
                     color: "#555",
@@ -429,17 +439,20 @@ const TreatmentInfoPage: React.FC = () => {
                 }}
             >
                 <span style={{ flex: "1 0 120px" }}>รหัสการรักษา</span>
-                <span style={{ flex: "1 0 180px" }}>รหัสบัตรประชาชน</span>
-                <span style={{ flex: "2 0 200px" }}>ชื่อ-นามสกุล</span>
+                <span style={{ flex: "1 0 160px" }}>รหัสบัตรประชาชน</span>
+                <span style={{ flex: "1 0 160px" }}>คำนำหน้าชื่อ</span>
+                <span style={{ flex: "2 0 160px" }}>ชื่อ-นามสกุล</span>
                 <span style={{ flex: "1 0 160px" }}>นัดหมายครั้งถัดไป</span>
                 <span style={{ flex: "1 0 120px" }}>ราคา</span>
             </div>
 
-            <Card style={{ borderRadius: 10, boxShadow: "0 2px 6px rgba(0,0,0,0.1)", flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
+            <Card style={{ borderRadius: 0, boxShadow: "0 2px 6px rgba(0,0,0,0.1)", flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
                 <div style={{ flex: 1, border: "1px solid #f0f0f0", borderTop: "none", borderRadius: "0 0 4px 4px", overflowY: "auto", overflowX: "auto" }}>
                     {filteredCases.length > 0 ? (
                         filteredCases.map((r) => {
+
                             const patient = patientsList.find((p) => p.ID === r.patientId) || r.patient;
+                            const title = patient?.Prefix || patient?.prefix || "";
                             const patientName = patient ? `${patient.FirstName || patient.firstName || ""} ${patient.LastName || patient.lastName || ""}` : "-";
                             const nationalId = patient?.CitizenID || "";
                             const appointment = r.appointment_date ? dayjs(r.appointment_date).format("DD/MM/YYYY") : "ไม่มี";
@@ -461,6 +474,7 @@ const TreatmentInfoPage: React.FC = () => {
                                 >
                                     <span style={{ flex: "1 0 120px" }}>{r.id}</span>
                                     <span style={{ flex: "1 0 180px" }}>{nationalId}</span>
+                                    <span style={{ flex: "1 0 180px" }}>{title}</span>
                                     <span style={{ flex: "2 0 200px" }}>{patientName}</span>
                                     <span style={{ flex: "1 0 160px" }}>{appointment}</span>
                                     <span style={{ flex: "1 0 120px" }}>{totalPrice.toLocaleString()} บาท</span>
@@ -520,7 +534,7 @@ const TreatmentInfoPage: React.FC = () => {
                                     },
                                 ]}
                             >
-                                <Input maxLength={13} inputMode="numeric" pattern="[0-9]*" onChange={handleNationalIdChange} />
+                                <Input placeholder="กรุณากรอกเลขบัตรประชาชน" maxLength={13} inputMode="numeric" pattern="[0-9]*" onChange={handleNationalIdChange} />
                             </Form.Item>
 
                         </Col><Col span={8}>
@@ -583,22 +597,47 @@ const TreatmentInfoPage: React.FC = () => {
                         </Row>
 
 
-                        <Row gutter={16} style={{ marginTop: -10 }}>
+                        <Row gutter={16} style={{ marginTop: 20 }}>
+                            <Col span={7}>
+                                <Form.Item label="รหัสบุคลากร" name="departmentID" rules={[
+                                    { required: true, message: "กรุณากรอกรหัสบุคลากร" },
+
+                                ]}>
+                                    <Input placeholder="กรุณากรอกรหัสบุคลากร"
+                                        onChange={(e) => {
+                                            const depId = Number(e.target.value); // 👈 แปลงตรงนี้ด้วย
+                                            const dept = departments.find((d) => d.ID === depId);
+                                            form.setFieldsValue({
+                                                departmentID: depId, // 👈 เก็บเป็น number แทน string
+                                                dentist_Name: dept?.PersonalData
+                                                    ? `${dept.PersonalData.FirstName} ${dept.PersonalData.LastName}`
+                                                    : "",
+                                            });
+                                        }}
+                                    />
+                                </Form.Item>
+
+                            </Col>
+
+                        </Row>
+                        <Row gutter={15} style={{ marginTop: 10 }}>
                             <Col span={10}>
                                 <Form.Item label="ลงชื่อทันตแพทย์" name="dentist_Name">
-                                    <Input />
+                                    <Input disabled />
                                 </Form.Item>
                             </Col>
                             <Col span={10}>
+
                                 <Form.Item label="วันที่ลงชื่อ" name="SignDate">
-                                    <DatePicker style={{ width: "100%" }} />
+                                    <Input disabled />
                                 </Form.Item>
                             </Col>
                         </Row>
                         <Row gutter={10}>
                             <Col span={23}>
                                 <Form.Item label="หมายเหตุ" name="note">
-                                    <TextArea rows={6} />
+                                    <TextArea placeholder="เพิ่มข้อความ"
+                                        rows={6} />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -607,8 +646,16 @@ const TreatmentInfoPage: React.FC = () => {
                     {/* Treatment List */}
                     <div style={{ border: "1px solid #d9d9d9", borderRadius: 8, padding: 16, marginBottom: 24 }}>
                         <Title level={4}>แผนการรักษา</Title>
-                        <Form.List name="treatments">
-                            {(fields, { add, remove }) => (
+                        <Form.List name="treatments" rules={[
+                            {
+                                validator: async (_, treatments) => {
+                                    if (!treatments || treatments.length === 0) {
+                                        return Promise.reject(new Error("กรุณาเพิ่มอย่างน้อย 1 รายการการรักษา"));
+                                    }
+                                },
+                            },
+                        ]}>
+                            {(fields, { add, remove }, { errors }) => (
                                 <>
                                     {fields.map(({ key, name, ...restField }, index) => (
                                         <div key={key} style={{ border: "1px dashed #d9d9d9", padding: 16, marginBottom: 16 }}>
@@ -632,8 +679,8 @@ const TreatmentInfoPage: React.FC = () => {
                                                 </Col>
 
                                                 <Col span={10}>
-                                                    <Form.Item {...restField} name={[name, "price"]} label="ราคารวม" rules={[{ required: true, message: "กรุณาใส่ราคารวม" }]}>
-                                                        <InputNumber
+                                                    <Form.Item {...restField} name={[name, "price"]} label="ราคา" rules={[{ required: true, message: "กรุณาใส่ราคารวม" }]}>
+                                                        <InputNumber placeholder="ใส่ราคา"
                                                             style={{ width: "100%" }}
                                                             min={0}
                                                             formatter={(value?: number | string) => (value === undefined || value === null || value === "" ? "" : String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ","))}
@@ -647,7 +694,7 @@ const TreatmentInfoPage: React.FC = () => {
                                                     </Form.Item>
                                                 </Col>
 
-                                                <Col span={4} style={{ display: "flex", alignItems: "center", marginTop: 24 }}>
+                                                <Col span={2} style={{ display: "flex", alignItems: "center", marginTop: 4 }}>
                                                     <Button
                                                         type="dashed"
                                                         danger
@@ -669,26 +716,7 @@ const TreatmentInfoPage: React.FC = () => {
                                             {/* ... keep same markup as you had for tooth selection ... */}
                                             {/* For brevity, omitted here — keep your current tooth selector code */}
                                             {/* Photo upload */}
-                                            <Form.Item style={{ marginTop: 10 }} label="อัปโหลดรูปภาพ">
-                                                <Upload
-                                                    listType="picture-card"
-                                                    fileList={dynamicFileLists[`treatments_${index}`] || []}
-                                                    onPreview={handlePreview}
-                                                    onChange={handleDynamicChange(index)}
-                                                    beforeUpload={() => false}
-                                                    multiple
-                                                    maxCount={5}
-                                                    accept="image/*"
-                                                    style={{ width: 80, height: 80 }}
-                                                >
-                                                    {(dynamicFileLists[`treatments_${index}`]?.length || 0) >= 5 ? null : (
-                                                        <div style={{ color: "#8c8c8c", fontSize: 12 }}>
-                                                            <PlusOutlined style={{ fontSize: 18 }} />
-                                                            <div style={{ marginTop: 4 }}>อัปโหลด</div>
-                                                        </div>
-                                                    )}
-                                                </Upload>
-                                            </Form.Item>
+
                                         </div>
                                     ))}
 
@@ -696,6 +724,7 @@ const TreatmentInfoPage: React.FC = () => {
                                         <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
                                             เพิ่มการรักษา
                                         </Button>
+                                        <Form.ErrorList errors={errors} />
                                     </Form.Item>
                                 </>
                             )}
@@ -704,15 +733,8 @@ const TreatmentInfoPage: React.FC = () => {
                 </Form>
             </Modal>
 
-            <Modal open={previewVisible} title={previewTitle} footer={null} onCancel={() => setPreviewVisible(false)}>
-                <img alt="preview" style={{ width: "100%" }} src={previewImage} />
-            </Modal>
         </div>
     );
 };
 
 export default TreatmentInfoPage;
-function getBase64(_arg0: File): any {
-    throw new Error("Function not implemented.");
-}
-

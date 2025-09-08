@@ -133,8 +133,8 @@ func SeedPatient() {
 		{
 			CitizenID:        "1234567890123",
 			Prefix:           "นาย",
-			FirstName:        "สมชาย",
-			LastName:         "ใจดี",
+			FirstName:        "เทส",
+			LastName:         "ระบบ",
 			NickName:         "ชาย",
 			Enthnicity:       "ไทย",
 			Nationality:      "ไทย",
@@ -225,7 +225,7 @@ func SeedCase() {
 					{Quadrant: "ขวาบน ซี่ 11"},
 					{Quadrant: "ซ้ายล่าง ซี่ 36"},
 				},
-				Photo: []byte{100, 100, 78, 71, 13, 10, 26, 10},
+				// Photo: []byte{100, 100, 78, 71, 13, 10, 26, 10},
 			},
 			{
 				TreatmentName: "อุดฟัน",
@@ -233,7 +233,7 @@ func SeedCase() {
 				Quadrants: []entity.Quadrant{
 					{Quadrant: "ขวาบนซี่ 26"},
 				},
-				Photo: []byte{137, 80, 78, 71, 13, 10, 26, 10},
+				// Photo: []byte{137, 80, 78, 71, 13, 10, 26, 10},
 			},
 		},
 	}

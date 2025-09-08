@@ -43,33 +43,49 @@ const StaffInfoPaeg: React.FC = () => {
 
   const applySearchFilter = () => {
     const trimmedText = searchText.trim();
+
     const lowerCaseSearchText = trimmedText.toLowerCase();
     const searchId = Number(trimmedText);
 
     if (!trimmedText) {
+
       setFilteredStaff(staffData); // แสดงทั้งหมดถ้าไม่มีคำค้น
       return;
     }
 
     // ถ้าเป็นตัวเลข → ตรวจสอบ Employee_ID ก่อน
     if (!isNaN(searchId)) {
+      console.log("Enter search")
       const exactMatch = staffData.find(staff => staff.Employee_ID === searchId);
       if (exactMatch) {
+        console.log("numID search")
         setFilteredStaff([exactMatch]); // เจอ Employee_ID → แสดงเฉพาะคนเดียว
         return;
+      } else {
+        setFilteredStaff([]);
+        return;
+
       }
     }
 
     // ถ้าไม่ใช่ Employee_ID หรือไม่เจอ → ค้นหาด้วย string อื่น ๆ
-    const newFilteredStaff = staffData.filter(staff => {
+    const newFilteredStaff = staffData.filter((staff) => {
+      const firstName = staff.firstName || "";
+      const lastName = staff.lastName || "";
+      const position = staff.position || "";
+      const idCard = String(staff.idCard || "");;
+      const email = staff.email || "";
+        
       return (
-        staff.firstName.toLowerCase().includes(lowerCaseSearchText) ||
-        staff.lastName.toLowerCase().includes(lowerCaseSearchText) ||
-        staff.position.toLowerCase().includes(lowerCaseSearchText) ||
-        staff.idCard.includes(lowerCaseSearchText) ||
-        staff.email.toLowerCase().includes(lowerCaseSearchText)
+        console.log("Text search"),
+        firstName.toLowerCase().includes(lowerCaseSearchText) ||
+        lastName.toLowerCase().includes(lowerCaseSearchText) ||
+        position.toLowerCase().includes(lowerCaseSearchText) ||
+        idCard.includes(trimmedText) || 
+        email.toLowerCase().includes(lowerCaseSearchText)
       );
     });
+
 
     setFilteredStaff(newFilteredStaff);
   };
@@ -121,16 +137,16 @@ const StaffInfoPaeg: React.FC = () => {
         บุคลากร
       </Title>
       {/* Consolidated both Search and Button into a single Row */}
-      <Row justify="space-between" align="middle" style={{ marginBottom: 30 }}>
+      <Row justify="space-between" align="middle" style={{ display: "flex", justifyContent: "space-between", marginBottom: 30 }}>
         <Col>
           <Input
-            placeholder="Search by ID, Name, Position, ID Card"
+            placeholder="   Search by ID, Name, Position, ID Card"
             prefix={<SearchOutlined style={{ color: '#aaa' }} />}
             size="large"
             value={searchText}
             onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setSearchText(e.target.value)}
             style={{
-              width: '300px',
+              width: '350px',
               borderRadius: '25px',
             }}
           />
@@ -159,14 +175,14 @@ const StaffInfoPaeg: React.FC = () => {
         alignItems: 'center',
         padding: '10px 16px',
         backgroundColor: '#f8f8f8',
-        borderRadius: '4px 4px 0 0',
+        borderRadius: '20px 20px 0 0',
         borderBottom: '1px solid #e0e0e0',
         fontWeight: 'bold',
         color: '#555',
         overflowX: 'auto',
         whiteSpace: 'nowrap',
       }}>
-        <span style={{ flex: '1 0 100px' }}>รหัสพนักงาน</span>        
+        <span style={{ flex: '1 0 100px' }}>รหัสพนักงาน</span>
         <span style={{ flex: '1 0 150px' }}>คำนำหน้าชื่อ</span>
         <span style={{ flex: '2 0 100px' }}>ชื่อ</span>
         <span style={{ flex: '2 0 150px' }}>นามสกุล</span>
@@ -215,7 +231,7 @@ const StaffInfoPaeg: React.FC = () => {
                 }}
                 onClick={() => navigate(`/staff/PersonalData/${staff.Employee_ID}`)}
               >
-                <span style={{ flex: '1 0 100px' }}>{formatEmployeeIdForDisplay(staff.Employee_ID)}</span>                
+                <span style={{ flex: '1 0 100px' }}>{formatEmployeeIdForDisplay(staff.Employee_ID)}</span>
                 <span style={{ flex: '1 0 150px' }}>{staff.title}</span>
                 <span style={{ flex: '2 0 150px' }}>{staff.firstName}</span>
                 <span style={{ flex: '2 0 150px' }}>{staff.lastName}</span>
