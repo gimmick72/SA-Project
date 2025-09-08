@@ -11,7 +11,6 @@ import ShowEven from '../Even/showeven';
 import EditEventModal from '../Even/editeven';
 import './calendar.custom.css';
 import { getAllDentists, DentistManagement, createDentist, updateDentist, deleteDentist } from "../../../../services/DentistMenagement/DentistMenagement"
-import { dentists } from './../../../First_pages/First_pages/OurDentistsPage/dentistsData';
 
 
 
@@ -27,11 +26,11 @@ interface EventType {
   dentist: string;
 }
 
-type EventData = {
-  room: string;
-  start: Date;
-  end: Date;
-};
+// type EventData = {
+//   room: string;
+//   start: Date;
+//   end: Date;
+// };
 
 
 const MyCalendar: React.FC = () => {
@@ -47,18 +46,6 @@ const MyCalendar: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
 
   const [dentist, setDentist] = useState<string>("สมชาย");
-
-
-  // โหลดข้อมูลจำลองจาก 'DB' เมื่อคอมโพเนนต์ mount
-  // useEffect(() => {
-  //   let mounted = true;
-  //   simulateFetchEventsFromDB().then(fetched => {
-  //     if (!mounted) return;
-  //     setEvents(fetched);
-  //     idRef.current = fetched.length + 1;
-  //   });
-  //   return () => { mounted = false; };
-  // }, []);
 
 
   // โหลดข้อมูลจาก DB เมื่อคอมโพเนนต์ mount
@@ -81,22 +68,6 @@ const MyCalendar: React.FC = () => {
 
         }));
 
-
-        // const mappedEventss: EventType[] = data.map((item, index) => {
-        //   const event: EventType = {
-        //     id: item.id ?? index + 1,
-        //     room: item.room,
-        //     start: new Date(item.time_in),
-        //     end: new Date(item.time_out),
-        //   };
-
-        //   console.log("startdb", item.time_in);
-        //   console.log("enddb", item.time_out);  
-        //   console.log("start", event.start);    
-        //   console.log("end", event.end);
-
-        //   return event;
-        // });
         console.log("โหลดข้อมูล:", mappedEvents);
         setEvents(mappedEvents);
         idRef.current = mappedEvents.length + 1;
@@ -121,14 +92,6 @@ const MyCalendar: React.FC = () => {
     setShowAddModal(true);
   };
 
-  // เพิ่ม event
-  // const handleAddEvent = (data: EventData) => {
-  //   const newEvent: EventType = { id: idRef.current++, ...data };
-  //   setEvents(prev => [...prev, newEvent]);
-  //   setShowAddModal(false);
-  //   setSelectedSlot(null);
-  //   message.success('เพิ่มกิจกรรมสำเร็จ');
-  // };
 
   const handleAddEvent = async (event: { room: string; start: Date; end: Date; dentist: string }) => {
     try {
@@ -165,16 +128,6 @@ const MyCalendar: React.FC = () => {
     }
   };
 
-
-
-  // แก้ไข event
-  // const handleEditEvent = (data: { room: string; start: Date; end: Date }) => {
-  //   if (!selectedEvent) return;
-  //   setEvents(prev => prev.map(ev => ev.id === selectedEvent.id ? { ...ev, ...data } : ev));
-  //   setShowEditModal(false);
-  //   setSelectedEvent(undefined);
-  //   message.success('แก้ไขกิจกรรมสำเร็จ');
-  // };
 
   const handleEditEvent = async (data: { room: string; start: Date; end: Date }) => {
     if (!selectedEvent) return;
@@ -217,20 +170,6 @@ const MyCalendar: React.FC = () => {
   };
 
 
-  // ลบ event by id
-  // const handleDeleteEvent = (id: number, skipConfirm = false) => {
-  //   const ev = events.find(e => e.id === id);
-  //   const doDelete = () => {
-  //     setEvents(prev => prev.filter(ev => ev.id !== id));
-  //   };
-  //   if (skipConfirm) {
-  //     doDelete();
-  //     return;
-  //   }
-  // };
-
-
-
   const handleDeleteEvent = async (id: number, skipConfirm = false) => {
     const ev = events.find(e => e.id === id);
     if (!ev) return;
@@ -253,7 +192,6 @@ const MyCalendar: React.FC = () => {
       return;
     };
   };
-
 
 
 
@@ -291,7 +229,6 @@ const MyCalendar: React.FC = () => {
           weekdayFormat: (date: Date) => format(date, 'EEEE', { locale: th }).replace(/^วัน/, ''),
           dayHeaderFormat: (date: Date) => format(date, 'EEEE', { locale: th }).replace(/^วัน/, ''),
         } as any}
-        style={{ height: '100%' }}
       />
 
       <AddEventModal
@@ -300,32 +237,6 @@ const MyCalendar: React.FC = () => {
         onCancel={() => setShowAddModal(false)}
         selectedDate={selectedSlot ? selectedSlot.start : null}
       />
-
-      {/* 
-      <AddEventModal
-        visible={modalVisible}
-        selectedDate={selectedDate}
-        onAdd={handleAddEvent}
-        onCancel={() => setModalVisible(false)}
-      /> */}
-
-      {/* <AddEventModal
-        visible={showAddModal}
-        onAdd={(newEvent) => {
-          setEvents(prev => [
-            ...prev,
-            {
-              id: prev.length + 1,
-              room: newEvent.room,
-              start: newEvent.start,
-              end: newEvent.end
-            }
-          ]);
-          setShowAddModal(false);
-        }}
-        onCancel={() => setShowAddModal(false)}
-        selectedDate={selectedSlot ? selectedSlot.start : null}
-      /> */}
 
       {selectedEvent && (<><ShowEven
         event={selectedEvent}

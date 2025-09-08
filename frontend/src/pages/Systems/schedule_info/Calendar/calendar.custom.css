@@ -19,15 +19,11 @@
 
 
 
-/* even color */ */
-.rbc-event {
-    background-color: #ff7875;
-    border-radius: 8px;
-    padding: 2px 4px;
-    font-size: 0.85rem;
-} 
+.rbc-event, .rbc-day-slot .rbc-background-event {
+    background-color:#ff7875 !important;
+}
 
-.rbc-event:hover {
-    background-color: #e8413e;
 
+.rbc-event:hover, .rbc-day-slot .rbc-background-event {
+    background-color:#e8413e !important;
 }
