@@ -17,7 +17,7 @@ import { MinusCircleOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 
 // ✅ ดึงบริการจริงจาก services
-import { fetchSupplyOptions, createDispense } from '@service/supply/supply';
+import { fetchSupplyOptions, createDispense } from "../../../services/Supply/supply";
 
 const { Option } = Select;
 

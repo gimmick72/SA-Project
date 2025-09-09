@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Card, Button } from "antd";
 import { useDrop, useDrag } from "react-dnd";
 import { Patient, RoomScheduleData, TimeSlot,ViewMode } from "./types";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 
 interface Props {
   room: RoomScheduleData;

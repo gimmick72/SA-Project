@@ -21,5 +21,5 @@ type RoomReservation struct{
 	Room Room
 
 	DentistMenagementID uint
-	DentistMenagement DentistMenagement
+	DentistMenagement DentistManagement
 }

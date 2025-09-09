@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import './promotion.css';
 import { Modal, Input, Button, Card, Select } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';

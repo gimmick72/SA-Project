@@ -201,9 +201,11 @@ const TreatmentEntry: React.FC = () => {
                     name="unitPrice"
                     rules={[{ required: true, message: 'กรุณาระบุราคา' }]}
                   >
-                    <InputNumber
+                    <InputNumber<number>
                       min={0}
                       formatter={value => `฿ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                      // ตรงนี้ต้องแก้มั้ย
+                      // ถ้าแก้ ใส่ <number> ตรง <InputNumber>
                       parser={value => {
                         const parsed = parseFloat(value!.replace(/฿\s?|(,*)/g, ''));
                         return isNaN(parsed) ? 0 : parsed;

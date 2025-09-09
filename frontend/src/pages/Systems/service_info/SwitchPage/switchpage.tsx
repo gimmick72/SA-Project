@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Service from "../service/service";
 import "./switchpage.css"
 import Promotion from "../Promotion/promotion";
 import 'antd/dist/reset.css';

@@ -2,13 +2,12 @@ package entity
 
 import (
 	"time"
-	"gorm.io/gorm"
 )
 
-type DentistMenagement struct {
-	gorm.Model
-	Room string
-	Date time.Time
-	Timein time.Time
-	TimeOut time.Time
+type DentistManagement struct {
+	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Room    string    `json:"room"`
+	TimeIn  time.Time `json:"time_in"`
+	TimeOut time.Time `json:"time_out"`
+	Dentist string    `json:"dentist"`
 }
