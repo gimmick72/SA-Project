@@ -39,8 +39,8 @@ const TreatmentInfoPage: React.FC = () => {
     const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
     const [departments, setDepartments] = useState<any[]>([]);
 
+     // 🔹 ดึงข้อมูล Department ทั้งหมดจาก /staff (หรือจะทำ API แยกก็ได้)
     useEffect(() => {
-        // 🔹 ดึงข้อมูล Department ทั้งหมดจาก /staff (หรือจะทำ API แยกก็ได้)
         fetch("http://localhost:8080/staff")
             .then(res => res.json())
             .then(data => setDepartments(data))
@@ -102,12 +102,13 @@ const TreatmentInfoPage: React.FC = () => {
         const filtered = cases.filter((c) => {
             const patient = patientsList.find((p) => p.ID === c.patientId) || c.patient;
             const name = patient ? `${patient.FirstName || patient.firstName || ""} ${patient.LastName || patient.lastName || ""}` : "";
-            const nid = patient?.CitizenID || patient?.NationalID || "";
+            const nid = patient?.CitizenID || "";
             const treatmentNames = (c.treatments || []).map((t) => (t.TreatmentName || (t as any).treatment_name || "")).join(" ");
             return name.toLowerCase().includes(lower) || String(nid).includes(lower) || treatmentNames.toLowerCase().includes(lower);
         });
         setFilteredCases(filtered);
     }, [searchText, cases, patientsList]);
+    
     // // prepare modal for creating new
     const handleAddClick = async () => {
         try {
@@ -154,6 +155,7 @@ const TreatmentInfoPage: React.FC = () => {
     const handleCancel = () => {
         setIsModalVisible(false);
     };
+
     // When National ID changes on form, try to find patient and populate fields
     const handleNationalIdChange = async (e: ChangeEvent<HTMLInputElement> | string) => {
         console.log("NationalIDChange")
@@ -201,6 +203,7 @@ const TreatmentInfoPage: React.FC = () => {
             setIsSubmitDisabled(true);
         }
     };
+
     // edit existing case (row)
     const handleEditClick = async (row: CaseRow) => {
 
@@ -264,6 +267,7 @@ const TreatmentInfoPage: React.FC = () => {
         setIsSubmitDisabled(false);
         setIsModalVisible(true);
     };
+
     // Create or update case (convert form values to backend shape)
     const handleFormSubmit = async (values: any) => {
         try {

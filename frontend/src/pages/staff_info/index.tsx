@@ -43,12 +43,10 @@ const StaffInfoPaeg: React.FC = () => {
 
   const applySearchFilter = () => {
     const trimmedText = searchText.trim();
-
     const lowerCaseSearchText = trimmedText.toLowerCase();
     const searchId = Number(trimmedText);
 
     if (!trimmedText) {
-
       setFilteredStaff(staffData); // แสดงทั้งหมดถ้าไม่มีคำค้น
       return;
     }
@@ -56,16 +54,28 @@ const StaffInfoPaeg: React.FC = () => {
     // ถ้าเป็นตัวเลข → ตรวจสอบ Employee_ID ก่อน
     if (!isNaN(searchId)) {
       console.log("Enter search")
+
       const exactMatch = staffData.find(staff => staff.Employee_ID === searchId);
       if (exactMatch) {
         console.log("numID search")
         setFilteredStaff([exactMatch]); // เจอ Employee_ID → แสดงเฉพาะคนเดียว
         return;
-      } else {
-        setFilteredStaff([]);
-        return;
-
       }
+      // else {
+      //   console.log("string search")
+      //   if (trimmedText.length === 13) {
+      //     console.log("length = 13")
+      //     const idCardMatches = staffData.filter(staff =>
+      //       (staff.idCard).includes(trimmedText)
+      //     );
+      //     if (idCardMatches.length > 0) {
+      //       console.log("Found by idCard");
+      //       setFilteredStaff(idCardMatches);
+      //       return;
+      //     }
+      //   }
+      // }
+
     }
 
     // ถ้าไม่ใช่ Employee_ID หรือไม่เจอ → ค้นหาด้วย string อื่น ๆ
@@ -73,15 +83,15 @@ const StaffInfoPaeg: React.FC = () => {
       const firstName = staff.firstName || "";
       const lastName = staff.lastName || "";
       const position = staff.position || "";
-      const idCard = String(staff.idCard || "");;
+      // const idCard = staff.idCard || "";;
       const email = staff.email || "";
-        
+
       return (
         console.log("Text search"),
         firstName.toLowerCase().includes(lowerCaseSearchText) ||
         lastName.toLowerCase().includes(lowerCaseSearchText) ||
         position.toLowerCase().includes(lowerCaseSearchText) ||
-        idCard.includes(trimmedText) || 
+        // idCard.includes(trimmedText) ||
         email.toLowerCase().includes(lowerCaseSearchText)
       );
     });
