@@ -1,0 +1,36 @@
+.payment-success-container {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.payment-success-card {
+  max-width: 600px;
+  width: 100%;
+}
+
+.payment-success-icon {
+  color: #52c41a;
+}
+
+.payment-success-details {
+  margin-bottom: 20px;
+}
+
+.payment-success-details-card {
+  background-color: #f6ffed;
+}
+
+.payment-success-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.payment-success-row:last-child {
+  margin-bottom: 0;
+}
+
+.payment-success-amount {
+  color: #52c41a;
+}

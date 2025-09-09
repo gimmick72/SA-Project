@@ -1,0 +1,25 @@
+.treatment-entry-container {
+  padding: 24px;
+}
+
+.treatment-entry-card {
+  margin-bottom: 24px;
+}
+
+.quantity-input {
+  width: 100%;
+}
+
+.unit-price-input {
+  width: 100%;
+}
+
+.add-button {
+  width: 100%;
+}
+
+.total-amount-display {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1890ff;
+}

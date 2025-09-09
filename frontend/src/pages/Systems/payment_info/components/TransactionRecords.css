@@ -1,0 +1,45 @@
+.transaction-records-container {
+  padding: 24px;
+}
+
+.payment-method-cash {
+  color: #52c41a;
+}
+
+.payment-method-promptpay {
+  color: #1890ff;
+}
+
+.payment-method-credit-card {
+  color: #722ed1;
+}
+
+.transaction-time {
+  font-size: 12px;
+}
+
+.date-range-picker {
+  width: 100%;
+}
+
+.payment-method-select {
+  width: 100%;
+}
+
+.search-button {
+  width: 100%;
+}
+
+.transaction-amount {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.treatment-list {
+  margin-top: 8px;
+}
+
+.treatment-tag {
+  margin-bottom: 4px;
+}

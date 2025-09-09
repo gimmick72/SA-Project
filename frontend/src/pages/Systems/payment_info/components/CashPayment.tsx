@@ -1,12 +1,13 @@
 import React from "react";
 import { Card, Form, Input, Typography } from "antd";
 import { CashPaymentProps } from "../types";
+import "./CashPayment.css";
 
 const { Text } = Typography;
 
 const CashPayment: React.FC<CashPaymentProps> = ({ form }) => {
   return (
-    <Card title="รายละเอียดการชำระด้วยเงินสด" size="small" style={{ marginBottom: '16px' }}>
+    <Card title="รายละเอียดการชำระด้วยเงินสด" size="small" className="cash-payment-card">
       <Form.Item
         label="จำนวนเงินที่รับมา"
         name="receivedAmount"
@@ -33,8 +34,8 @@ const CashPayment: React.FC<CashPaymentProps> = ({ form }) => {
           const change = received - amount;
           
           return change > 0 ? (
-            <div style={{ padding: '12px', backgroundColor: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: '6px' }}>
-              <Text strong style={{ color: '#52c41a' }}>
+            <div className="change-display">
+              <Text strong className="change-amount">
                 เงินทอน: ฿{change.toFixed(2)}
               </Text>
             </div>

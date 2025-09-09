@@ -1,0 +1,166 @@
+.promptpay-card {
+  margin-bottom: 16px;
+}
+
+.qr-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.bank-header {
+  background-color: #6B46C1;
+  color: white;
+  padding: 12px;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 0;
+}
+
+.bank-header-title {
+  color: white;
+  margin: 0;
+}
+
+.qr-display {
+  background-color: #1E40AF;
+  color: white;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.qr-icon {
+  font-size: 24px;
+}
+
+.qr-text {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.promptpay-logo {
+  background-color: white;
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.promptpay-logo-text {
+  border: 2px solid #1E40AF;
+  border-radius: 4px;
+  padding: 8px 16px;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #1E40AF;
+}
+
+.promptpay-logo-pay {
+  color: #10B981;
+}
+
+.qr-code-container {
+  background-color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  min-height: 200px;
+  align-items: center;
+}
+
+.qr-code-image {
+  max-width: 200px;
+  height: auto;
+}
+
+.payment-details {
+  background-color: white;
+  padding: 16px;
+  border: 1px solid #d9d9d9;
+  border-top: none;
+}
+
+.payment-detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.payment-divider {
+  height: 1px;
+  background-color: #d9d9d9;
+  margin: 12px 0;
+}
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.amount-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.amount-note {
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.footer-bar {
+  background-color: #6B46C1;
+  height: 20px;
+  border-radius: 0 0 8px 8px;
+}
+
+.manual-payment {
+  margin-top: 16px;
+}
+
+.manual-payment-box {
+  background-color: #f6f6f6;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.manual-payment-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manual-payment-amount {
+  margin-top: 8px;
+}
+
+.amount-highlight {
+  color: #1890ff;
+}
+
+.instructions {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 6px;
+}
+
+.instructions-title {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.instructions-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.refresh-button-container {
+  text-align: center;
+  margin-top: 16px;
+}

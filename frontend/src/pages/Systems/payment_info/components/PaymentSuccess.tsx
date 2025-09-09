@@ -3,6 +3,7 @@ import { Card, Button, Result, Typography } from "antd";
 import { CheckCircleOutlined, HomeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { PaymentSuccessProps, PaymentMethod } from "../types";
+import "./PaymentSuccess.css";
 
 const { Text } = Typography;
 
@@ -23,10 +24,10 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
   };
 
   return (
-    <div style={{ padding: '24px', display: 'flex', justifyContent: 'center' }}>
-      <Card style={{ maxWidth: 600, width: '100%' }}>
+    <div className="payment-success-container">
+      <Card className="payment-success-card">
         <Result
-          icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+          icon={<CheckCircleOutlined className="payment-success-icon" />}
           status="success"
           title="ชำระเงินสำเร็จ!"
           subTitle={
@@ -37,17 +38,17 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
             </div>
           }
           extra={[
-            <div key="details" style={{ marginBottom: '20px' }}>
-              <Card size="small" style={{ backgroundColor: '#f6ffed' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div key="details" className="payment-success-details">
+              <Card size="small" className="payment-success-details-card">
+                <div className="payment-success-row">
                   <Text strong>วิธีการชำระ:</Text>
                   <Text>{getPaymentMethodName(paymentMethod)}</Text>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div className="payment-success-row">
                   <Text strong>จำนวนเงิน:</Text>
-                  <Text strong style={{ color: '#52c41a' }}>฿{amount.toFixed(2)}</Text>
+                  <Text strong className="payment-success-amount">฿{amount.toFixed(2)}</Text>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="payment-success-row">
                   <Text strong>วันที่:</Text>
                   <Text>{new Date().toLocaleDateString('th-TH')}</Text>
                 </div>

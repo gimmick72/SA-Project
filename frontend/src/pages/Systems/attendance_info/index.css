@@ -1,0 +1,34 @@
+.attendance-container {
+  padding: 24px;
+}
+
+.attendance-stats-row {
+  margin-bottom: 24px;
+}
+
+.attendance-controls {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.attendance-status-select {
+  width: 120px;
+}
+
+.attendance-date-picker {
+  width: 100%;
+}
+
+.attendance-form-row {
+  margin-bottom: 16px;
+}
+
+.attendance-form-col {
+  padding-right: 8px;
+}
+
+.attendance-form-col:last-child {
+  padding-right: 0;
+}
