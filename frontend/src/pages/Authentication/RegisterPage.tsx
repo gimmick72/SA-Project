@@ -3,6 +3,7 @@ import { Form, Input, Button, Card, Typography, message, Select, DatePicker } fr
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, BankOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthAPI, RegisterRequest } from "../../services/authApi";
+import "./RegisterPage.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -54,23 +55,10 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div style={{ 
-      minHeight: "100vh", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      padding: "20px"
-    }}>
-      <Card 
-        style={{ 
-          width: "100%",
-          maxWidth: "450px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.1)"
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <Title level={2} style={{ color: "#722ED1", marginBottom: "8px" }}>
+    <div className="register-container">
+      <Card className="register-card">
+        <div className="register-header">
+          <Title level={2} className="register-title">
             สมัครสมาชิก
           </Title>
           <Text type="secondary">สำหรับผู้ดูแลระบบและผู้ป่วยใหม่</Text>
@@ -92,11 +80,11 @@ const RegisterPage: React.FC = () => {
             </Select>
           </Form.Item>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="name-row">
             <Form.Item
               name="first_name"
               rules={[{ required: true, message: "กรุณากรอกชื่อ!" }]}
-              style={{ flex: 1 }}
+              className="name-field"
             >
               <Input 
                 prefix={<UserOutlined />} 
@@ -107,7 +95,7 @@ const RegisterPage: React.FC = () => {
             <Form.Item
               name="last_name"
               rules={[{ required: true, message: "กรุณากรอกนามสกุล!" }]}
-              style={{ flex: 1 }}
+              className="name-field"
             >
               <Input 
                 prefix={<UserOutlined />} 
@@ -154,7 +142,7 @@ const RegisterPage: React.FC = () => {
                       label="วันเกิด"
                     >
                       <DatePicker 
-                        style={{ width: '100%' }}
+                        className="date-picker-full"
                         placeholder="เลือกวันเกิด"
                         format="YYYY-MM-DD"
                       />
@@ -229,26 +217,22 @@ const RegisterPage: React.FC = () => {
               type="primary" 
               htmlType="submit" 
               loading={loading}
-              style={{ 
-                width: "100%",
-                backgroundColor: "#722ED1",
-                borderColor: "#722ED1"
-              }}
+              className="register-button"
             >
               สมัครสมาชิก
             </Button>
           </Form.Item>
         </Form>
 
-        <div style={{ textAlign: "center" }}>
+        <div className="register-footer">
           <Text type="secondary">
             มีบัญชีแล้ว?{" "}
-            <Link to="/auth/login" style={{ color: "#722ED1" }}>
+            <Link to="/auth/login" className="register-link">
               เข้าสู่ระบบ
             </Link>
           </Text>
           <br />
-          <Link to="/home" style={{ color: "#722ED1" }}>
+          <Link to="/home" className="register-link">
             ← กลับหน้าแรก
           </Link>
         </div>

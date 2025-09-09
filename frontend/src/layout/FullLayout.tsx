@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../Container/sidebar";
 import NavbarTop from "../Container/navbartop";
 import Content from "../Container/content";
+import "./FullLayout.css";
 
 interface FullLayoutProps {
   children?: React.ReactNode;
@@ -12,9 +13,9 @@ interface FullLayoutProps {
 
 const FullLayout: React.FC<FullLayoutProps> = ({ children }) => {
   return (
-    <Layout style={{ height: "100vh",  overflow: "hidden" }}>
+    <Layout className="full-layout">
       <Sidebar />
-      <Layout style={{ display: "flex", flexDirection: "column" }}>
+      <Layout className="full-layout-inner">
         <NavbarTop />
         <Content>
           {children || <Outlet />}

@@ -1,0 +1,47 @@
+.navbar-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  height: 56px !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
+.navbar-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-avatar {
+  border: 2px solid #8E55D9;
+}
+
+.navbar-title {
+  margin: 0;
+  color: #722ED1;
+}
+
+.navbar-menu {
+  background: #ffffff !important;
+  border-bottom: none;
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
+.navbar-login-link {
+  color: #151515;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.navbar-login-icon {
+  margin-right: 6px;
+}

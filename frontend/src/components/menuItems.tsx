@@ -1,4 +1,5 @@
 import { TiHomeOutline } from "react-icons/ti";
+import { TbLayoutDashboard } from "react-icons/tb";
 import { FaStethoscope } from "react-icons/fa";
 import { LuClipboardPen, LuCalendar, LuPill } from "react-icons/lu";
 import { MdOutlineGroup, MdPayment } from "react-icons/md";
@@ -7,7 +8,7 @@ import { FaRegSave } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
 export const menuItems = [
-  { key: "1", icon: TiHomeOutline, label: "หน้าหลัก", path: "/admin" },
+  { key: "1", icon: TbLayoutDashboard, label: "แดชบอร์ด", path: "/admin" },
   { key: "2", icon: LuClipboardPen, label: "ประวัติคนไข้", path: "/admin/patient" },
   { key: "3", icon: FaStethoscope, label: "การรักษา", path: "/admin/treatment" },
   { key: "4", icon: LuCalendar, label: "ตารางแพทย์", path: "/admin/schedule" },

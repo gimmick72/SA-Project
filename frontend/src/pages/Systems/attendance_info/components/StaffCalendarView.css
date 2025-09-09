@@ -1,0 +1,271 @@
+.staff-calendar-view {
+  padding: 20px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.calendar-header {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar-navigation {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calendar-title {
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-range {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.calendar-filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.calendar-grid {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.calendar-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.calendar-header-row {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  border-bottom: 2px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.time-column-header {
+  padding: 16px 8px;
+  font-weight: 600;
+  text-align: center;
+  border-right: 1px solid #e8e8e8;
+  background: #f0f0f0;
+}
+
+.day-header {
+  padding: 16px 8px;
+  text-align: center;
+  border-right: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.day-name {
+  font-weight: 600;
+  color: #666;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.day-date {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1890ff;
+  margin-top: 4px;
+}
+
+.calendar-body {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.time-row {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  border-bottom: 1px solid #e8e8e8;
+  min-height: 60px;
+}
+
+.time-label {
+  padding: 8px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  border-right: 1px solid #e8e8e8;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.time-slot {
+  border-right: 1px solid #e8e8e8;
+  padding: 4px;
+  cursor: pointer;
+  position: relative;
+  min-height: 60px;
+  transition: background-color 0.2s ease;
+}
+
+.time-slot:hover {
+  background-color: #f0f9ff;
+}
+
+.schedule-item {
+  background: #1890ff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 2px 0;
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.schedule-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.schedule-item.scheduled {
+  opacity: 0.8;
+  border-left: 4px solid #faad14;
+}
+
+.schedule-item.confirmed {
+  opacity: 1;
+  border-left: 4px solid #52c41a;
+}
+
+.schedule-item.cancelled {
+  opacity: 0.5;
+  background: #ff4d4f;
+  border-left: 4px solid #ff7875;
+  text-decoration: line-through;
+}
+
+.schedule-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.schedule-time {
+  font-size: 10px;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+/* Today highlight */
+.day-header.today {
+  background: #e6f7ff;
+}
+
+.day-header.today .day-date {
+  background: #1890ff;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px auto 0;
+}
+
+.time-slot.today {
+  background: #f6ffed;
+}
+
+/* Position-specific colors */
+.schedule-item.dentist {
+  background: #1890ff;
+}
+
+.schedule-item.assistant {
+  background: #52c41a;
+}
+
+.schedule-item.receptionist {
+  background: #faad14;
+}
+
+.schedule-item.maid {
+  background: #722ed1;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .calendar-container {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-controls {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .calendar-filters {
+    justify-content: center;
+  }
+  
+  .calendar-navigation {
+    justify-content: center;
+  }
+}
+
+/* Modal styling */
+.ant-modal .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ant-modal .ant-form-item-label > label {
+  font-weight: 600;
+}
+
+/* Loading and empty states */
+.calendar-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+}
+
+.calendar-empty {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+/* Drag and drop placeholder (for future enhancement) */
+.schedule-item.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+.time-slot.drop-target {
+  background: #e6f7ff;
+  border: 2px dashed #1890ff;
+}

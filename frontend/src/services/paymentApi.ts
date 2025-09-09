@@ -18,6 +18,9 @@ export interface PaymentRequest {
   expiryDate?: string;
   cvv?: string;
   
+  // PromptPay specific
+  phoneNumber?: string;
+  
   // Optional patient ID
   patientId?: number;
 }

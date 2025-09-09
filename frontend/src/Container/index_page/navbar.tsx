@@ -6,6 +6,7 @@ import Avatar from "antd/es/avatar";
 import { UserOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import Logo from "../../assets/logo.png";
+import "./navbar.css";
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -20,39 +21,28 @@ const items = [
 
 const HomePage: React.FC = () => {
   return (
-    <Header
-      style={{
-        backgroundColor: "#E7DDF6",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0 40px",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <Avatar src={Logo} shape="circle" size="large" 
-          style={{ border: "2px solid #8E55D9",}}
-/>
-        <Title level={3} style={{ margin: 0, color: "#722ED1" }}>
+    <Header className="navbar-header">
+      <div className="navbar-logo-section">
+        <Avatar 
+          src={Logo} 
+          shape="circle" 
+          size="large" 
+          className="navbar-avatar"
+        />
+        <Title level={3} className="navbar-title">
           TooThoot
         </Title>
       </div>
 
       <Menu
         mode="horizontal"
-        style={{
-          backgroundColor: "#E7DDF6",
-          borderBottom: "none",
-          display: "flex",
-          justifyContent: "center",
-          flex: 1,
-        }}
+        className="navbar-menu"
         items={items}
       />
 
-      <Link to="/auth/login" style={{ color: "#722ED1", fontWeight: 600, textDecoration: "none" }}>
-        <UserOutlined style={{ marginRight: 6 }} />
-        ลงชื่อเข้าใช้
+      <Link to="/admin" className="navbar-login-link">
+        <UserOutlined className="navbar-login-icon" />
+        {" "}เข้าสู่ระบบ
       </Link>
     </Header>
   );

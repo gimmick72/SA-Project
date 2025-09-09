@@ -1,0 +1,124 @@
+.staff-work-time-management {
+  padding: 24px;
+  background-color: #ffffff;
+  min-height: 100vh;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h2 {
+  margin: 0;
+  color: #000000;
+}
+
+.management-tabs {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.management-tabs .ant-tabs-nav {
+  margin-bottom: 0;
+  padding: 0 24px;
+}
+
+.management-tabs .ant-tabs-content-holder {
+  padding: 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+.dashboard-container {
+  padding: 24px;
+  overflow-y: auto;
+  max-height: calc(100vh - 240px);
+}
+
+.dashboard-stats-card {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  text-align: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.working {
+  border-left: 4px solid #52c41a;
+}
+
+.stat-card.break {
+  border-left: 4px solid #faad14;
+}
+
+.stat-card.pending {
+  border-left: 4px solid #f5222d;
+}
+
+.stat-card.hours {
+  border-left: 4px solid #722ed1;
+}
+
+.stat-card.overtime {
+  border-left: 4px solid #fa8c16;
+}
+
+.quick-actions-card {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.recent-activities {
+  height: 300px;
+}
+
+.activity-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-time {
+  width: 60px;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.activity-content {
+  flex: 1;
+  font-size: 14px;
+}
+
+
+.ant-statistic-content-value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ant-tabs-tab {
+  font-weight: 500;
+}
+
+.ant-tabs-tab-active {
+  font-weight: 600;
+}

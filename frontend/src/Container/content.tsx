@@ -1,5 +1,6 @@
 import React from "react";
 import { Layout, theme } from "antd";
+import "./content.css";
 
 const { Content } = Layout;
 
@@ -13,7 +14,7 @@ const ContentLayout: React.FC<ContentLayoutProps> = ({ children }) => {
   } = theme.useToken();
 
   return (
-    <Content style={{ margin: "30px", flexGrow: 1 }}>
+    <Content className="content-layout">
       {children}
     </Content>
   );

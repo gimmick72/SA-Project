@@ -1,9 +1,11 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
 
 const PatientInfoPage = () => {
   return (
-      <Outlet />
+    <div className="container">
+      <h1>Patient Information Page</h1>
+      <p>Welcome to the Patient Information system!</p>
+    </div>
   );
 };
 

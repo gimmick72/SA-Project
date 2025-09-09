@@ -14,8 +14,7 @@ const PaymentInfoPage = Loadable(lazy(() => import("../pages/Systems/payment_inf
 const AttendanceInfoPage = Loadable(lazy(() => import("../pages/Systems/attendance_info/index")));
 const ServiceInfoPage = Loadable(lazy(() => import("../pages/Systems/service_info/index")));
 
-// Removed unused patient route imports - files were deleted
-import PatientInfoPageRoute from "./PatientRoute/patient_route";
+// Patient routes removed - using simplified patient info page
 
 const AdminRoutes: RouteObject[] = [
   {
@@ -29,7 +28,6 @@ const AdminRoutes: RouteObject[] = [
       {
         path: "patient",
         element: <PatientInfoPage />,
-        children: PatientInfoPageRoute
       },
       {
         path: "treatment",

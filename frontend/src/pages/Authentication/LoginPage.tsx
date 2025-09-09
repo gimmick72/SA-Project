@@ -3,6 +3,7 @@ import { Form, Input, Button, Card, Typography, message, Select } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthAPI, LoginRequest } from "../../services/authApi";
+import "./LoginPage.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -39,23 +40,10 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{ 
-      minHeight: "100vh", 
-      display: "flex", 
-      alignItems: "center", 
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      padding: "20px"
-    }}>
-      <Card 
-        style={{ 
-          width: "100%",
-          maxWidth: "400px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.1)"
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <Title level={2} style={{ color: "#722ED1", marginBottom: "8px" }}>
+    <div className="login-container">
+      <Card className="login-card">
+        <div className="login-header">
+          <Title level={2} className="login-title">
             เข้าสู่ระบบ
           </Title>
           <Text type="secondary">สำหรับผู้ดูแลระบบและผู้ป่วย</Text>
@@ -105,38 +93,28 @@ const LoginPage: React.FC = () => {
               type="primary" 
               htmlType="submit" 
               loading={loading}
-              style={{ 
-                width: "100%",
-                backgroundColor: "#722ED1",
-                borderColor: "#722ED1"
-              }}
+              className="login-button"
             >
               เข้าสู่ระบบ
             </Button>
           </Form.Item>
         </Form>
 
-        <div style={{ textAlign: "center" }}>
+        <div className="login-footer">
           <Text type="secondary">
             ยังไม่มีบัญชี?{" "}
-            <Link to="/auth/register" style={{ color: "#722ED1" }}>
+            <Link to="/auth/register" className="login-link">
               สมัครสมาชิก
             </Link>
           </Text>
           <br />
-          <Link to="/home" style={{ color: "#722ED1" }}>
+          <Link to="/home" className="login-link">
             ← กลับหน้าแรก
           </Link>
         </div>
 
-        <div style={{ 
-          textAlign: "center", 
-          marginTop: "16px",
-          padding: "12px",
-          backgroundColor: "#f0f8ff",
-          borderRadius: "4px"
-        }}>
-          <Text type="secondary" style={{ fontSize: "12px" }}>
+        <div className="demo-credentials">
+          <Text type="secondary" className="demo-text">
             ทดสอบ: admin@clinic.com / admin123 (Admin) หรือ patient@example.com / patient123 (Patient)
           </Text>
         </div>

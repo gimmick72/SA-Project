@@ -1,12 +1,13 @@
 import React from "react";
 import { Card, Form, Input, Space, Typography } from "antd";
 import { CreditCardPaymentProps } from "../types";
+import "./CreditCardPayment.css";
 
 const { Text } = Typography;
 
 const CreditCardPayment: React.FC<CreditCardPaymentProps> = ({ form }) => {
   return (
-    <Card title="รายละเอียดบัตรเครดิต" size="small" style={{ marginBottom: '16px' }}>
+    <Card title="รายละเอียดบัตรเครดิต" size="small" className="credit-card-payment-card">
       <Form.Item
         label="หมายเลขบัตร"
         name="cardNumber"
@@ -23,14 +24,14 @@ const CreditCardPayment: React.FC<CreditCardPaymentProps> = ({ form }) => {
         name="cardHolder"
         rules={[{ required: true, message: 'กรุณาระบุชื่อผู้ถือบัตร' }]}
       >
-        <Input placeholder="JOHN DOE" style={{ textTransform: 'uppercase' }} />
+        <Input placeholder="JOHN DOE" className="card-holder-input" />
       </Form.Item>
       
       <Space.Compact style={{ width: '100%' }}>
         <Form.Item
           label="วันหมดอายุ"
           name="expiryDate"
-          style={{ width: '50%' }}
+          className="expiry-date-field"
           rules={[
             { required: true, message: 'กรุณาระบุวันหมดอายุ' },
             { pattern: /^(0[1-9]|1[0-2])\/([0-9]{2})$/, message: 'รูปแบบ: MM/YY' }
@@ -42,7 +43,7 @@ const CreditCardPayment: React.FC<CreditCardPaymentProps> = ({ form }) => {
         <Form.Item
           label="CVV"
           name="cvv"
-          style={{ width: '50%' }}
+          className="cvv-field"
           rules={[
             { required: true, message: 'กรุณาระบุ CVV' },
             { pattern: /^[0-9]{3,4}$/, message: 'CVV ต้องเป็นตัวเลข 3-4 หลัก' }
@@ -52,7 +53,7 @@ const CreditCardPayment: React.FC<CreditCardPaymentProps> = ({ form }) => {
         </Form.Item>
       </Space.Compact>
       
-      <div style={{ padding: '12px', backgroundColor: '#fff2e8', border: '1px solid #ffcc99', borderRadius: '6px' }}>
+      <div className="security-notice">
         <Text type="secondary">
           🔒 ข้อมูลบัตรของคุณจะถูกเข้ารหัสและปลอดภัย
         </Text>

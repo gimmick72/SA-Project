@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { Form, Card, Typography, Button, Radio, message, Input, Divider, Space } from 'antd';
-import { DollarOutlined, MobileOutlined, CreditCardOutlined } from '@ant-design/icons';
+import { Form, Card, Typography, Button, Radio, message, Input, Divider, Space, Tabs } from 'antd';
+import { DollarOutlined, MobileOutlined, CreditCardOutlined, FileTextOutlined, FileDoneOutlined, HistoryOutlined, FormOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import CashPayment from './components/CashPayment';
 import OnlinePayment from './components/OnlinePayment';
 import CreditCardPayment from './components/CreditCardPayment';
 import PaymentSuccess from './components/PaymentSuccess';
 import PaymentError from './components/PaymentError';
+import TreatmentEntry from './components/TreatmentEntry';
+import ReceiptSystem from './components/ReceiptSystem';
+import TransactionRecords from './components/TransactionRecords';
 import { PaymentFormData, PaymentMethod, PaymentStatus, PaymentResult } from './types';
 import { paymentApi, PaymentRequest } from '../../../services/paymentApi';
+import './index.css';
 
 const { Title, Text } = Typography;
 
@@ -38,6 +42,8 @@ const PaymentInfoPage = () => {
         paymentRequest.cardType = values.cardType;
         paymentRequest.expiryDate = values.expiryDate;
         paymentRequest.cvv = values.cvv;
+      } else if (values.paymentMethod === 'promptpay') {
+        paymentRequest.phoneNumber = values.phoneNumber;
       }
 
       // Process payment through API
@@ -102,16 +108,10 @@ const PaymentInfoPage = () => {
     );
   }
 
-  // Show payment form
-  return (
-    <div style={{ 
-      padding: '24px',
-      height: '100vh',
-      overflow: 'auto'
-    }}>
-      <Title level={2}>ชำระเงิน</Title>
-      
-      <Card style={{ maxWidth: 800, margin: '0 auto' }}>
+  // Payment form component
+  const PaymentForm = () => (
+    <div className="payment-form-container">
+      <Card className="payment-card">
         <Form
           form={form}
           layout="vertical"
@@ -128,11 +128,16 @@ const PaymentInfoPage = () => {
             ]}
           >
             <Input
-              type="number"
+              type="text"
               prefix="฿"
-              placeholder="0.00"
+              placeholder="0"
               size="large"
-              style={{ fontSize: '18px', fontWeight: 'bold' }}
+              className="amount-input"
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^\d]/g, '');
+                const formatted = value ? parseInt(value).toLocaleString() : '';
+                e.target.value = formatted;
+              }}
             />
           </Form.Item>
 
@@ -148,62 +153,168 @@ const PaymentInfoPage = () => {
               onChange={(e) => setPaymentMethod(e.target.value)}
               size="large"
             >
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Radio value="cash" style={{ padding: '12px', border: '1px solid #d9d9d9', borderRadius: '8px', width: '100%' }}>
+              <Space direction="vertical" className="payment-methods-space">
+                <Radio value="cash" className="payment-method-radio">
                   <Space>
-                    <DollarOutlined style={{ fontSize: '20px', color: '#52c41a' }} />
-                    <div>
-                      <Text strong>เงินสด (Cash)</Text>
-                      <br />
-                      <Text type="secondary">ชำระด้วยเงินสดโดยตรง</Text>
-                    </div>
+                    <DollarOutlined className="cash-icon" />
+                    <span>เงินสด</span>
                   </Space>
                 </Radio>
-                
-                <Radio value="promptpay" style={{ padding: '12px', border: '1px solid #d9d9d9', borderRadius: '8px', width: '100%' }}>
+                <Radio value="promptpay" className="payment-method-radio">
                   <Space>
-                    <MobileOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
-                    <div>
-                      <Text strong>พร้อมเพย์ (PromptPay)</Text>
-                      <br />
-                      <Text type="secondary">ชำระผ่านระบบพร้อมเพย์</Text>
-                    </div>
+                    <MobileOutlined className="promptpay-icon" />
+                    <span>พร้อมเพย์ (PromptPay)</span>
                   </Space>
                 </Radio>
-                
-                <Radio value="credit_card" style={{ padding: '12px', border: '1px solid #d9d9d9', borderRadius: '8px', width: '100%' }}>
+                <Radio value="credit_card" className="payment-method-radio">
                   <Space>
-                    <CreditCardOutlined style={{ fontSize: '20px', color: '#722ed1' }} />
-                    <div>
-                      <Text strong>บัตรเครดิต (Credit Card)</Text>
-                      <br />
-                      <Text type="secondary">VISA, MasterCard, และอื่นๆ</Text>
-                    </div>
+                    <CreditCardOutlined className="credit-card-icon" />
+                    <span>บัตรเครดิต</span>
                   </Space>
                 </Radio>
               </Space>
             </Radio.Group>
           </Form.Item>
 
-          {/* Payment Method Details */}
-          {paymentMethod === 'cash' && <CashPayment form={form} />}
-          {paymentMethod === 'promptpay' && <OnlinePayment form={form} />}
-          {paymentMethod === 'credit_card' && <CreditCardPayment form={form} />}
+          {/* Conditional Payment Details */}
+          {paymentMethod === 'cash' && (
+            <Form.Item
+              label="จำนวนเงินที่รับ"
+              name="cashReceived"
+              rules={[
+                { required: true, message: 'กรุณาระบุจำนวนเงินที่รับ' },
+                { type: 'number', min: 0, message: 'จำนวนเงินต้องไม่น้อยกว่า 0' }
+              ]}
+            >
+              <Input
+                type="text"
+                prefix="฿"
+                placeholder="0"
+                size="large"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^\d]/g, '');
+                  const formatted = value ? parseInt(value).toLocaleString() : '';
+                  e.target.value = formatted;
+                }}
+              />
+            </Form.Item>
+          )}
 
-          {/* Submit Button */}
+          {paymentMethod === 'promptpay' && (
+            <OnlinePayment form={form} />
+          )}
+
+          {paymentMethod === 'credit_card' && (
+            <>
+              <Form.Item
+                label="หมายเลขบัตร"
+                name="cardNumber"
+                rules={[{ required: true, message: 'กรุณาระบุหมายเลขบัตร' }]}
+              >
+                <Input placeholder="1234 5678 9012 3456" maxLength={19} />
+              </Form.Item>
+              
+              <Space.Compact style={{ width: '100%' }}>
+                <Form.Item
+                  label="วันหมดอายุ"
+                  name="expiryDate"
+                  style={{ width: '50%' }}
+                  rules={[{ required: true, message: 'กรุณาระบุวันหมดอายุ' }]}
+                >
+                  <Input placeholder="MM/YY" maxLength={5} />
+                </Form.Item>
+                <Form.Item
+                  label="CVV"
+                  name="cvv"
+                  style={{ width: '50%' }}
+                  rules={[{ required: true, message: 'กรุณาระบุ CVV' }]}
+                >
+                  <Input placeholder="123" maxLength={4} />
+                </Form.Item>
+              </Space.Compact>
+            </>
+          )}
+
+          <Form.Item
+            label="หมายเหตุ (ไม่บังคับ)"
+            name="reference"
+          >
+            <Input.TextArea 
+              placeholder="หมายเหตุเพิ่มเติม..."
+              rows={3}
+            />
+          </Form.Item>
+
           <Form.Item>
             <Button 
               type="primary" 
               htmlType="submit" 
               loading={loading}
               size="large"
-              style={{ width: '100%', height: '50px', fontSize: '18px' }}
+              className="submit-button"
             >
               {loading ? 'กำลังดำเนินการ...' : `ชำระเงินด้วย${getPaymentMethodName(paymentMethod)}`}
             </Button>
           </Form.Item>
         </Form>
       </Card>
+    </div>
+  );
+
+  // Main component with tabs
+  return (
+    <div className="payment-container">
+      <div className="page-header">
+        <Title level={2}>ระบบชำระเงิน</Title>
+      </div>
+      
+      <div className="payment-tabs">
+        <Tabs
+          defaultActiveKey="payment"
+          items={[
+            {
+              key: 'payment',
+              label: (
+                <span>
+                  <DollarOutlined />
+                  ชำระเงิน
+                </span>
+              ),
+              children: <PaymentForm />,
+            },
+            {
+              key: 'treatment',
+              label: (
+                <span>
+                  <FormOutlined />
+                  กรอกรายการรักษา
+                </span>
+              ),
+              children: <TreatmentEntry />,
+            },
+            {
+              key: 'receipt',
+              label: (
+                <span>
+                  <FileDoneOutlined />
+                  ทำระบบใบเสร็จ
+                </span>
+              ),
+              children: <ReceiptSystem />,
+            },
+            {
+              key: 'records',
+              label: (
+                <span>
+                  <HistoryOutlined />
+                  บันทึกการทำรายการ
+                </span>
+              ),
+              children: <TransactionRecords />,
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 };
