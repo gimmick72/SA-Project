@@ -50,12 +50,7 @@ const PriceCategoryCard: React.FC<Props> = ({ title, subtitle, items }) => {
         )}
       />
 
-      <div style={{ textAlign: "right", marginTop: 12 }}>
-        <Text style={{ color: "#722ED1", fontWeight: 500 }}>
-          View More ...
-          <RightOutlined />
-        </Text>
-      </div>
+      
     </Card>
   );
 };

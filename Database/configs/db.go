@@ -3,6 +3,7 @@ package configs
 import (
 	patientEntity "Database/entity/patient"
 	"Database/entity"
+	bookingQueueEntity "Database/entity/bookingQueue"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -39,6 +40,10 @@ func SetupDatbase() {
 		//CaseData
 		&entity.CaseData{},
 		&entity.Treatment{},
-		
+
+
+		//BookingQueue
+		&bookingQueueEntity.Queue{},
+		&bookingQueueEntity.Timeslot{},
 	)
 }

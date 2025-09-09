@@ -13,6 +13,8 @@ import SlideInTop from "../../Motion/SlideInTop";
 import PromoPage from "../PromoPage/PromoPage";
 
 
+
+
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
@@ -21,7 +23,7 @@ const menuItems = [
   { label: "หน้าแรก", path: "/" },
   { label: "ทันตแพทย์ของเรา", path: "/dentists" },
   { label: "บริการ", path: "/services" },
-  { label: "จองคิว", path: "/allbooking" },
+  { label: "จองคิว", path: "/booking" },
   { label: "ติดต่อเรา", path: "/contact" },
 
 ];
@@ -73,8 +75,8 @@ const HomePage: React.FC = () => {
           <Menu.Item key="contact">
             <a href="#contact">ติดต่อเรา</a>
           </Menu.Item>
-          <Menu.Item key="allbooking">
-            <Link to="allbooking">จองคิว</Link>
+          <Menu.Item key="booking">
+            <Link to="booking">จองคิว</Link>
           </Menu.Item>
 
         </Menu>

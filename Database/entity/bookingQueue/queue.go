@@ -1,7 +1,11 @@
-package entity
+package bookingQueue
+
 import (
 	"gorm.io/gorm"
 	"time"
+
+	"Database/entity"
+	"Database/entity/patient"
 )
 
 type Queue struct{
@@ -10,17 +14,12 @@ type Queue struct{
 	QueueBooking time.Time
 	
 	PatientID uint
-	Patient Patient `gorm:"foreignKey:PatientID;references:ID"`
+	Patient patient.Patient `gorm:"foreignKey:PatientID;references:ID"`
 	
 	ServiceID uint
-	Service Service `gorm:"foreignKey:ServiceID;references:ID"`
+	Service entity.Service `gorm:"foreignKey:ServiceID;references:ID"`
 	
 	TimeslotID uint
 	Timerslot Timeslot `gorm:"foreignKey:TimeslotID;references:ID"`
 }
 
-type Timeslot struct{
-	gorm.Model
-	Slot time.Time
-	SlotAvaliable int
-}
