@@ -8,10 +8,10 @@ import { SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from "@a
 import dayjs, { Dayjs } from "dayjs";
 import type { ColumnsType } from "antd/es/table";
 import type { TableProps } from "antd";
-import { fetchSupplies, deleteSupply, fetchDispenses } from "@service/supply/supply";
+import { fetchSupplies, deleteSupply, fetchDispenses } from "../../../services/supply";
 
 // 👉 เพิ่ม: service อัปเดต (ถ้ายังไม่มีใน services/supply.ts ให้เพิ่มตามตัวอย่างท้ายข้อความ)
-import { updateSupply } from "@service/supply/supply";
+import { updateSupply } from "../../../services/supply";
 
 const { Search } = Input;
 const { RangePicker } = DatePicker;

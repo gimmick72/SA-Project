@@ -8,13 +8,13 @@ import (
 	// "gorm.io/gorm"
 
 	"Database/configs"
-	serviceEntity "Database/entity"
-	patientEntity "Database/entity/patient"
+	entity "Database/entity"
+	
 )
 
 // POST/initailPatient.go
 func CreateSymptom(c *gin.Context) {
-	var symptom patientEntity.InitialSymptomps
+	var symptom entity.InitialSymptomps
 
 	if err := c.ShouldBindJSON(&symptom); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload", "details": err.Error()})
@@ -31,7 +31,7 @@ func CreateSymptom(c *gin.Context) {
 	symptom.PatientID = uint(pid)
 
 	// เช็คว่ามี patient นี้จริงไหม (กัน FK ล้ม)
-	if tx := configs.DB.First(&patientEntity.Patient{}, symptom.PatientID); tx.Error != nil {
+	if tx := configs.DB.First(&entity.Patient{}, symptom.PatientID); tx.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "patient not found"})
 		return
 	}
@@ -53,9 +53,9 @@ func CreateSymptom(c *gin.Context) {
 
 // Get Service
 func GetServicetoSymtompOption(c *gin.Context) {
-	var services []serviceEntity.Service
+	var services []entity.Service
 	if err := configs.DB.
-		Model(&serviceEntity.Service{}).
+		Model(&entity.Service{}).
 		Select("id", "name_service"). // ✅ ใช้คอลัมน์จริง
 		Order("name_service").
 		Find(&services).Error; err != nil { // ✅ ใช้ Find กับ Model เดียวกัน

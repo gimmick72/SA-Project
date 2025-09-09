@@ -26,8 +26,8 @@ import {
   ServiceToSymtomsAPI,
   PatientSymptomsAPI,
 } from "../../../services/patient/patientApi";
-import { splitToDateAndTime } from "../../../utils/dateTime";
-import { useSyncDateTime } from "../../hooks/syncDateTime";
+import { splitToDateAndTime } from "./utils/dateTime";
+import { useSyncDateTime } from "../../../hooks/syncDateTime";
 
 const { Title } = Typography;
 

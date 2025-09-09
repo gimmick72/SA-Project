@@ -22,7 +22,7 @@ import {
   Card,
 } from "antd";
 import dayjs from "dayjs";
-import type { DateOnly } from "../../../utils/calDate";
+import type { DateOnly } from "./utils/calDate";
 
 const { Option } = Select;
 

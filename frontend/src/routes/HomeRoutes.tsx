@@ -7,9 +7,6 @@ import BookingPage from "../pages/First_pages/First_pages/BookingPage/BookingPag
 // HomePage
 const FirstPages = Loadable(lazy(() => import("../pages/First_pages/main")));
 
-
-
-
 const IndexRoutes: RouteObject[] = [
   {
     path: "/",

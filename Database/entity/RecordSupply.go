@@ -1,4 +1,4 @@
-// entity/record_supply.go
+
 package entity
 
 import (

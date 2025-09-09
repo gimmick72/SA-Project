@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"Database/configs"
-	patientEntity "Database/entity/patient"
+	entity "Database/entity"
 )
 
 //POST /emergency-contacts
 func CreateEmergencyContact(c *gin.Context) {
 	
-	var emergencyContact patientEntity.ContactPerson
+	var emergencyContact entity.ContactPerson
 	if err := c.ShouldBindJSON(&emergencyContact); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -20,7 +20,7 @@ func CreateEmergencyContact(c *gin.Context) {
 	DB := configs.DB
 
 	//บันทึกลงฐานข้อมูล
-	if err := DB.Model(&patientEntity.ContactPerson{}).Create(&emergencyContact).Error; err != nil {
+	if err := DB.Model(&entity.ContactPerson{}).Create(&emergencyContact).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -30,9 +30,9 @@ func CreateEmergencyContact(c *gin.Context) {
 // GET /emergency-contacts
 func FindEmergencyContacts(c *gin.Context) {
 
-	var emergencyContacts []patientEntity.ContactPerson
+	var emergencyContacts []entity.ContactPerson
 	db := configs.DB.
-		Model(&patientEntity.ContactPerson{})
+		Model(&entity.ContactPerson{})
 
 	contactID := c.Query("contactID")
 	if contactID != "" {
@@ -53,7 +53,7 @@ func FindEmergencyContacts(c *gin.Context) {
 //PUT /emergency-contacts
 func UpdateEmergencyContact(c *gin.Context) {
 
-	var emergencyContact patientEntity.ContactPerson
+	var emergencyContact entity.ContactPerson
 	if err := c.ShouldBindJSON(&emergencyContact); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -62,7 +62,7 @@ func UpdateEmergencyContact(c *gin.Context) {
 	DB := configs.DB
 
 	//ตรวจสอบว่ามีข้อมูลในฐานข้อมูลหรือไม่
-	var existingContact patientEntity.ContactPerson
+	var existingContact entity.ContactPerson
 	if tx := DB.Where("id = ?", emergencyContact.ID).First(&existingContact); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ไม่มีข้อมูลผู้ติดต่อฉุกเฉิน"})
 		return

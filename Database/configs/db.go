@@ -1,10 +1,9 @@
 package configs
 
 import (
-	patientEntity "Database/entity/patient"
-	"Database/entity"
-	bookingQueueEntity "Database/entity/bookingQueue"
 
+	"Database/entity"
+	
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -28,11 +27,11 @@ func SetupDatbase() {
 	//Migrate the schema
 	DB.AutoMigrate(
 		//Patient
-		&patientEntity.Patient{},
-		&patientEntity.Address{},
-		&patientEntity.ContactPerson{},
-		&patientEntity.HistoryPatient{},
-		&patientEntity.InitialSymptomps{},
+		&entity.Patient{},
+		&entity.Address{},
+		&entity.ContactPerson{},
+		&entity.HistoryPatient{},
+		&entity.InitialSymptomps{},
 
 		//service
 		&entity.Service{},
@@ -43,7 +42,14 @@ func SetupDatbase() {
 
 
 		//BookingQueue
-		&bookingQueueEntity.Queue{},
-		&bookingQueueEntity.Timeslot{},
+		&entity.Queue{},
+		&entity.Timeslot{},
+
+		//Medicine
+		&entity.Supply{},
+		&entity.RecordSupply{},
+
+		//Queue and Room
+		&entity.Appointment{},
 	)
 }

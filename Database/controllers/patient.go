@@ -8,19 +8,19 @@ import (
 	"gorm.io/gorm"
 
 	"Database/configs"
-	patientEntity "Database/entity/patient"
+	entity "Database/entity"
 )
 
 // POST /api/patients
 func CreatePatient(c *gin.Context) {
-	var patient patientEntity.Patient
+	var patient entity.Patient
 	if err := c.ShouldBindJSON(&patient); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid patient", "details": err.Error()})
 		return
 	}
 
 	// ป้องกันเลขบัตรประชาชนซ้ำ
-	var exist patientEntity.Patient
+	var exist entity.Patient
 	if tx := configs.DB.Where("citizen_id = ?", patient.CitizenID).First(&exist); tx.RowsAffected > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "คนไข้มีประวัติแล้ว"})
 		return
@@ -36,7 +36,7 @@ func CreatePatient(c *gin.Context) {
 	}
 
 	// preload กลับให้ครบ (optional)
-	var created patientEntity.Patient
+	var created entity.Patient
 	if err := db.
 		Preload("Address").
 		Preload("ContactPerson").
@@ -49,8 +49,8 @@ func CreatePatient(c *gin.Context) {
 
 // GET /api/patients  (?patientID=)
 func FindPatient(c *gin.Context) {
-	var patients []patientEntity.Patient
-	db := configs.DB.Model(&patientEntity.Patient{}).
+	var patients []entity.Patient
+	db := configs.DB.Model(&entity.Patient{}).
 		Preload("Address").
 		Preload("ContactPerson").
 		Preload("InitialSymptomps").
@@ -74,7 +74,7 @@ func FindPatient(c *gin.Context) {
 // GET /api/patients/:id
 func GetPatientByID(c *gin.Context) {
 	id := c.Param("id")
-	var patient patientEntity.Patient
+	var patient entity.Patient
 
 	if err := configs.DB.
 		Preload("Address").
@@ -92,7 +92,7 @@ func GetPatientByID(c *gin.Context) {
 // PUT /api/patients/:id
 func UpdatePatient(c *gin.Context) {
 	id := c.Param("id")
-	var payload patientEntity.Patient
+	var payload entity.Patient
 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload", "details": err.Error()})
@@ -100,7 +100,7 @@ func UpdatePatient(c *gin.Context) {
 	}
 
 	// อัปเดตฟิลด์หลักของ Patient
-	if tx := configs.DB.Model(&patientEntity.Patient{}).
+	if tx := configs.DB.Model(&entity.Patient{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
 			"citizenID":        payload.CitizenID,
@@ -122,7 +122,7 @@ func UpdatePatient(c *gin.Context) {
 
 	// Upsert Address
 	if payload.Address != nil {
-		var addr patientEntity.Address
+		var addr entity.Address
 		if err := configs.DB.Where("patient_id = ?", id).First(&addr).Error; err == nil {
 			// update
 			if err := configs.DB.Model(&addr).Updates(map[string]interface{}{
@@ -148,7 +148,7 @@ func UpdatePatient(c *gin.Context) {
 
 	// Upsert ContactPerson
 	if payload.ContactPerson != nil {
-		var cp patientEntity.ContactPerson
+		var cp entity.ContactPerson
 		if err := configs.DB.Where("patient_id = ?", id).First(&cp).Error; err == nil {
 			// update (สำคัญ: ใช้ key "phone_number" ให้ถูกชื่อ column)
 			if err := configs.DB.Model(&cp).Updates(map[string]interface{}{
@@ -174,7 +174,7 @@ func UpdatePatient(c *gin.Context) {
 // DELETE /api/patients/:id
 func DeletePatient(c *gin.Context) {
 	id := c.Param("id")
-	if err := configs.DB.Unscoped().Where("id = ?", id).Delete(&patientEntity.Patient{}).Error; err != nil {
+	if err := configs.DB.Unscoped().Where("id = ?", id).Delete(&entity.Patient{}).Error; err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }

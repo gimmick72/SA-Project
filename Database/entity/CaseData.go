@@ -1,4 +1,3 @@
-// Database/entity/CaseData.go
 package entity
 
 import (
@@ -6,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"Database/entity/patient"
+	
 )
 
 type CaseData struct {
@@ -20,7 +19,7 @@ type CaseData struct {
 	Department   Department `gorm:"foreignKey:DepartmentID"`
 
 	PatientID  uint      `json:"patient_id" gorm:"index"` // <- ต้องมีคอลัมน์นี้ในตาราง
-    Patient    patient.Patient `json:"patient"`
+    Patient    Patient `json:"patient"`
 
 	// TreatmentID uint
 	 Treatments []Treatment `json:"treatments" gorm:"foreignKey:CaseID"`

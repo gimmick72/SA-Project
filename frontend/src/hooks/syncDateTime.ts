@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { FormInstance } from "antd";
-import { combineDateTimeRFC3339Local } from "../../utils/dateTime";
+import { combineDateTimeRFC3339Local } from "../pages/Systems/patient_info/utils/dateTime";
 import { Form } from "antd";
 
 export const useSyncDateTime = (

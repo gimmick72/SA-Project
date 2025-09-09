@@ -1,6 +1,6 @@
 // src/services/schedule.ts
 import { Dayjs } from "dayjs";
-import { RoomScheduleData } from "pages/Systems/queue_info/types";
+import { RoomScheduleData } from "../../pages/Systems/queue_info/types";
 
 // ถ้าตั้ง Vite proxy ไว้ให้ /api วิ่งไป 8080 แล้ว ให้ตั้งเป็น "" ได้
 const BASE = "http://localhost:8080";

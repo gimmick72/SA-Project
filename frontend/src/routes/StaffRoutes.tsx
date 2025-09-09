@@ -2,6 +2,7 @@ import { lazy } from "react";
 import type { RouteObject } from "react-router-dom";
 import Loadable from "../components/third-patry/Loadable";
 import FullLayout from "../layout/FullLayout";
+import { Outlet } from "react-router-dom";
 
 const HomeInfoPage = Loadable(lazy(() => import("../pages/Systems/home_info/index")));
 const PatientInfoPage = Loadable(lazy(() => import("../pages/Systems/patient_info/index"))); 
@@ -14,8 +15,9 @@ const PaymentInfoPage = Loadable(lazy(() => import("../pages/Systems/payment_inf
 const AttendanceInfoPage = Loadable(lazy(() => import("../pages/Systems/attendance_info/index")));
 const ServiceInfoPage = Loadable(lazy(() => import("../pages/Systems/service_info/index")));
 
-
-import {PatientRoute} from "../routes/PatientRoute/patient_route";
+const QueueOutlet = () => <Outlet />; 
+import {PatientRoute} from "../pages/Systems/patient_info/PatientRoute/patient_route";
+import {QueueRouter} from "../pages/Systems/queue_info/Qrouter";
 
 
 const AdminRoutes: RouteObject[] = [
@@ -50,7 +52,9 @@ const AdminRoutes: RouteObject[] = [
       },
       {
         path: "queue",
-        element: <QueueInfoPage />,
+        // element: <QueueInfoPage />,
+        element: <QueueOutlet/>,
+        children: QueueRouter
       },
       {
         path: "payment",
