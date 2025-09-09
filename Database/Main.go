@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Database/configs"
-	"Database/controllers"
+	"Database/controllers/initailPatient"
 )
 
 const PORT = "8080"
@@ -20,16 +20,20 @@ func main() {
 	router := r.Group("/api")
 	{
 		//Patient
-		router.POST("/patients", controllers.CreatePatient)     // สร้าง
+		router.POST("/patients", controllers.CreatePatient)     // AddPatient
 		router.GET("/patients", controllers.FindPatient)         // ดึงทั้งหมด
 		router.GET("/patients/:id", controllers.GetPatientByID) // (เพิ่ม) ดึงรายตัว
 		router.PUT("/patients/:id", controllers.UpdatePatient)  // (เพิ่ม) แก้ไข
 		router.DELETE("/patients/:id", controllers.DeletePatient) // (เพิ่ม) ลบ
 
-			// Run the server go run main.go
-			r.Run("localhost:" + PORT)
-			
+		router.POST("/patients/:id/symptoms",controllers.CreateSymptom) //AddSymptom
+		router.GET("/services",controllers.GetServicetoSymtompOption) //ดึง service มาเลือกตอนเพิ่มอาการ
+		router.GET("/case-data/:id",controllers.GetCaseHistory) //ดึง case data
+
+		
 	}
+	// Run the server go run main.go
+	r.Run("localhost:" + PORT)
 
 }
 

@@ -1,4 +1,4 @@
-package patientEntity
+package patient
 
 import (
 	"gorm.io/gorm"
@@ -6,8 +6,7 @@ import (
 
 type ContactPerson struct {
 	gorm.Model
-	Relationship       string   `json:"relationship"`
-	ContactpersonPhone string   `json:"contactpersonphone"`
-	PatientID          uint     `json:"patientID" gorm:"uniqueIndex"`
-	Patient            *Patient `json:"patient,omitempty"`
+	Relationship string `json:"relationship"`
+	PhoneNumber  string `json:"emergency_phone"`
+	PatientID uint `gorm:"index;not null;constraint:OnDelete:CASCADE;"`
 }

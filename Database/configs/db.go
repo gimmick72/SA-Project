@@ -2,7 +2,7 @@ package configs
 
 import (
 	patientEntity "Database/entity/patient"
-	
+	"Database/entity"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -32,5 +32,13 @@ func SetupDatbase() {
 		&patientEntity.ContactPerson{},
 		&patientEntity.HistoryPatient{},
 		&patientEntity.InitialSymptomps{},
+
+		//service
+		&entity.Service{},
+
+		//CaseData
+		&entity.CaseData{},
+		&entity.Treatment{},
+		
 	)
 }

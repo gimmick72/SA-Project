@@ -2,55 +2,59 @@ import React, { useEffect, useState } from "react";
 import { Table, message, Space, Popconfirm, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PatientAPI } from "../../../../services/patient/patientApi";
-import { PatientRow } from "../../../../interface/patient";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom"; // ✅ ใช้ useNavigate
+import { useNavigate } from "react-router-dom";
+import { PatientRow } from "../../../../interface/initailPatient/patient";
 
+// ✅ ดึง array ออกมาไม่ว่ารูปไหน
+const pickArray = (resp: any): any[] => {
+  if (Array.isArray(resp)) return resp; // [ ... ]
+  if (Array.isArray(resp?.patients)) return resp.patients; // { patients: [...] }
+  if (Array.isArray(resp?.data)) return resp.data; // { data: [...] }
+  if (Array.isArray(resp?.items)) return resp.items; // { items: [...] }
+  if (Array.isArray(resp?.data?.patients)) return resp.data.patients;
+  if (Array.isArray(resp?.data?.data)) return resp.data.data;
+  return [];
+};
+
+// ✅ แม็พฟิลด์ให้คลุมทั้ง snake_case, camelCase, GORM
 const toRows = (resp: any): PatientRow[] => {
-  const raw =
-    (Array.isArray(resp) && resp) ||
-    (Array.isArray(resp?.data) && resp.data) ||
-    (Array.isArray(resp?.data?.patients) && resp.data.patients) ||
-    (Array.isArray(resp?.patients) && resp.patients) ||
-    (Array.isArray(resp?.items) && resp.items) ||
-    [];
-
+  const raw = pickArray(resp);
   return raw.map((p: any, i: number) => ({
-    id: p.ID ?? p.id ?? `row-${i}`, // ✅ มีค่าเสมอ
-    firstname: p.firstname ?? p.first_name ?? "",
-    lastname: p.lastname ?? p.last_name ?? "",
-    phonenumber: p.phonenumber ?? p.phone_number ?? "",
+    id: p.id ?? p.ID ?? `row-${i}`,
+    firstname: p.firstname ?? p.first_name ?? p.Firstname ?? "",
+    lastname: p.lastname ?? p.last_name ?? p.Lastname ?? "",
+    phonenumber: p.phonenumber ?? p.phone_number ?? p.PhoneNumber ?? "",
   }));
 };
+
+// ตรวจ id ว่าเป็น int บวก
+const isPositiveInt = (v: any) => /^[1-9]\d*$/.test(String(v ?? ""));
 
 const PatienTable: React.FC = () => {
   const [data, setData] = useState<PatientRow[]>([]);
   const [loading, setLoading] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
-  const navigate = useNavigate(); // ✅
+  const [msg, ctx] = message.useMessage();
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const resp = await PatientAPI.getAll();
-      setData(toRows(resp));
-    } catch (error: any) {
-      console.error("Error fetching patients:", error);
-      messageApi.error(error?.response?.data?.error || "โหลดข้อมูลไม่สำเร็จ");
+      const r = await PatientAPI.getAll(); // ได้ res.data โดยตรงแล้ว
+      console.log(
+        "[GET] /api/patients resp =",
+        r,
+        "isArray?",
+        Array.isArray(r)
+      );
+      setData(toRows(r));
+    } catch (e: any) {
+      console.error(e);
+      msg.error(
+        e?.response?.data?.error || e?.message || "โหลดข้อมูลไม่สำเร็จ"
+      );
       setData([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: number | string) => {
-    try {
-      await PatientAPI.delete(Number(id));
-      messageApi.success("ลบข้อมูลสำเร็จ");
-      fetchData();
-    } catch (error) {
-      console.error("Error deleting patient:", error);
-      messageApi.error("ลบข้อมูลไม่สำเร็จ");
     }
   };
 
@@ -66,53 +70,64 @@ const PatienTable: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      width: 220,
-      render: (_text, record) => (
-        <Space>
-          {/* เพิ่มข้อมูลย่อยของคนไข้รายนี้ */}
-          <Button
-            size="small"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate(`initial-symptoms/${record.id}`)} 
-          >
-            เพิ่ม
-          </Button>
-
-          {/* ไปหน้าแก้ไข/รายละเอียด */}
-          <Button
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`detail/${record.id}`)} 
-          >
-            แก้ไข
-          </Button>
-
-          <Popconfirm
-            title="ยืนยันการลบ?"
-            okText="ลบ"
-            cancelText="ยกเลิก"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />}>
-              ลบ
+      width: 320,
+      render: (_t, r) => {
+        const disabled = !isPositiveInt(r.id);
+        const id = r.id;
+        return (
+          <Space>
+            <Button
+              size="small"
+              disabled={disabled}
+              onClick={() => navigate(`initial-symptoms/${id}`)}
+            >
+              บันทึกบริการ
             </Button>
-          </Popconfirm>
-        </Space>
-      ),
+           
+            <Button
+              size="small"
+              disabled={disabled}
+              onClick={() => navigate(`/admin/patient/detail/${id}?mode=view`)} 
+            >
+              รายละเอียด
+            </Button>
+            <Button
+              size="small"
+              disabled={disabled}
+              onClick={() => navigate(`/admin/patient/detail/${id}?mode=edit`)} 
+            >
+              แก้ไข
+            </Button>
+            <Popconfirm
+              title="ยืนยันการลบ?"
+              okText="ลบ"
+              cancelText="ยกเลิก"
+              onConfirm={async () => {
+                if (disabled) return;
+                await PatientAPI.delete(Number(id));
+                msg.success("ลบแล้ว");
+                fetchData();
+              }}
+            >
+              <Button size="small" danger disabled={disabled}>
+                ลบ
+              </Button>
+            </Popconfirm>
+          </Space>
+        );
+      },
     },
   ];
 
   return (
     <>
-      {contextHolder}
+      {ctx}
       <Table
         loading={loading}
         columns={columns}
         dataSource={data}
-        rowKey="id"                              
-        pagination={{ pageSize: 10 }}
-        
+        rowKey={(r) => String(r.id ?? `tmp-${r.firstname}-${r.lastname}`)}
+        pagination={{ pageSize: 5 }}
       />
     </>
   );
