@@ -2,7 +2,7 @@
 
 import "../patient_info/design/pateint.css";
 import React, { useState } from "react";
-import { PatientAPI } from "../../../services/patient/patientApi";
+import { PatientAPI } from "../../../services/Patient/patientApi";
 import type {
   Patient,
   ContactPerson,

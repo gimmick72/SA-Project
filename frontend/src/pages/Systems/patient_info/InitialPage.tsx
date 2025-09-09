@@ -25,7 +25,7 @@ import {
   PatientAPI,
   ServiceToSymtomsAPI,
   PatientSymptomsAPI,
-} from "../../../services/patient/patientApi";
+} from "../../../services/Patient/patientApi";
 import { splitToDateAndTime } from "../../../utils/dateTime";
 import { useSyncDateTime } from "../../hooks/syncDateTime";
 

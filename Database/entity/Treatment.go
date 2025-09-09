@@ -8,9 +8,14 @@ type Treatment struct {
 	gorm.Model
 	
 	TreatmentName  string
-	Price          float64 `gorm:"type:decimal(10,2)"`	
+	Price          float64 `gorm:"type:decimal(10,2)"`
 
-	CaseID     uint     `json:"case_id" gorm:"index"`
-	CaseData   CaseData `json:"case_data" gorm:"foreignKey:CaseID;references:ID"`
+	// Photo []byte `gorm:"type:blob"`
+	// QuadrantID uint
+	Quadrants []Quadrant `gorm:"foreignKey:TreatmentID"`
+	
+	CaseDataID     uint
+	CaseData	   CaseData `gorm:"foreignKey:CaseDataID"`		
 
+	
 }

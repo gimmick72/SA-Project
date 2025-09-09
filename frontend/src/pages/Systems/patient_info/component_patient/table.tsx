@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, message, Space, Popconfirm, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { PatientAPI } from "../../../../services/patient/patientApi";
+import { PatientAPI } from "../../../../services/Patient/patientApi";
 import { useNavigate } from "react-router-dom";
 import { PatientRow } from "../../../../interface/initailPatient/patient";
 

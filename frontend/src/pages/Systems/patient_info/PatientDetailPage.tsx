@@ -6,7 +6,7 @@ import NavigateHeader  from "./component_patient/header_navigate";
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { message } from "antd";
-import { PatientAPI } from "../../../services/patient/patientApi";
+import { PatientAPI } from "../../../services/Patient/patientApi";
 import { Patient } from "../../../interface/initailPatient/patient";
 
 /** yyyy-mm-dd from string | Date | ISO */

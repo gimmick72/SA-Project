@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Table, Typography, Button, Space, Drawer, Descriptions, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useParams, useNavigate } from "react-router-dom";
-import { GetCaseDataToHistory } from "../../../../services/patient/patientApi";
+import { GetCaseDataToHistory } from "../../../../services/Patient/patientApi";
 import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
