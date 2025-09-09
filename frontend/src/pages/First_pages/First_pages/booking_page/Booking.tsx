@@ -1,95 +1,94 @@
+import React from "react";
+import { Layout, Menu, Typography, Avatar, Row, Col, Card } from "antd";
+import {  UserOutlined,} from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { Calendar, theme } from "antd";
-import type { CalendarProps } from "antd";
-import type { Dayjs } from "dayjs";
-import "./booking.css";
-import { Outlet } from "react-router-dom";
-const onPanelChange = (value: Dayjs, mode: CalendarProps<Dayjs>["mode"]) => {
-  console.log(value.format("YYYY-MM-DD"), mode);
-};
+import Booking from "../booking_page/Booking";
 
-const Booking = () => {
-  const { token } = theme.useToken();
+const { Header, Content } = Layout;
+const { Title } = Typography;
+const menuItems = [
+  { label: "หน้าแรก", path: "/" },
+  { label: "ทันตแพทย์ของเรา", path: "/dentists" },
+  { label: "บริการ", path: "/services" },
+  { label: "จองคิว", path: "/Allbooking" },
+  { label: "ติดต่อเรา", path: "/contact" },
+];
 
-  const wrapperStyle: React.CSSProperties = {
-    width: 300,
-    border: `1px solid ${token.colorBorderSecondary}`,
-    borderRadius: token.borderRadiusLG,
-  };
-
+const AllBooking : React.FC = () => {
   return (
-    <>
-    <Outlet/>
-      <div
+    <Layout style={{ minHeight: "100vh", fontFamily: "sans-serif", backgroundColor: "#F5F2F9" }}>
+      <Header
         style={{
-          minHeight: "70vh",
-          padding: "2rem",
-          border: `1px solid black`,
-          borderRadius: "20px",
-          display: "grid",
-          marginLeft: "10rem",
-          marginRight: "10rem",
-          marginTop: "2rem",
-          marginBottom: "2rem",
-          fontFamily: "sans-serif",
-          // backgroundColor:" #FDFAFF"
+          backgroundColor: "#E7DDF6",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 40px",
+          minWidth: "1000px",
         }}
       >
-        <div
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <Avatar src="src\assets\logo.png" shape="circle" size="large" style={{ border: "solid 2px #8E55D9" }} />
+          <Title level={3} style={{ margin: 0, color: "#722ED1" }}>
+            TooThoot
+          </Title>
+        </div>
+
+        {/* Menu */}
+        <Menu
+          mode="horizontal"
           style={{
+            backgroundColor: "#E7DDF6",
+            borderBottom: "none",
             display: "flex",
-            justifyContent: "space-between",
-            paddingLeft: "2rem",
+            justifyContent: "center",
+            flex: 1,
           }}
         >
-          <div>
-            <h1>เลือกวันและเวลา</h1>
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolores,
-              vel.
-            </p>
-            <br />
-            <div>
-              <h1>Day</h1>
-              <button className="time-button">time</button>
-              <button className="time-button">time</button>
+          <Menu.Item>
+            <Link to="/#home">หน้าแรก</Link>
+          </Menu.Item>
+          <Menu.Item>
+            <Link to="/#dentists">ทันตแพทย์ของเรา</Link>
+          </Menu.Item>
+          <Menu.Item>
+            <Link to="/#services">บริการ</Link>
+          </Menu.Item>
+          <Menu.Item >
+            <Link to="/#contact">ติดต่อเรา</Link>
+          </Menu.Item>
+          <Menu.Item key="allbooking">
+            <a href="allbooking">จองคิว</a>
+          </Menu.Item>
+        </Menu>
 
-              <div
-                style={{
-                  width: "300px",
-                  height: "100px",
-                  margin: "2rem",
-                  border: "1px solid #000",
-                  borderRadius: "20px",
-                  textAlign: "center",
-                  alignContent: "center",
-                }}
-              >
-                status
-              </div>
-            </div>
-            <Link to="/booking/your-queue">
-              <button className="booking-button">จองคิว</button>
-            </Link>
-          </div>
-
-          <div
-            style={{
-              marginTop: "2rem",
-              width: "40%",
-              height: "350px",
-              // border: `1px solid black`,
-              borderRadius: "20px",
-              padding: "1rem",
-            }}
-          >
-            <Calendar fullscreen={false} onPanelChange={onPanelChange} />
-          </div>
-          <div></div>
+        {/* Sign In */}
+        <div style={{ color: "#722ED1", fontWeight: 600, cursor: "pointer" }}>
+          <Link to="/auth/login" style={{ width: '100%' }}>
+          <UserOutlined style={{ marginRight: 6 }} />
+          ลงชื่อเข้าใช้
+          </Link>
         </div>
-        <button className="back-button">ย้อนกลับ</button>
-      </div>
-    </>
+      </Header>
+
+      {/* Content */}
+      <Content
+        style={{
+          padding: "60px 20px",
+          height: "calc(100vh - 64px)", // 64px is default AntD Header height
+          overflowY: "auto",
+        }}
+      >
+
+        <div>
+          <Booking/>
+        </div>
+        
+
+      </Content>
+    </Layout>
   );
 };
-export default Booking;
+
+export default AllBooking;

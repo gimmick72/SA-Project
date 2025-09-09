@@ -13,7 +13,7 @@ const ContentLayout: React.FC<ContentLayoutProps> = ({ children }) => {
   } = theme.useToken();
 
   return (
-    <Content style={{ margin: "30px", flexGrow: 1, backgroundColor: '#000000' }}>
+    <Content style={{ margin: "30px", flexGrow: 1 }}>
       {children}
     </Content>
   );

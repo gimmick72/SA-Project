@@ -1,51 +1,27 @@
+// Database/entity/CaseData.go
 package entity
+
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
+
+	"Database/entity/patient"
 )
 
-type CaseData struct{
+type CaseData struct {
 	gorm.Model
-	FollowUpDate time.Time
-	Note string
-	
-	PersonalDataID uint
-	PersonalData PersonalData `gorm:"foreignKey:PerdonalDataID;references:ID"`
+	SignDate      time.Time
+	Appointment_date time.Time
+	Note          string
+	TotalPrice    float64 `gorm:"type:decimal(10,2)"`
 
-	PatientID uint
-	Patient Patient `gorm:"foreignKey:PatientID;references:ID"`
+	DepartmentID uint
+	Department   Department `gorm:"foreignKey:DepartmentID"`
 
-	TreatmentToothID uint
-	TreatmentTooth TreatmentTooth `gorm:"foreignKey:TreatmentToothID;references:ID"`
-}
+	PatientID  uint      `json:"patient_id" gorm:"index"` // <- ต้องมีคอลัมน์นี้ในตาราง
+    Patient    patient.Patient `json:"patient"`
 
-type ToothNumber struct{
-	gorm.Model
-	Number int
-}
-
-type ToothPosition struct{
-	gorm.Model
-	Position string
-}
-
-type Treatment struct{
-	gorm.Model
-	TreatmentName string
-}
-
-
-//ระบุฟัน ชี่ไหน ทำอะไร
-type TreatmentTooth struct{
-	gorm.Model
-	TreatmentDate time.Time
-
-	ToothPositionID uint
-	ToothPosition ToothPosition `gorm:"foreignKey:ToothPositionID;references:ID"`
-
-	ToothNumberID uint
-	ToothNumber ToothNumber `gorm:"foreignKey:ToothNumberID;references:ID"`
-
-	TreatmentID uint
-	Treatment Treatment `gorm:"foreignKey:TreatmentID;references:ID"`
+	// TreatmentID uint
+	 Treatments []Treatment `json:"treatments" gorm:"foreignKey:CaseID"`
 }

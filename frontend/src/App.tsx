@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import FullLayout from "./layout/FullLayout";
 import IndexLayout from "./layout/IndexLayout";
 import ConfigRoutes from "./routes";
@@ -10,6 +10,7 @@ const App: React.FC = () => {
     <React.StrictMode>
       <Router>
         <ConfigRoutes />
+        
       </Router>
     </React.StrictMode>
   );

@@ -28,9 +28,7 @@ const ServiceCard: React.FC<Props> = ({ icon, title, description }) => {
       <Title level={4}>{title}</Title>
       <Text>{description}</Text>
       <div style={{ marginTop: 20 }}>
-        <Button type="link" style={{ color: "#722ED1", fontWeight: "bold" }}>
-          รายละเอียด <RightOutlined />
-        </Button>
+        
       </div>
     </Card>
   );
