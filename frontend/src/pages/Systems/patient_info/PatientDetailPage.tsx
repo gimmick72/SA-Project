@@ -1,8 +1,13 @@
+//Show OK
+//PUT not OK
+
 import "./design/pateint.css";
-import Navigate from "./component_patient/header_navigate";
+import NavigateHeader  from "./component_patient/header_navigate";
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { message } from "antd";
 import { PatientAPI } from "../../../services/patient/patientApi";
+import { Patient } from "../../../interface/initailPatient/patient";
 
 /** yyyy-mm-dd from string | Date | ISO */
 const toDateInputValue = (v?: string | Date) => {
@@ -57,6 +62,7 @@ const calcAgeFromBirth = (yyyy_mm_dd: string): string => {
 const PatientDetail: React.FC = () => {
   const { id: idFromPath } = useParams();
   const [search] = useSearchParams();
+  const navigate = useNavigate();
   const patientId = idFromPath ?? search.get("id");
 
   // mode: view(default) | edit
@@ -98,15 +104,24 @@ const PatientDetail: React.FC = () => {
 
   // ---------- Save (ตัวอย่าง) ----------
   const handleSave = async () => {
-    if (READONLY) return;
-    // TODO: map formData -> payload ของ backend คุณ
-    // await PatientAPI.update(idNum, payload);
-    // message.success("บันทึกสำเร็จ");
+    if (READONLY || !Number.isFinite(idNum)) return;
+  
+    const payload = buildPayload(formData);
+  
+    try {
+      await PatientAPI.update(idNum, payload);
+      message.success("บันทึกสำเร็จ");
+      navigate(`/admin/patient/detail/${idNum}?mode=view`);
+    } catch (e: any) {
+      console.error(e);
+      message.error(e?.response?.data?.error || e?.message || "บันทึกไม่สำเร็จ");
+    }
   };
+  
 
   return (
     <div className="wrapper">
-      <Navigate />
+      <NavigateHeader /> 
       <div style={{ paddingLeft: "3rem" }}>
         {/* --- row1 --- */}
         <div className="row1">
@@ -445,3 +460,32 @@ const PatientDetail: React.FC = () => {
 };
 
 export default PatientDetail;
+function buildPayload(formData: any): Patient {
+  return {
+    citizenID: formData.citizenID,
+    prefix: formData.prefix,
+    firstname: formData.firstname,
+    lastname: formData.lastname,
+    nickname: formData.nickname,
+    congenitadisease: formData.underlyingDisease,
+    blood_type: formData.bloodtype,
+    gender: formData.gender,
+    birthday: formData.birthdate,
+    phone_number: formData.phone_number,
+    age: formData.age ? Number(formData.age) : undefined,
+    drug_allergy: formData.drug_allergy,
+    contactperson: {
+      relationship: formData.relationship,
+      emergency_phone: formData.emergency_phone,
+    },
+    address: {
+      house_number: formData.house_number,
+      moo: formData.Moo,
+      subdistrict: formData.subdistict,
+      district: formData.distict,
+      province: formData.province,
+      postcode: formData.postcode,
+    },
+  };
+}
+

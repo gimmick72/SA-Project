@@ -1,4 +1,4 @@
-package patientEntity
+package patient
 
 import (
 	"gorm.io/gorm"
@@ -16,8 +16,10 @@ type InitialSymptomps struct {
 	Weight        float64   `json:"weight"`
 	Height        float64   `json:"height"`
 
-	ServiceID uint     `json:"serviceID" gorm:"index"`
-	PatientID uint     `json:"patientID" gorm:"index"`
-	
-
+	 // FK ไปหา Patient
+	 PatientID uint             `json:"patientID"`
+	 Patient   Patient          `json:"patient" gorm:"foreignKey:PatientID;references:ID"`
+ 
+	 // FK ไปหา Service
+	 ServiceID *uint `json:"serviceID,omitempty"`
 }

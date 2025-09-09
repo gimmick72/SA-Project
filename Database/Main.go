@@ -28,6 +28,8 @@ func main() {
 
 		router.POST("/patients/:id/symptoms",controllers.CreateSymptom) //AddSymptom
 		router.GET("/services",controllers.GetServicetoSymtompOption) //ดึง service มาเลือกตอนเพิ่มอาการ
+		router.GET("/case-data/:id",controllers.GetCaseHistory) //ดึง case data
+
 		
 	}
 	// Run the server go run main.go

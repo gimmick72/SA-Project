@@ -1,4 +1,4 @@
-package patientEntity
+package patient
 
 import (
 	"gorm.io/gorm"

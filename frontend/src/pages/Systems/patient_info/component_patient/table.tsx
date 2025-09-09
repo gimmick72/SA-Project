@@ -7,10 +7,10 @@ import { PatientRow } from "../../../../interface/initailPatient/patient";
 
 // ✅ ดึง array ออกมาไม่ว่ารูปไหน
 const pickArray = (resp: any): any[] => {
-  if (Array.isArray(resp)) return resp;                  // [ ... ]
-  if (Array.isArray(resp?.patients)) return resp.patients;  // { patients: [...] }
-  if (Array.isArray(resp?.data)) return resp.data;          // { data: [...] }
-  if (Array.isArray(resp?.items)) return resp.items;        // { items: [...] }
+  if (Array.isArray(resp)) return resp; // [ ... ]
+  if (Array.isArray(resp?.patients)) return resp.patients; // { patients: [...] }
+  if (Array.isArray(resp?.data)) return resp.data; // { data: [...] }
+  if (Array.isArray(resp?.items)) return resp.items; // { items: [...] }
   if (Array.isArray(resp?.data?.patients)) return resp.data.patients;
   if (Array.isArray(resp?.data?.data)) return resp.data.data;
   return [];
@@ -40,18 +40,27 @@ const PatienTable: React.FC = () => {
     try {
       setLoading(true);
       const r = await PatientAPI.getAll(); // ได้ res.data โดยตรงแล้ว
-      console.log("[GET] /api/patients resp =", r, "isArray?", Array.isArray(r));
+      console.log(
+        "[GET] /api/patients resp =",
+        r,
+        "isArray?",
+        Array.isArray(r)
+      );
       setData(toRows(r));
     } catch (e: any) {
       console.error(e);
-      msg.error(e?.response?.data?.error || e?.message || "โหลดข้อมูลไม่สำเร็จ");
+      msg.error(
+        e?.response?.data?.error || e?.message || "โหลดข้อมูลไม่สำเร็จ"
+      );
       setData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const columns: ColumnsType<PatientRow> = [
     { title: "รหัส", dataIndex: "id", key: "id", width: 120 },
@@ -67,13 +76,26 @@ const PatienTable: React.FC = () => {
         const id = r.id;
         return (
           <Space>
-            <Button size="small" disabled={disabled} onClick={() => navigate(`initial-symptoms/${id}`)}>
+            <Button
+              size="small"
+              disabled={disabled}
+              onClick={() => navigate(`initial-symptoms/${id}`)}
+            >
               บันทึกบริการ
             </Button>
-            <Button size="small" disabled={disabled} onClick={() => navigate(`detail/${id}?mode=view`)}>
+           
+            <Button
+              size="small"
+              disabled={disabled}
+              onClick={() => navigate(`/admin/patient/detail/${id}?mode=view`)} 
+            >
               รายละเอียด
             </Button>
-            <Button size="small" disabled={disabled} onClick={() => navigate(`detail/${id}?mode=edit`)}>
+            <Button
+              size="small"
+              disabled={disabled}
+              onClick={() => navigate(`/admin/patient/detail/${id}?mode=edit`)} 
+            >
               แก้ไข
             </Button>
             <Popconfirm

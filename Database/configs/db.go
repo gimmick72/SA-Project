@@ -35,6 +35,10 @@ func SetupDatbase() {
 
 		//service
 		&entity.Service{},
+
+		//CaseData
+		&entity.CaseData{},
+		&entity.Treatment{},
 		
 	)
 }

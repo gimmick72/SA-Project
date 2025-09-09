@@ -101,6 +101,9 @@ export const PatientSymptomsAPI = {
 }
 
 export const ServiceToSymtomsAPI = {
-  getService: () => Get('/api/services',false)
+  getService: () => Get(`/api/services`,false)
 }
 
+export const GetCaseDataToHistory = {
+  getCaseData: (id?: string) => Get(`/api/case-data/${id}`,false)
+}

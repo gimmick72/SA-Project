@@ -1,34 +1,45 @@
-import "../design/index.css";
-import { useNavigate } from "react-router-dom";
+import { Tabs } from "antd";
+import type { TabsProps } from "antd";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
-const PatientHeader = () => {
+const NavigateHeader: React.FC = () => {
   const navigate = useNavigate();
-  return (
-    <div className="header">
-      <h2 
-      style={{ fontWeight: "600" }}
-      onClick={() => navigate("/admin/patient/detail/${recortd.id}")}
-      >ข้อมูลประจำตัว</h2>
-      
-      {/* <h3 className="header-element">
-        <span
-          style={{ margin: "0.5rem", color: "black", fontWeight: "400", cursor: "pointer" }}
-          onClick={() => navigate("/admin/patient/contact")}
-        >
-          ข้อมูลการติดต่อ
-        </span>
-      </h3> */}
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
 
-      <h3 className="header-element">
-        <span
-          style={{ margin: "0.5rem", color: "black", fontWeight: "400", cursor: "pointer" }}
-          onClick={() => navigate("/admin/patient/patient-history/${record.id}")}
-        >
-          ประวัติการรักษา
-        </span>
-      </h3>
-    </div>
+  const items: TabsProps["items"] = [
+    {
+      key: "detail",
+      label: "ข้อมูลประจำตัว",
+    },
+    {
+      key: "history",
+      label: "ประวัติการรักษา",
+    },
+  ];
+
+  // เลือก tab ตาม path ปัจจุบัน
+  const activeKey =
+    location.pathname.includes("patient-history") ? "history" : "detail";
+
+  const onChange = (key: string) => {
+    if (!id) return;
+    if (key === "detail") {
+      navigate(`/admin/patient/detail/${id}?mode=view`);
+    } else if (key === "history") {
+      navigate(`/admin/patient/patient-history/${id}`);
+    }
+  };
+
+  return (
+    <Tabs
+      activeKey={activeKey}
+      items={items}
+      onChange={onChange}
+      type="line"
+      size="large"
+    />
   );
 };
 
-export default PatientHeader;
+export default NavigateHeader;
