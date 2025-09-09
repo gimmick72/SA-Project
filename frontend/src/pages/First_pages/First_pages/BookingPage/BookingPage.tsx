@@ -136,7 +136,7 @@ const BookingPage: React.FC = () => {
                         name="firstName"
                         rules={[{ required: true, message: "กรุณากรอกชื่อ" }]}
                       >
-                        <Input placeholder="ชื่อจริง" prefix={<UserOutlined />} />
+                        <Input placeholder="เช่น นนท์" prefix={<UserOutlined />} />
                       </Form.Item>
                     </Col>
                     <Col xs={24} md={12}>
@@ -145,7 +145,7 @@ const BookingPage: React.FC = () => {
                         name="lastName"
                         rules={[{ required: true, message: "กรุณากรอกนามสกุล" }]}
                       >
-                        <Input placeholder="นามสกุล" prefix={<UserOutlined />} />
+                        <Input placeholder="เช่น สาตราคม" prefix={<UserOutlined />} />
                       </Form.Item>
                     </Col>
                   </Row>
