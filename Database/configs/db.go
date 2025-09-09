@@ -70,17 +70,17 @@ func SeedStaff() {
 		Specialization                                                 string
 		StartDate                                                      time.Time
 	}{
-		{"ทพ.", "Somsak", "Thongdee", "ชาย", "somsak@clinic.com", "1234567890123", "081-234-5678",
+		{"ทพ.", "Somsak", "Thongdee", "ชาย", "somsak@clinic.com", "1234567890123", "0812345678",
 			"123 Moo 1", "Nongprue", "Muang", "Nakhon Ratchasima", 45,
 			"ทันตแพทย์", "Part-time", "D54321", 20000, "ทันตกรรมจัดฟัน",
 			time.Date(2015, 3, 1, 0, 0, 0, 0, time.UTC)},
 
-		{"ทพ.ญ.", "Suda", "Kanya", "หญิง", "suda@clinic.com", "9876543210987", "089-111-2222",
+		{"ทพ.ญ.", "Suda", "Kanya", "หญิง", "suda@clinic.com", "9876543210987", "0891112222",
 			"456 Sukhumvit Rd", "", "Bangkok", "", 45,
 			"ผู้ช่วย", "Full-time", "A00002", 15000, "",
 			time.Date(2021, 9, 10, 0, 0, 0, 0, time.UTC)},
 
-		{"นาย", "Anan", "Chaiyos", "ชาย", "anan@clinic.com", "1122334455667", "089-555-1111",
+		{"นาย", "Anan", "Chaiyos", "ชาย", "anan@clinic.com", "1122334455667", "0895551111",
 			"88 Rama 2 Rd", "", "Bangkok", "", 45,
 			"เจ้าหน้าที่แผนกต้อนรับ", "Full-time", "", 12000, "",
 			time.Date(2018, 11, 1, 0, 0, 0, 0, time.UTC)},

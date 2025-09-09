@@ -21,11 +21,7 @@ export interface InitialSymptomps {
   Weight?: number;
   Height?: number;
 }
-export interface Quadrant {
-  ID?: number;
-  Quadrant: string;
-  TreatmentID?: number;
-}
+
 export interface Patient {
   ID?: number;
   CitizenID?: string;
@@ -78,9 +74,15 @@ export interface Treatment {
   TreatmentName: string;
   Price: number;
   appointment_date?: string | null; // ISO string หรือ null
-  Photo?: string | null;     // url หรือ base64 (จาก backend)
-  Quadrants?: Quadrant[];    // ถ้ามี
-  // frontend-only (ก่อนอัปโหลด)
-  // selected_teeth?: string[]; // ตัวเลขฟันจาก UI
-  photo_upload?: any[];      // UploadFile[] หรือ File[] จาก AntD Upload
 }
+
+export type CaseRow = {
+    id: number;
+    patientId: number;
+    appointment_date?: string | null;
+    treatments: Treatment[];
+    note?: string;
+    patient?: any; // can tighten type if you have Patient interface
+    SignDate?: string;
+    totalPrice?: number;   // ✅ new field
+};

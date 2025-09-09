@@ -4,25 +4,14 @@ import { Card, Button, Typography, Modal, Form, Input, message, Popconfirm, Row,
 import { PlusOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/lib/upload/interface";
 import dayjs from "dayjs";
-import type { CaseData as CaseDataIface, Treatment as TreatmentIface, } from "../../interface/Patient";
+import type { CaseData as CaseData, CaseRow } from "../../interface/Case";
 import { CaseAPI } from "../../services/https/CaseAPI";
 // import { StaffAPI } from '../../services/https/StaffAPI';
 
-const { getAllCases, getCaseByID, addCaseFormData, updateCase, deleteCase } = CaseAPI;
+const { getAllCases, deleteCase } = CaseAPI;
 
 const { Title } = Typography;
 const { TextArea } = Input;
-
-type CaseRow = {
-    id: number;
-    patientId: number;
-    appointment_date?: string | null;
-    treatments: TreatmentIface[];
-    note?: string;
-    patient?: any; // can tighten type if you have Patient interface
-    SignDate?: string;
-    totalPrice?: number;   // ✅ new field
-};
 
 const TreatmentInfoPage: React.FC = () => {
     const [cases, setCases] = useState<CaseRow[]>([]);
@@ -39,7 +28,7 @@ const TreatmentInfoPage: React.FC = () => {
     const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
     const [departments, setDepartments] = useState<any[]>([]);
 
-     // 🔹 ดึงข้อมูล Department ทั้งหมดจาก /staff (หรือจะทำ API แยกก็ได้)
+    // 🔹 ดึงข้อมูล Department ทั้งหมดจาก /staff (หรือจะทำ API แยกก็ได้)
     useEffect(() => {
         fetch("http://localhost:8080/staff")
             .then(res => res.json())
@@ -52,7 +41,7 @@ const TreatmentInfoPage: React.FC = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const data: CaseDataIface[] = await getAllCases();
+                const data: CaseData[] = await getAllCases();
                 // Map to local CaseRow shape
                 const mapped: CaseRow[] = data.map((c) => ({
                     id: (c.ID as number) || 0,
@@ -83,14 +72,16 @@ const TreatmentInfoPage: React.FC = () => {
 
     // search / filter
     useEffect(() => {
-        const trimmedText = searchText.trim();
-        if (!trimmedText) {
+        const trimmed = searchText.trim().toLowerCase();
+
+        if (!trimmed) {
             setFilteredCases(cases);
             return;
         }
-        const lower = trimmedText.toLowerCase();
-        const num = Number(trimmedText);
 
+        const num = Number(trimmed);
+
+        // 🔹 exact match by Case ID
         if (!isNaN(num)) {
             const exact = cases.find((c) => c.id === num);
             if (exact) {
@@ -101,14 +92,32 @@ const TreatmentInfoPage: React.FC = () => {
 
         const filtered = cases.filter((c) => {
             const patient = patientsList.find((p) => p.ID === c.patientId) || c.patient;
-            const name = patient ? `${patient.FirstName || patient.firstName || ""} ${patient.LastName || patient.lastName || ""}` : "";
-            const nid = patient?.CitizenID || "";
-            const treatmentNames = (c.treatments || []).map((t) => (t.TreatmentName || (t as any).treatment_name || "")).join(" ");
-            return name.toLowerCase().includes(lower) || String(nid).includes(lower) || treatmentNames.toLowerCase().includes(lower);
+
+            const firstName = (patient?.FirstName || patient?.firstName || "").toLowerCase();
+            const lastName = (patient?.LastName || patient?.lastName || "").toLowerCase();
+            const fullName = `${firstName} ${lastName}`.trim();
+
+            const nid = String(patient?.CitizenID || "").toLowerCase();
+
+            // 🔹 check treatments more strictly
+            const hasTreatment = (c.treatments || []).some((t) =>
+                (t.TreatmentName || (t as any).treatment_name || "")
+                    .toLowerCase()
+                    .includes(trimmed)
+            );
+
+            return (
+                fullName.includes(trimmed) ||
+                firstName.includes(trimmed) ||
+                lastName.includes(trimmed) ||
+                (trimmed.length >= 13 && nid.includes(trimmed)) || // ✅ ค้นหาเฉพาะเมื่อกรอก >= 13
+                hasTreatment
+            );
         });
+
         setFilteredCases(filtered);
     }, [searchText, cases, patientsList]);
-    
+
     // // prepare modal for creating new
     const handleAddClick = async () => {
         try {
@@ -129,18 +138,6 @@ const TreatmentInfoPage: React.FC = () => {
             if (patient) {
                 message.success("พบข้อมูลคนไข้");
 
-                // 4️⃣ เติมข้อมูล patient ลง form
-                form.setFieldsValue({
-                    patientId: patient.ID,
-                    patientName: `${patient.FirstName} ${patient.LastName}`,
-                    age: patient.Age,
-                    phoneNumber: patient.PhoneNumber,
-                    // preExistingConditions: patient.CongenitaDisease,
-                    allergyHistory: patient.DrugAllergy,
-                    // bloodType: patient.BloodType,
-                    // ...map ฟิลด์อื่นๆ ตามต้องการ
-                });
-
                 setSelectedPatient(patient);
                 setIsSubmitDisabled(false); // Enable ปุ่ม submit
             } else {
@@ -152,117 +149,42 @@ const TreatmentInfoPage: React.FC = () => {
         }
     };
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
     // When National ID changes on form, try to find patient and populate fields
     const handleNationalIdChange = async (e: ChangeEvent<HTMLInputElement> | string) => {
-        console.log("NationalIDChange")
+        console.log("NationalIDChange");
         const val = typeof e === "string" ? e : e.target.value;
         form.setFieldValue("NationalID", val);
 
         const nid = String(val || "").trim();
-        if (nid.length === 13) {
-            try {
-                // เรียก API ดึง patient ตัวเต็ม
-                const found = await CaseAPI.getPatientByCitizenId(nid);
+        try {
+            const { patient, formValues } = await CaseAPI.getPatientFormValuesByCitizenId(nid);
 
-                if (found) {
-                    setSelectedPatient(found);
-
-                    // ดึง InitialSymptomps ตัวแรกเหมือน handleEditClick
-                    const init = found.InitialSymptomps && found.InitialSymptomps.length
-                        ? found.InitialSymptomps[0]
-                        : null;
-
-                    form.setFieldsValue({
-                        fullName: `${found.Prefix ?? ""} ${found.FirstName ?? ""} ${found.LastName ?? ""}`.trim(),
-                        age: found.Age ?? "",
-                        preExistingConditions: found.CongenitaDisease ?? "",
-                        phone: found.PhoneNumber ?? "",
-                        allergyHistory: found.DrugAllergy ?? "",
-                        symptomps: init?.Symptomps ?? "",
-                        bloodPressure: init?.BloodPressure ?? "",
-                        heartRate: init?.HeartRate ?? "",
-                        weight: init?.Weight ?? "",
-                        height: init?.Height ?? "",
-                        bloodType: found.BloodType ?? "",
-                    });
-                    setIsSubmitDisabled(false);
-                } else {
-                    message.error("ไม่พบหมายเลขบัตรประชาชนนี้");
-                    setIsSubmitDisabled(true);
-                }
-            } catch (err) {
-                console.error(err);
-                message.error("เกิดข้อผิดพลาดในการค้นหาคนไข้");
+            if (patient && formValues) {
+                setSelectedPatient(patient);
+                form.setFieldsValue(formValues);
+                setIsSubmitDisabled(false);
+            } else {
+                message.error("ไม่พบหมายเลขบัตรประชาชนนี้");
                 setIsSubmitDisabled(true);
             }
-        } else {
+        } catch (err) {
+            console.error(err);
+            message.error("เกิดข้อผิดพลาดในการค้นหาคนไข้");
             setIsSubmitDisabled(true);
         }
     };
 
     // edit existing case (row)
     const handleEditClick = async (row: CaseRow) => {
-
         console.log("🟢 คลิกแก้ไข Row:", row);
         setEditingCase(row);
-        // prefer patient from row; avoid relying on async setSelectedPatient
-        const patient = row.patient || patientsList.find((x) => x.ID === row.patientId) || null;
+
+        const { formValues, patient } =
+            await CaseAPI.getCaseFormValuesByID(row.id, row, patientsList);
+
         if (patient) setSelectedPatient(patient);
 
-        const data = await getCaseByID(row.id);
-        console.log("📦 ข้อมูลที่ได้จาก API:", data);
-        const init =
-            data.Patient?.InitialSymptomps && data.Patient.InitialSymptomps.length
-                ? data.Patient.InitialSymptomps[0]
-                : null;
-
-
-        const formValues: any = {
-            departmentID: data.DepartmentID ?? undefined,
-            dentist_Name: data.Department?.PersonalData ? `${data.Department.PersonalData.FirstName} ${data.Department.PersonalData.LastName}` : "",
-            NationalID: patient?.CitizenID || patient?.NationalID || undefined,
-            fullName: patient ? `${patient.Prefix || ""} ${patient.FirstName || (patient as any).firstName || ""} ${patient.LastName || (patient as any).lastName || ""}` : "",
-            age: patient?.Age || (patient as any).age,
-            preExistingConditions:
-                patient?.CongenitaDisease ||
-                (patient as any).preExistingConditions || "",
-            phone: patient?.PhoneNumber || (patient as any).phone,
-            allergyHistory: patient?.DrugAllergy || (patient as any).allergyHistory || "",
-            note: row.note,
-            appointment_date: row.appointment_date ? dayjs(row.appointment_date) : null,
-            treatments: (row.treatments || []).map((t) => ({
-                treatment_name: t.TreatmentName || (t as any).treatment_name,
-                price: t.Price || (t as any).price || 0,
-                // photo: t.Photo || (t as any).photo || null,
-            })),
-            SignDate: data.SignDate ? dayjs(data.SignDate) : null,
-
-            symptomps: init?.Symptomps || init?.symptomps || "",
-            bloodPressure: init?.BloodPressure || init?.bloodPressure || "",
-            heartRate: init?.HeartRate || init?.heart_rate || init?.heartRate || "",
-            weight: init?.Weight ?? init?.weight ?? "",
-            height: init?.Height ?? init?.height ?? "",
-            bloodType: patient?.BloodType || patient?.bloodType || "",
-        };
-
         form.setFieldsValue(formValues);
-
-        // restore dynamicSelectedTeeth and dynamicFileLists if those are present on treatments
-        const newFiles: { [key: string]: UploadFile[] } = {};
-        const newTeeth: { [key: number]: string[] } = {};
-        (row.treatments || []).forEach((t, idx) => {
-            const photos = (t as any).photo_upload;
-            if (Array.isArray(photos) && photos.length)
-                newFiles[`treatments_${idx}`] = photos as UploadFile[];
-            const sel = (t as any).selected_teeth;
-            if (Array.isArray(sel)) newTeeth[idx] = sel as string[];
-        });
-        setDynamicFileLists(newFiles);
-        setDynamicSelectedTeeth(newTeeth);
 
         setIsSubmitDisabled(false);
         setIsModalVisible(true);
@@ -275,104 +197,17 @@ const TreatmentInfoPage: React.FC = () => {
                 message.error("กรุณาเพิ่มอย่างน้อย 1 รายการการรักษาก่อนบันทึก");
                 return;
             }
-            // build payload
-            const patientIdToUse = selectedPatient?.ID || selectedPatient?.id || values.patientId || null;
-            if (!patientIdToUse) {
-                message.error("กรุณาเลือกผู้ป่วยที่ถูกต้อง (National ID)");
-                return;
-            }
-            const parseDate = (val?: string | null) => {
-                if (!val || val.startsWith("0001-01-01")) return null;
-                return dayjs(val);
-            };
 
-            const cleanISOString = (val?: any) => {
-                if (!val) return null;
-                const iso = typeof val === "string" ? val : val.toISOString?.();
-                if (!iso || iso.startsWith("0001-01-01")) return null;
-                return iso;
-            };
-            const treatments = (values.treatments || []).map((t: any, idx: number) => ({
-                TreatmentName: t.treatment_name,
-                Price: Number(t.price || 0),
-                selected_teeth: dynamicSelectedTeeth[idx] || [],
-            }));
+            const newCases = await CaseAPI.saveCase(
+                values,
+                selectedPatient,
 
-            // คำนวณรวมราคา
-            const totalPrice = treatments.reduce((sum: any, t: { Price: any; }) => sum + t.Price, 0);
+                editingCase,
+                cases
+            );
 
-            const payload: Partial<CaseDataIface> = {
-                appointment_date: cleanISOString(values.appointment_date) || undefined,
-                SignDate: cleanISOString(values.SignDate) || new Date().toISOString(),
-                Note: values.note || values.notes || "",
-                PatientID: patientIdToUse,
-                DepartmentID: values.departmentID ? Number(values.departmentID) : 1,
-                TotalPrice: totalPrice,
-                Treatment: treatments,
-            };
-
-            if (editingCase) {
-                console.log("editingMode");
-                // update existing
-                const updated = await updateCase(editingCase.id, payload as CaseDataIface);
-                // reflect update in UI — CaseAPI returns mapped CaseDataIface
-                const updatedRow: CaseRow = {
-                    id: updated.ID as number,
-                    patientId: updated.PatientID as number,
-                    appointment_date: updated.appointment_date || "",
-                    treatments: updated.Treatment || [],
-                    note: updated.Note || "",
-                    patient: (updated as any).Patient || selectedPatient,
-                    SignDate: updated.SignDate || "",
-                    totalPrice: updated.TotalPrice || 0,
-
-
-                };
-                setCases((prev) => prev.map((r) => (r.id === editingCase.id ? updatedRow : r)));
-                form.setFieldsValue({
-                    NationalID: updated.Patient?.CitizenID ?? updated.Patient?.NationalID ?? "",
-                    fullName: `${updated.Patient?.Prefix ?? ""} ${updated.Patient?.FirstName ?? ""} ${updated.Patient?.LastName ?? ""}`.trim(),
-                    age: updated.Patient?.Age ?? "",
-                    preExistingConditions: updated.Patient?.CongenitaDisease ?? "",
-                    phone: updated.Patient?.PhoneNumber ?? "",
-                    allergyHistory: updated.Patient?.DrugAllergy ?? "",
-                    symptomps: updated.Patient?.InitialSymptomps?.[0]?.Symptomps ?? "",
-                    bloodPressure: updated.Patient?.InitialSymptomps?.[0]?.BloodPressure ?? "",
-                    heartRate: updated.Patient?.InitialSymptomps?.[0]?.HeartRate ?? "",
-                    weight: updated.Patient?.InitialSymptomps?.[0]?.Weight ?? "",
-                    height: updated.Patient?.InitialSymptomps?.[0]?.Height ?? "",
-                    bloodType: updated.Patient?.BloodType ?? "",
-                    appointment_date: parseDate(updated.appointment_date),
-                    SignDate: parseDate(updated.SignDate),
-                    note: updated.Note ?? "",
-                    treatments: updated.Treatment?.map((t) => ({
-                        treatment_name: t.TreatmentName,
-                        price: t.Price,
-                        // appointment_date: t.appointment_date ? dayjs(t.appointment_date) : null,
-                    })) || [],
-                });
-            } else {
-                // create new
-                await addCaseFormData(payload as CaseDataIface);
-
-                // ดึงข้อมูลล่าสุดจาก backend
-                const latestCasesData = await getAllCases();
-
-                // แปลงข้อมูลจาก CaseData เป็น CaseRow
-                const latestCases: CaseRow[] = latestCasesData.map((c) => ({
-                    id: c.ID as number,
-                    patientId: c.PatientID as number,
-                    appointment_date: c.appointment_date || "",
-                    treatments: c.Treatment || [],
-                    note: c.Note || "",
-                    patient: c.Patient || null,
-                    SignDate: c.SignDate || "",
-                    totalPrice: c.TotalPrice || 0,
-                }));
-
-                setCases(latestCases);
-                message.success("เพิ่มการรักษาสำเร็จ");
-            }
+            setCases(newCases);
+            message.success(editingCase ? "แก้ไขการรักษาสำเร็จ" : "เพิ่มการรักษาสำเร็จ");
             setIsModalVisible(false);
         } catch (err) {
             console.error(err);
@@ -390,6 +225,10 @@ const TreatmentInfoPage: React.FC = () => {
             console.error(err);
             message.error("ลบไม่สำเร็จ");
         }
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
     };
 
     return (

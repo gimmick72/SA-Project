@@ -80,15 +80,42 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Form.Item name="idCard" label="เลขบัตรประชาชน" rules={[{ required: true, message: 'กรุณากรอกเลขบัตรประชาชน' }]}>
-            <Input placeholder="เลขบัตรประชาชน" />
-          </Form.Item>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Form.Item name="phone" label="เบอร์โทรศัพท์" rules={[{ required: true, message: 'กรุณากรอกเบอร์โทรศัพท์' }]}>
-            <Input placeholder="ใส่เบอร์โทรศัพท์" />
-          </Form.Item>
-        </Col>
+                        <Form.Item
+                          name="idCard"
+                          label="เลขบัตรประชาชน"
+                          rules={[
+                            { required: true, message: 'กรุณากรอกเลขบัตรประชาชน' },
+                            { pattern: /^\d{1,13}$/, message: 'กรอกได้เฉพาะตัวเลขและไม่เกิน 13 หลัก' },
+                          ]}
+                        >
+                          <Input
+                            placeholder="ใส่เลขบัตรประชาชน"
+                            maxLength={13} // จำกัด input
+        
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={12} md={6}>
+                        <Form.Item
+                          name="phone"
+                          label="เบอร์โทรศัพท์"
+                          rules={[
+                            { required: true, message: 'กรุณาใส่เบอร์โทรศัพท์' },
+                            { pattern: /^\d+$/, message: 'กรอกได้เฉพาะตัวเลขเท่านั้น' },
+                            { min: 10, max: 10, message: 'เบอร์โทรศัพท์ต้องมี 10 หลัก' },
+                          ]}
+                        >
+                          <Input
+                            placeholder="ใส่เบอร์โทรศัพท์"
+                            maxLength={10}
+                            inputMode="numeric"
+                            onChange={(e) => {
+                              const onlyNumbers = e.target.value.replace(/\D/g, ""); // ลบทุกตัวที่ไม่ใช่เลข
+                              e.target.value = onlyNumbers;
+                            }}
+                          />
+                        </Form.Item>
+                      </Col>
       </Row>
       <Col xs={24} sm={12} md={24}>
         {/* ====== อีเมล / ที่อยู่ ====== */}
