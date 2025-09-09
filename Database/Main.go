@@ -5,6 +5,7 @@ import (
 
 	"Database/configs"
 	"Database/controllers/initailPatient"
+	"Database/controllers"
 )
 
 const PORT = "8080"
@@ -31,7 +32,22 @@ func main() {
 		router.GET("/case-data/:id",controllers.GetCaseHistory) //ดึง case data
 
 		
+		// Supplies
+		router.GET("/supplies", controllers.ListSupplies)
+		router.POST("/supplies", controllers.CreateSupply)
+		router.DELETE("/supplies/:id", controllers.DeleteSupply)
+		router.POST("/dispenses", controllers.CreateDispense)
+		router.GET("/dispenses", controllers.ListDispenses)
+		router.PUT("/supplies/:id", controllers.UpdateSupply)
+
+		// Schedule / Queue
+		router.GET("/schedule", controllers.GetSchedule)
+		router.POST("/schedule/assign", controllers.AssignSchedule)
+
+		
 	}
+
+	
 	// Run the server go run main.go
 	r.Run("localhost:" + PORT)
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Form, Input, Button, InputNumber, Select, DatePicker, message, Card, Space, Row, Col } from 'antd';
 import dayjs from 'dayjs';
-import { createSupply } from '@service/supply/supply';
+import { createSupply } from '../../../services/supply';
 
 const { Option } = Select;
 
@@ -94,7 +94,7 @@ const AddSupplyPage: React.FC = () => {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item style={{ marginTop: 4, marginRight: 8, textAlign: 'right' }}>
+        <Form.Item style={{ marginTop: 4,marginRight: 8, textAlign: 'right' }}>
           <Space>
             <Button htmlType="button" onClick={onReset} disabled={submitting}>
               ล้างข้อมูล
@@ -102,7 +102,7 @@ const AddSupplyPage: React.FC = () => {
             <Button type="primary" htmlType="submit" loading={submitting}>
               เพิ่มเวชภัณฑ์
             </Button>
-
+            
           </Space>
         </Form.Item>
       </Form>

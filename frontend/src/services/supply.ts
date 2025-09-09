@@ -1,25 +1,8 @@
 // src/services/supply.ts
+import { } from "../interface/types";
 export const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
-
-export type Supply = {
-  id: number;
-  code: string;
-  name: string;
-  category: string;
-  quantity: number;
-  unit: string;
-  importDate: string;  // "YYYY-MM-DD" หรือ RFC3339
-  expiryDate: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
-export type SupplyPage = {
-  items: Supply[];
-  total: number;
-  page: number;
-  page_size: number;
-};
+import { Supply, SupplyPage } from "../interface/types";
+import { DispenseItem, DispensePage } from "../interface/types";
 
 // --- helper แปลงคีย์ให้เป็นตัวเล็กแบบที่ UI ใช้ ---
 function normalizeSupply(raw: any): Supply {
@@ -85,3 +68,88 @@ export async function deleteSupply(id: number) {
   const res = await fetch(`${BASE_URL}/api/supplies/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error(await res.text()); // พอแล้ว ไม่ต้องเช็ก 204 เพิ่ม
 }
+
+//create supply
+export async function createSupply(payload: {
+  code: string;
+  name: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  import_date: string; // "YYYY-MM-DD"
+  expiry_date: string; // "YYYY-MM-DD"
+}) {
+  const res = await fetch(`${BASE_URL}/api/supplies`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `HTTP ${res.status}`);
+  }
+  return await res.json();
+}
+
+//Dispense supply
+// โหลดตัวเลือกเวชภัณฑ์จาก backend (หน้า AllSupplies ใช้อยู่แล้ว)
+export async function fetchSupplyOptions() {
+  const res = await fetch(`${BASE_URL}/api/supplies?page=1&page_size=100`);
+  if (!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  const items = Array.isArray(data) ? data : data.items || [];
+  return items.map((it: any) => ({
+    code: it.code ?? it.Code,
+    name: it.name ?? it.Name,
+    category: it.category ?? it.Category,
+  }));
+}
+
+// สร้างรายการเบิกจ่าย
+export async function createDispense(payload: {
+  case_code: string;
+  dispenser: string;
+  items: { supply_code: string; quantity: number }[];
+}) {
+  const res = await fetch(`${BASE_URL}/api/dispenses`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+export async function fetchDispenses(params: {
+  q?: string;
+  date_from?: string; // YYYY-MM-DD
+  date_to?: string;   // YYYY-MM-DD
+  page?: number;
+  page_size?: number;
+  sort_by?: string;   // recorded_at|supply_code|supply_name|quantity|dispenser|case_code
+  order?: "asc" | "desc";
+}): Promise<DispensePage> {
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== "") qs.append(k, String(v));
+  });
+  const res = await fetch(`${BASE_URL}/api/dispenses?` + qs.toString());
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json() as DispensePage;
+}
+
+export async function updateSupply(id: number, payload: any) {
+  const res = await fetch(`${BASE_URL}/api/supplies/${id}`, {
+    method: "PUT", // หรือ PATCH ตาม backend
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(t || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+
