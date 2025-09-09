@@ -7,26 +7,26 @@ import 'antd/dist/reset.css';
 type Props = {
     event: RBCEvent | null;
     visible: boolean;
-    onSave: (eventData: { title: string; start: Date; end: Date }) => void;
+    onSave: (eventData: { room: string; start: Date; end: Date }) => void;
     onCancel: () => void;
 };
 
 const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) => {
-    const [title, setTitle] = useState('');
+    const [room, setRoom] = useState('');
     const [timein, setTimein] = useState('');
     const [timeout, setTimeout] = useState('');
 
 
     useEffect(() => {
         if (event) {
-            setTitle(String(event.title ?? ''));
+            setRoom(String(event.title ?? ''));
             setTimein(event.start ? dayjs(event.start).format('HH:mm') : '');
             setTimeout(event.end ? dayjs(event.end).format('HH:mm') : '');
         }
     }, [event]);
 
     const handleOk = () => {
-        if (title && timein && timeout) {
+        if (room && timein && timeout) {
             const today = event?.start ? dayjs(event.start) : dayjs();
 
             const [startHour, startMinute] = timein.split(':').map(Number);
@@ -40,7 +40,7 @@ const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) =
                 return;
             }
 
-            onSave({ title, start, end });
+            onSave({ room, start, end });
             resetForm();
         } else {
             message.error('กรุณากรอกข้อมูลให้ครบถ้วน');
@@ -48,12 +48,12 @@ const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) =
     };
 
     const resetForm = () => {
-        setTitle('');
+        setRoom('');
         setTimein('');
         setTimeout('');
     };
 
-    const rooms = ["x001", "x002", "x003", "004"];
+    const rooms = ["B001", "B002", "B003", "B004"];
 
     return (
         <Modal
@@ -71,8 +71,8 @@ const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) =
 
                     <Form.Item label="เลือกห้อง">
                         <Select
-                            value={title}
-                            onChange={(value) => setTitle(value)}
+                            value={room}
+                            onChange={(value) => setRoom(value)}
                             placeholder="เลือกห้อง"
                             options={rooms.map((room) => ({
                                 value: room,

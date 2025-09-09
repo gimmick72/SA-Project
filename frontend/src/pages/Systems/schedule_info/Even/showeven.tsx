@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'antd';
 import 'antd/dist/reset.css';
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 type EventType = {
   id: number;
-  title: string;
+  room: string;
   start: Date;
   end: Date;
 };
@@ -14,7 +16,7 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   onEdit?: (event: EventType) => void;
-  onDelete: (id: number, skipConfirm:boolean ) => void;
+  onDelete: (id: number, skipConfirm: boolean) => void;
 };
 
 const ShowEven: React.FC<Props> = ({ event, visible, onClose, onEdit, onDelete }) => {
@@ -29,14 +31,23 @@ const ShowEven: React.FC<Props> = ({ event, visible, onClose, onEdit, onDelete }
   return (
     <Modal
       open={visible}
-      title={event ? event.title : 'รายละเอียดกิจกรรม'}
+      title={event ? event.room : 'รายละเอียดกิจกรรม'}
       footer={null}
       onCancel={onClose}
     >
-      <div>
-        <p><strong>ชื่อ:</strong> {event?.title}</p>
-        <p><strong>เริ่ม:</strong> {event ? event.start.toString() : '-'}</p>
-        <p><strong>สิ้นสุด:</strong> {event ? event.end.toString() : '-'}</p>
+      <div style={{ marginBottom: 16 }}>
+        <p><strong>ห้อง:</strong> {event?.room}</p>
+        <p>
+          <strong>วัน:</strong> {event ? format(event.start, 'dd/MM/yyyy', { locale: th }) : '-'}
+        </p>
+        <p>
+          <strong>เวลาเข้างาน:</strong>{' '}
+          {event ? `${format(event.start, 'HH:mm', { locale: th })}` : '-'}
+        </p>
+        <p>
+          <strong>เวลาออกงาน:</strong>{' '}
+          {event ? `${format(event.end, 'HH:mm', { locale: th })}` : '-'}
+        </p>
       </div>
 
       {/* ยืนยันการลบกิจกรรม */}

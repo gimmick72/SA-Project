@@ -1,129 +1,90 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import './promotion.css';
-import { Modal, Input, Button, Card } from 'antd';
+import { Modal, Input, Button, Card, Select } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import { createPromotion, deletePromotion, getAllPromotion, getAllService, updatePromotion } from "../../../../services/Service/Service";
 
-interface Item {
-    id: number;
-    name: string;
-    service: string;
-    detail: string;
-    price: number;
-    startDate: string;
-    endDate: string;
+interface Promotion {
+    id?: number;
+    name_promotion: string;
+    service_id?: number;
+    promotion_detail: string;
+    cost: number;
+    date_start: string;
+    date_end: string;
+}
+
+interface Service {
+    id?: number;
+    name_service: string;
+    detail_service: string;
+    cost: number;
+    category_id: number;
 }
 
 const Promotion = () => {
-    const [items, setItems] = useState<Item[]>([
-        {
-            id: 1,
-            name: "โปรโมชันฟอกฟันขาว",
-            service: "ฟอกฟันขาว",
-            detail: "ฟอกฟันขาวด้วย Zoom Whitening ราคาพิเศษ",
-            price: 2500,
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        },
-        {
-            id: 2,
-            name: "โปรโมชันขูดหินปูน",
-            service: "ขูดหินปูน",
-            detail: "ขูดหินปูนพร้อมตรวจสุขภาพช่องปาก",
-            price: 800,
-            startDate: "2025-09-01",
-            endDate: "2025-09-15"
-        },
-        {
-            id: 3,
-            name: "โปรโมชันจัดฟัน",
-            service: "จัดฟัน",
-            detail: "จัดฟันราคาพิเศษสำหรับนักศึกษา",
-            price: 15000,
-            startDate: "2025-09-10",
-            endDate: "2025-12-31"
-        },
-        {
-            id: 4,
-            name: "โปรโมชันถอนฟัน",
-            service: "ถอนฟัน",
-            detail: "ถอนฟันราคาพิเศษสำหรับเด็ก",
-            price: 500,
-            startDate: "2025-09-05",
-            endDate: "2025-09-20"
-        },
-        {
-            id: 5,
-            name: "โปรโมชันอุดฟัน",
-            service: "อุดฟัน",
-            detail: "อุดฟันด้วยวัสดุเรซินคอมโพสิต",
-            price: 1200,
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        },
-        {
-            id: 6,
-            name: "โปรโมชันเคลือบฟลูออไรด์",
-            service: "เคลือบฟลูออไรด์",
-            detail: "เคลือบฟลูออไรด์สำหรับเด็กและผู้ใหญ่",
-            price: 600,
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        },
-        {
-            id: 7,
-            name: "โปรโมชันรากฟันเทียม",
-            service: "รากฟันเทียม",
-            detail: "รากฟันเทียมราคาพิเศษ",
-            price: 35000,
-            startDate: "2025-09-15",
-            endDate: "2025-10-31"
-        },
-        {
-            id: 8,
-            name: "โปรโมชันฟอกฟันขาวคู่",
-            service: "ฟอกฟันขาว",
-            detail: "ฟอกฟันขาวสำหรับ 2 ท่าน ราคาพิเศษ",
-            price: 4000,
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        },
-        {
-            id: 9,
-            name: "โปรโมชันขูดหินปูน+ขัดฟัน",
-            service: "ขูดหินปูน",
-            detail: "ขูดหินปูนและขัดฟันในราคาพิเศษ",
-            price: 1000,
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        },
-        {
-            id: 10,
-            name: "โปรโมชันตรวจสุขภาพฟัน",
-            service: "ตรวจสุขภาพฟัน",
-            detail: "ตรวจสุขภาพฟันฟรีสำหรับเด็กอายุต่ำกว่า 12 ปี",
-            price: 0,
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        }
-    ]);
+
+    const [promotion, setPromotion] = useState<Promotion[]>([]);
+    const [service, setService] = useState<Service[]>([]);
+    const [items, setItems] = useState<Promotion[]>([]);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const promotionData = await getAllPromotion();
+                const serviceData = await getAllService();
+
+
+                const formattedPromotion = promotionData.map(p => ({
+                    id: p.id,
+                    name_promotion: p.name_promotion,
+                    service_id: p.service_id,
+                    promotion_detail: p.promotion_detail,
+                    cost: p.cost || 0,
+                    date_start: p.date_start,
+                    date_end: p.date_end,
+                }));
+
+                const formattedService = serviceData.map(s => ({
+                    id: s.id,
+                    name_service: s.name_service,
+                    detail_service: s.detail_service,
+                    cost: s.cost || 0,
+                    category_id: s.category_id,
+                }));
+
+                setPromotion(formattedPromotion);
+                setService(formattedService);
+                setItems(formattedPromotion); // สำหรับ edit/delete/add
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
+        };
+        fetchData();
+    }, []);
+
+
+
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [search, setSearch] = useState<string>("");
     const filteredItems = items.filter(item => {
         const keyword = search.trim().toLowerCase();
         if (!keyword) return true;
         return (
-            item.name.toLowerCase().includes(keyword) ||
-            item.service.toLowerCase().includes(keyword) ||
-            item.detail.toLowerCase().includes(keyword)
+            item.name_promotion.toLowerCase().includes(keyword) ||
+            (item.service_id && service.find(s => s.id === item.service_id)?.name_service.toLowerCase().includes(keyword)) ||
+            item.promotion_detail.toLowerCase().includes(keyword)
         );
     });
-    const [newItem, setNewItem] = useState<Omit<Item, 'id'>>({
-        name: "",
-        service: "",
-        detail: "",
-        price: 0,
-        startDate: "",
-        endDate: ""
+
+    const [newItem, setNewItem] = useState<Omit<Promotion, 'id' | 'created_at' | 'updated_at'>>({
+        name_promotion: '',
+        service_id: undefined,
+        promotion_detail: '',
+        cost: 0 || undefined!,
+        date_start: '',
+        date_end: ''
     });
 
     const [modal, setModal] = useState<{
@@ -138,7 +99,7 @@ const Promotion = () => {
         itemIndex: null,
     });
 
-    const handleChange = (field: keyof Item, value: any, index?: number) => {
+    const handleChange = (field: keyof Promotion, value: any, index?: number) => {
         if (index === undefined) {
             setNewItem(prev => ({ ...prev, [field]: value }));
         } else {
@@ -148,42 +109,101 @@ const Promotion = () => {
         }
     };
 
-    const handleModalSave = () => {
+    const handleModalSave = async () => {
         if (modal.type === 'add') {
-            if (!newItem.name || !newItem.service) return;
-            setItems([...items, { ...newItem, id: Date.now() }]);
-            setNewItem({ name: "", service: "", detail: "", price: 0, startDate: "", endDate: "" });
+            // ตรวจสอบ field ที่จำเป็น
+            if (!newItem.name_promotion.trim()) {
+                alert("กรุณากรอกชื่อโปรโมชัน");
+                return;
+            }
+            if (!newItem.service_id) {
+                alert("กรุณาเลือกบริการ");
+                return;
+            }
+            if (!newItem.date_start || !newItem.date_end) {
+                alert("กรุณาเลือกวันที่เริ่มและสิ้นสุด");
+                return;
+            }
+
+            try {
+                // เรียก API เพิ่มโปรโมชั่น
+                const savedPromotion = await createPromotion({
+                    ...newItem,
+                    service_id: newItem.service_id!, // ensure เป็น number
+                    date_start: newItem.date_start,
+                    date_end: newItem.date_end,
+                });
+
+                // อัพเดต state
+                setPromotion(prev => [...prev, savedPromotion]);
+                setItems(prev => [...prev, savedPromotion]);
+
+                // ปิด Modal และรีเซ็ต newItem
+                setModal({ visible: false, type: null, detail: '', itemIndex: null });
+                setNewItem({
+                    name_promotion: '',
+                    service_id: 0,
+                    promotion_detail: '',
+                    cost: 0,
+                    date_start: '',
+                    date_end: ''
+                });
+            } catch (error) {
+                console.error('Failed to create promotion:', error);
+                alert("สร้างโปรโมชั่นไม่สำเร็จ");
+            }
         } else if (modal.type === 'view' && modal.itemIndex !== null) {
-            const updated = [...items];
-            updated[modal.itemIndex].detail = modal.detail;
-            setItems(updated);
+            const updatedItem = { ...items[modal.itemIndex], promotion_detail: modal.detail };
+            try {
+                const updatedPromotion = await updatePromotion(updatedItem.id!, updatedItem);
+                const updatedItems = [...items];
+                updatedItems[modal.itemIndex] = updatedPromotion;
+                setItems(updatedItems);
+                setPromotion(updatedItems);
+                setModal({ visible: false, type: null, detail: '', itemIndex: null });
+            } catch (error) {
+                console.error('Failed to update promotion:', error);
+            }
         }
-        setModal({ visible: false, type: null, detail: '', itemIndex: null });
     };
+
+    // เปลี่ยนค่า ฟิล
+    const handleNewPromotionChange = (field: keyof Promotion, value: string | number) => {
+        setNewItem(prev => ({ ...prev, [field]: value }));
+    };
+
 
 
     //  ลบข้อมูล
     const [isCardVisible, setIsCardVisible] = useState(false);
     const [itemIdToDelete, setItemIdToDelete] = useState<null | Number>(null);
 
-    const handleDelete = (id: number) => {
-        setItems(prev => prev.filter(item => item.id !== id));
-        setIsCardVisible(false);
-    };
 
     // ยืนยันการลบ
     const confirmDelete = (id: number) => {
         setItemIdToDelete(id);
         setIsCardVisible(true);
     };
-    const handleOk = () => {
-        // Filter out the item with the stored ID
-        setItems(prev => prev.filter(item => item.id !== itemIdToDelete));
 
-        // Clean up state
-        setIsCardVisible(false);
-        setItemIdToDelete(null);
+    const handleOk = async () => {
+        if (itemIdToDelete === null) return;
+
+        try {
+            await deletePromotion(Number(itemIdToDelete));
+            setItems(prev => prev.filter(item => item.id !== itemIdToDelete));
+            console.log("ลบสำเร็จ")
+
+        } catch (error) {
+            console.error("ลบไม่สำเร็จ", error);
+
+        } finally {
+            // Clean up state
+            setIsCardVisible(false);
+            setItemIdToDelete(null);
+        }
+
     };
+
     const handleCancel = () => {
         setIsCardVisible(false);
         setItemIdToDelete(null);
@@ -191,23 +211,34 @@ const Promotion = () => {
 
 
     const handleEdit = (index: number) => setEditIndex(index);
-    const handleSave = () => setEditIndex(null);
+
+    const handleSave = async (index: number) => {
+        const itemToUpdate = items[index];
+        try {
+            const updated = await updatePromotion(itemToUpdate.id!, itemToUpdate);
+            const newItems = [...items];
+            newItems[index] = updated;
+            setItems(newItems);
+            setPromotion(newItems);
+            setEditIndex(null);
+            console.log("อัปเดตสำเร็จ");
+        } catch (error) {
+            console.error("อัปเดตไม่สำเร็จ", error)
+        }
+    };
+
 
     const openModal = (type: 'add' | 'view', index: number | null) => {
         if (type === 'add') {
-            setModal({ visible: true, type, detail: newItem.detail, itemIndex: null });
+            setModal({ visible: true, type, detail: newItem.promotion_detail, itemIndex: null });
         } else if (index !== null) {
             setModal({
                 visible: true,
                 type,
-                detail: items[index].detail,
+                detail: items[index].promotion_detail,
                 itemIndex: index
             });
         }
-    };
-
-    const handleNewItemChange = (field: keyof typeof newItem, value: any) => {
-        setNewItem(prev => ({ ...prev, [field]: value }));
     };
 
 
@@ -243,18 +274,21 @@ const Promotion = () => {
                                 <td>
                                     {editIndex === index ? (
                                         <Input
-                                            value={item.name}
-                                            onChange={(e) => handleChange('name', e.target.value, index)}
+                                            value={item.name_promotion}
+                                            onChange={(e) => handleChange('name_promotion', e.target.value, index)}
                                         />
-                                    ) : item.name}
+                                    ) : item.name_promotion}
                                 </td>
                                 <td>
                                     {editIndex === index ? (
                                         <Input
-                                            value={item.service}
-                                            onChange={(e) => handleChange('service', e.target.value, index)}
+                                            type="number"
+                                            value={item.service_id}
+                                            onChange={(e) => handleChange('service_id', Number(e.target.value), index)}
                                         />
-                                    ) : item.service}
+                                    ) : (
+                                        service.find(s => s.id === item.service_id)?.name_service || "–"
+                                    )}
                                 </td>
                                 <td>
                                     <Button onClick={() => openModal('view', index)}>ดูรายละเอียด</Button>
@@ -263,37 +297,37 @@ const Promotion = () => {
                                     {editIndex === index ? (
                                         <Input
                                             type="number"
-                                            value={item.price}
-                                            onChange={(e) => handleChange('price', Number(e.target.value), index)}
+                                            value={item.cost}
+                                            onChange={(e) => handleChange('cost', Number(e.target.value), index)}
                                         />
-                                    ) : item.price}
+                                    ) : item.cost}
                                 </td>
                                 <td>
                                     {editIndex === index ? (
                                         <Input
                                             type="date"
-                                            value={item.startDate}
-                                            onChange={(e) => handleChange('startDate', e.target.value, index)}
+                                            value={item.date_start ? item.date_start.split("T")[0] : ""}
+                                            onChange={(e) => handleChange('date_start', e.target.value, index)}
                                         />
-                                    ) : item.startDate}
+                                    ) : item.date_start?.split("T")[0]}
                                 </td>
                                 <td>
                                     {editIndex === index ? (
                                         <Input
                                             type="date"
-                                            value={item.endDate}
-                                            onChange={(e) => handleChange('endDate', e.target.value, index)}
+                                            value={item.date_end ? item.date_end.split("T")[0] : ""}
+                                            onChange={(e) => handleChange('date_end', e.target.value, index)}
                                         />
-                                    ) : item.endDate}
+                                    ) : item.date_end?.split("T")[0]}
                                 </td>
                                 <td style={{ textAlign: "center", verticalAlign: "middle" }}>
 
                                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                        <Button danger onClick={() => confirmDelete(item.id)}><DeleteOutlined /> ลบ </Button>
+                                        <Button danger onClick={() => item.id !== undefined && confirmDelete(item.id)}><DeleteOutlined /> ลบ </Button>
 
                                         {editIndex === index ? (
                                             <Button style={{ marginLeft: "10px" }}
-                                                onClick={handleSave}>บันทึก</Button>
+                                                onClick={() => handleSave(index)}>บันทึก</Button>
                                         ) : (
                                             <Button style={{ marginLeft: "10px" }}
                                                 onClick={() => handleEdit(index)}>แก้ไข</Button>
@@ -356,49 +390,50 @@ const Promotion = () => {
                 cancelText="ยกเลิก"
                 centered
             >
-                {/* ฟอร์มกรอกข้อมูลเมื่อเพิ่ม */}
                 {modal.type === 'add' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         <Input
-                            placeholder="ชื่อรายการ"
-                            value={newItem.name}
-                            onChange={(e) => handleNewItemChange('name', e.target.value)}
+                            placeholder="ชื่อโปรโมชัน"
+                            value={newItem.name_promotion}
+                            onChange={(e) => handleNewPromotionChange('name_promotion', e.target.value)}
                         />
-                        <Input
-                            placeholder="บริการ"
-                            value={newItem.service}
-                            onChange={(e) => handleChange('service', e.target.value)}
-                        />
+                        <Select
+                            placeholder="เลือกบริการ"
+                            value={newItem.service_id}
+                            onChange={(value) => handleNewPromotionChange('service_id', value)}
+                        >
+                            {service.map(s => (
+                                <Select.Option key={s.id} value={s.id}>{s.name_service}</Select.Option>
+                            ))}
+                        </Select>
                         <Input.TextArea
                             rows={3}
                             placeholder="รายละเอียด"
-                            value={newItem.detail}
-                            onChange={(e) => handleChange('detail', e.target.value)}
+                            value={newItem.promotion_detail}
+                            onChange={(e) => handleNewPromotionChange('promotion_detail', e.target.value)}
                         />
                         <Input
                             type="number"
                             placeholder="ราคา"
-                            value={newItem.price}
-                            onChange={(e) => handleChange('price', Number(e.target.value))}
+                            value={newItem.cost}
+                            onChange={(e) => handleNewPromotionChange('cost', Number(e.target.value))}
                         />
                         <Input
                             type="date"
-                            value={newItem.startDate}
-                            onChange={(e) => handleChange('startDate', e.target.value)}
+                            value={newItem.date_start}
+                            onChange={(e) => handleNewPromotionChange('date_start', e.target.value)}
                         />
                         <Input
                             type="date"
-                            value={newItem.endDate}
-                            onChange={(e) => handleChange('endDate', e.target.value)}
+                            value={newItem.date_end}
+                            onChange={(e) => handleNewPromotionChange('date_end', e.target.value)}
                         />
                     </div>
                 )}
 
-                {/* ดูรายละเอียด */}
-                {modal.type === 'view' && (
+                {modal.type === 'view' && modal.itemIndex !== null && (
                     <Input.TextArea
                         rows={4}
-                        placeholder="พิมพ์รายละเอียดที่นี่..."
                         value={modal.detail}
                         onChange={(e) => setModal({ ...modal, detail: e.target.value })}
                     />

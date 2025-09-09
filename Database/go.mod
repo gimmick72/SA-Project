@@ -5,7 +5,7 @@ go 1.24.4
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	gorm.io/driver/sqlite v1.6.0
-	gorm.io/gorm v1.30.3
+	gorm.io/gorm v1.30.5
 )
 
 require (
