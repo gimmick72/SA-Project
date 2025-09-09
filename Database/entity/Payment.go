@@ -54,5 +54,11 @@ type Transaction struct{
 	CashPayment CashPayment
 
 	PatientID uint
-	Patient Patient
+	Patient Patient // Define the Patient type above this line
+}
+
+type Patient struct {
+	gorm.Model
+	Name string
+	Age  int
 }

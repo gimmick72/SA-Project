@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import './promotion.css';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input, Button, Card } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 
 interface Item {
     id: number;
@@ -147,15 +148,10 @@ const Promotion = () => {
         }
     };
 
-    const handleAddItem = () => {
-        setModal({ visible: true, type: 'add', detail: '', itemIndex: null });
-    };
-
     const handleModalSave = () => {
         if (modal.type === 'add') {
-            // ดึงค่าจากฟอร์มใน modal
             if (!newItem.name || !newItem.service) return;
-            setItems([...items, { ...newItem, id: Date.now(), detail: modal.detail }]);
+            setItems([...items, { ...newItem, id: Date.now() }]);
             setNewItem({ name: "", service: "", detail: "", price: 0, startDate: "", endDate: "" });
         } else if (modal.type === 'view' && modal.itemIndex !== null) {
             const updated = [...items];
@@ -165,9 +161,34 @@ const Promotion = () => {
         setModal({ visible: false, type: null, detail: '', itemIndex: null });
     };
 
+
+    //  ลบข้อมูล
+    const [isCardVisible, setIsCardVisible] = useState(false);
+    const [itemIdToDelete, setItemIdToDelete] = useState<null | Number>(null);
+
     const handleDelete = (id: number) => {
         setItems(prev => prev.filter(item => item.id !== id));
+        setIsCardVisible(false);
     };
+
+    // ยืนยันการลบ
+    const confirmDelete = (id: number) => {
+        setItemIdToDelete(id);
+        setIsCardVisible(true);
+    };
+    const handleOk = () => {
+        // Filter out the item with the stored ID
+        setItems(prev => prev.filter(item => item.id !== itemIdToDelete));
+
+        // Clean up state
+        setIsCardVisible(false);
+        setItemIdToDelete(null);
+    };
+    const handleCancel = () => {
+        setIsCardVisible(false);
+        setItemIdToDelete(null);
+    };
+
 
     const handleEdit = (index: number) => setEditIndex(index);
     const handleSave = () => setEditIndex(null);
@@ -185,6 +206,10 @@ const Promotion = () => {
         }
     };
 
+    const handleNewItemChange = (field: keyof typeof newItem, value: any) => {
+        setNewItem(prev => ({ ...prev, [field]: value }));
+    };
+
 
     return (
         <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto 0 auto', display: 'flex', flexDirection: 'column', gap: '20px', boxSizing: 'border-box', position: 'relative', background: '#fff' }}>
@@ -194,9 +219,10 @@ const Promotion = () => {
                     allowClear
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    style={{ width: 350, marginRight: 16 }}
+                    style={{ width: 300, marginRight: 16 }}
                 />
-                <Button type="primary" onClick={handleAddItem}>+ เพิ่มโปรโมชัน</Button>
+                <Button className="add_Button"
+                    type="primary" onClick={() => openModal('add', null)}>+ เพิ่มโปรโมชัน</Button>
             </div>
             <div className="table-container">
                 <table className="item-table">
@@ -260,15 +286,59 @@ const Promotion = () => {
                                         />
                                     ) : item.endDate}
                                 </td>
-                                <td >
-                                    <Button danger onClick={() => handleDelete(item.id)}>ลบ</Button>
-                                    {editIndex === index ? (
-                                        <Button style={{ marginLeft: "8px" }}
-                                            onClick={handleSave}>บันทึก</Button>
-                                    ) : (
-                                        <Button style={{ marginLeft: "8px" }}
-                                            onClick={() => handleEdit(index)}>แก้ไข</Button>
+                                <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <Button danger onClick={() => confirmDelete(item.id)}><DeleteOutlined /> ลบ </Button>
+
+                                        {editIndex === index ? (
+                                            <Button style={{ marginLeft: "10px" }}
+                                                onClick={handleSave}>บันทึก</Button>
+                                        ) : (
+                                            <Button style={{ marginLeft: "10px" }}
+                                                onClick={() => handleEdit(index)}>แก้ไข</Button>
+                                        )}
+                                    </div>
+
+                                    {isCardVisible && (
+                                        <div
+                                            style={{
+                                                position: "fixed",
+                                                top: 0,
+                                                left: 0,
+                                                width: "100%",
+                                                height: "100%",
+                                                backgroundColor: "rgba(0,0,0,0)", // overlay
+                                                zIndex: 999,
+                                                pointerEvents: "auto", // ปิดการคลิก background ไม่ได้
+                                            }}
+                                        >
+                                            <Card
+                                                title="ยืนยันการลบ"
+                                                style={{
+                                                    width: 450,
+                                                    position: "absolute",
+                                                    top: "40%",
+                                                    left: "55%",
+                                                    transform: "translate(-50%, -50%)",
+                                                    zIndex: 1000,
+                                                    border: "2px solid #CBC6FF",
+                                                    pointerEvents: "auto", // ทำให้ card สามารถคลิกได้
+                                                }}
+                                                actions={[
+                                                    <Button key="cancel" onClick={handleCancel} style={{ width: 120 }}>
+                                                        ยกเลิก
+                                                    </Button>,
+                                                    <Button key="ok" type="primary" danger onClick={handleOk} style={{ width: 120 }}>
+                                                        ยืนยัน
+                                                    </Button>,
+                                                ]}
+                                            >
+                                                <p>คุณต้องการลบรายการนี้ใช่หรือไม่?</p>
+                                            </Card>
+                                        </div>
                                     )}
+
                                 </td>
                             </tr>
                         ))}
@@ -292,7 +362,7 @@ const Promotion = () => {
                         <Input
                             placeholder="ชื่อรายการ"
                             value={newItem.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
+                            onChange={(e) => handleNewItemChange('name', e.target.value)}
                         />
                         <Input
                             placeholder="บริการ"
@@ -302,8 +372,8 @@ const Promotion = () => {
                         <Input.TextArea
                             rows={3}
                             placeholder="รายละเอียด"
-                            value={modal.detail}
-                            onChange={(e) => setModal({ ...modal, detail: e.target.value })}
+                            value={newItem.detail}
+                            onChange={(e) => handleChange('detail', e.target.value)}
                         />
                         <Input
                             type="number"
@@ -323,6 +393,7 @@ const Promotion = () => {
                         />
                     </div>
                 )}
+
                 {/* ดูรายละเอียด */}
                 {modal.type === 'view' && (
                     <Input.TextArea

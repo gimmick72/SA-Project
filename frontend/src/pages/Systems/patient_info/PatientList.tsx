@@ -1,7 +1,7 @@
 import "./design/index.css";
-// import ".design/contact.css"
 import PatienTable from "./component_patient/table";
 import { useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 const PatientListPage = () => {
   const navigate = useNavigate();
@@ -22,9 +22,11 @@ const PatientListPage = () => {
 
       {/* พื้นที่ตาราง */}
       <div className="table-wrap">
-        <PatienTable />
+      <PatienTable />
+   
       </div>
     </div>
+    
   );
 };
 

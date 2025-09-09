@@ -10,27 +10,13 @@ const InitialSymptoms = Loadable(lazy(() => import("../../pages/Systems/patient_
 const HistoryPage = Loadable(lazy(() => import("../../pages/Systems/patient_info/HistoryPage")));
 const AddPatientPage = Loadable(lazy(() => import("../../pages/Systems/patient_info/AddPatientPage")));
 
-const PatientInfoPageRoute: RouteObject[] = [
-  {
-    index: true,
-    element: React.createElement(PatientListPage),
-  },
-  {
-    path: "detail",
-    element: React.createElement(PatientDetailPage),
-  },
-  {
-    path: "initial",
-    element: React.createElement(InitialSymptoms),
-  },
-  {
-    path: "patient-history",
-    element: React.createElement(HistoryPage),
-  },
-  {
-    path: "add-patient",
-    element: React.createElement(AddPatientPage),
-  },
+const PatientRoute: RouteObject[] = [
+  { index: true, element: React.createElement(PatientListPage) },
+  { path: "detail/:id", element: React.createElement(PatientDetailPage) },          
+  { path: "initial-symptoms/:id", element: React.createElement(InitialSymptoms) },  
+  { path: "patient-history/:id", element: React.createElement(HistoryPage) },
+  { path: "add-patient", element: React.createElement(AddPatientPage) },
+  // { path: "admin/patient", element: React.createElement(PatientListPage) },
 ];
 
-export default PatientInfoPageRoute;
+export { PatientRoute };

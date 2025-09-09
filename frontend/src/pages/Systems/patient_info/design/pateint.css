@@ -1,5 +1,16 @@
+html, body { height: 100%; }
+body { overflow-y: auto; }
+
+.form-shell {
+    height: 100vh;            /* สูงเท่าหน้าจอ */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;         /* กันสโครลซ้อน */
+  }
+  
+
 .wrapper {
-    margin-left: 2rem;
+    margin-left: 1rem;
     padding: 0;
     max-width: 100%;        
     /* border: 1px solid #ccc; */
@@ -164,3 +175,4 @@
     flex-direction: row;
     margin-bottom: 0.25rem;
 }
+
