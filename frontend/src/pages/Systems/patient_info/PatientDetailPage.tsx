@@ -1,16 +1,31 @@
-//Show OK
-//PUT not OK
-
+// src/pages/admin/patient/PatientDetail.tsx
 import "./design/pateint.css";
-import NavigateHeader  from "./component_patient/header_navigate";
+import NavigateHeader from "./component_patient/header_navigate";
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { message } from "antd";
+import {
+  Form,
+  Input,
+  DatePicker,
+  Radio,
+  Row,
+  Col,
+  Button,
+  Card,
+  message,
+  Space,
+  Select,
+  Divider,
+} from "antd";
+import dayjs, { Dayjs } from "dayjs";
+import th from "dayjs/locale/th";
 import { PatientAPI } from "../../../services/patient/patientApi";
 import { Patient } from "../../../interface/initailPatient/patient";
 
-/** yyyy-mm-dd from string | Date | ISO */
-const toDateInputValue = (v?: string | Date) => {
+dayjs.locale(th);
+
+/* ---------- helpers ---------- */
+function toDateInputValue(v?: string | Date) {
   if (!v) return "";
   const d = new Date(v);
   if (isNaN(d.getTime())) return "";
@@ -18,7 +33,7 @@ const toDateInputValue = (v?: string | Date) => {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
-};
+}
 
 const mapPatientToForm = (p: any) =>
   !p
@@ -33,13 +48,16 @@ const mapPatientToForm = (p: any) =>
         nickname: p.nickname ?? p.nickName ?? "",
         birthdate: toDateInputValue(p.birthday),
         age: p.age ?? "",
-        underlyingDisease: p.congenitadisease ?? "",
+        congenitaldisease: p.congenitaldisease ?? "",
         bloodtype: p.blood_type ?? "",
-        phone_number: p.phonenumber ?? "",
-        drug_allergy: p.drugallergy ?? "",
+        phone_number: p.phonenumber ?? p.phone_number ?? "",
+        drug_allergy: p.drugallergy ?? p.drug_allergy ?? "",
         relationship: p?.contactperson?.relationship ?? "",
         emergency_phone:
-          p?.contactperson?.phoneNumber ?? p?.contactperson?.phone ?? "",
+          p?.contactperson?.phoneNumber ??
+          p?.contactperson?.phone ??
+          p?.contactperson?.emergency_phone ??
+          "",
         house_number: p?.address?.house_number ?? p?.address?.houseNumber ?? "",
         Moo: p?.address?.moo ?? "",
         subdistict: p?.address?.subdistrict ?? p?.address?.subdistict ?? "",
@@ -48,7 +66,6 @@ const mapPatientToForm = (p: any) =>
         postcode: p?.address?.postcode ?? p?.address?.postalCode ?? "",
       };
 
-/** optional: คำนวนอายุจาก yyyy-mm-dd */
 const calcAgeFromBirth = (yyyy_mm_dd: string): string => {
   const dob = new Date(yyyy_mm_dd);
   if (isNaN(dob.getTime())) return "";
@@ -59,433 +76,407 @@ const calcAgeFromBirth = (yyyy_mm_dd: string): string => {
   return String(hasntBirthday ? age - 1 : age);
 };
 
+
+/* ---------- Component ---------- */
 const PatientDetail: React.FC = () => {
+  const [form] = Form.useForm();
   const { id: idFromPath } = useParams();
-  const [search] = useSearchParams();
+  const [search, setSearch] = useSearchParams();
   const navigate = useNavigate();
+  const [initialValues, setInitialValues] = useState<Patient>();
+
   const patientId = idFromPath ?? search.get("id");
+  const idNum = useMemo(() => Number(patientId), [patientId]);
 
   // mode: view(default) | edit
   const mode = (search.get("mode") ?? "view").toLowerCase();
   const READONLY = mode !== "edit";
 
-  const [formData, setFormData] = useState<any>({});
-  const idNum = useMemo(() => Number(patientId), [patientId]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // allergy UI state: "none" | "has"
+  const [allergyMode, setAllergyMode] = useState<"none" | "has">("none");
 
   const fetchPatientData = async (id: number) => {
     if (!Number.isFinite(id)) return;
-    const resp = await PatientAPI.getByID(id);
-    const patient = resp?.data ?? resp;
-    setFormData(mapPatientToForm(patient));
+    setLoading(true);
+    try {
+      const resp = await PatientAPI.getByID(id);
+      const patient = resp?.data ?? resp;
+      const f = mapPatientToForm(patient);
+      const initial = {
+        ...f,
+        birthdate: f.birthdate ? dayjs(f.birthdate) : undefined,
+      };
+
+      // อัพเดทค่าในฟอร์ม
+      form.setFieldsValue(initial);
+      setInitialValues(patient);
+
+      // ตั้งค่า mode แพ้ยา
+      setAllergyMode(initial.drug_allergy ? "has" : "none");
+    } catch (e) {
+      console.error("Error fetching patient:", e);
+      message.error("โหลดข้อมูลผู้ป่วยไม่สำเร็จ");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // เปิดโหมดแก้ไข
+  const handleEdit = () => {
+    setSearch({ ...Object.fromEntries(search.entries()), mode: "edit" });
+  };
+
+  // ยกเลิกการแก้ไข
+  const handleCancel = () => {
+    setSearch({ ...Object.fromEntries(search.entries()), mode: "view" });
+    // รีเซ็ตฟอร์มกลับเป็นค่าเดิม
+    if (initialValues) {
+      const f = mapPatientToForm(initialValues);
+      const resetValues = {
+        ...f,
+        birthdate: f.birthdate ? dayjs(f.birthdate) : undefined,
+      };
+      form.setFieldsValue(resetValues);
+      setAllergyMode(resetValues.drug_allergy ? "has" : "none");
+    }
   };
 
   useEffect(() => {
     if (Number.isFinite(idNum)) fetchPatientData(idNum);
   }, [idNum]);
 
-  // ---------- Change handlers ----------
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (READONLY) return;
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
+  // คำนวณอายุอัตโนมัติเมื่อเปลี่ยนวันเกิด
+  const onBirthChange = (d: Dayjs | null) => {
+    form.setFieldsValue({
+      birthdate: d,
+      age: d ? calcAgeFromBirth(d.format("YYYY-MM-DD")) : "",
+    });
   };
 
-  const handleGenderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (READONLY) return;
-    setFormData((prev: any) => ({ ...prev, gender: e.target.value }));
-  };
-
-  const handleBirthdateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (READONLY) return;
-    const v = e.target.value; // yyyy-mm-dd
-    const age = calcAgeFromBirth(v);
-    setFormData((prev: any) => ({ ...prev, birthdate: v, age }));
-  };
-
-  // ---------- Save (ตัวอย่าง) ----------
-  const handleSave = async () => {
+  const onFinish = async (values: any) => {
     if (READONLY || !Number.isFinite(idNum)) return;
-  
-    const payload = buildPayload(formData);
-  
+
+    // สร้าง payload โดยตรง
+    const payload: Patient = {
+      citizenID: values.citizenID,
+      prefix: values.prefix,
+      firstname: values.firstname,
+      lastname: values.lastname,
+      nickname: values.nickname,
+      congenitaldisease: values.underlyingDisease,
+      blood_type: values.bloodtype,
+      gender: values.gender,
+      birthday: values.birthdate
+        ? (values.birthdate as Dayjs).startOf("day").toDate().toISOString()
+        : undefined,
+      phone_number: values.phone_number,
+      age: values.age ? Number(values.age) : undefined,
+      drug_allergy: allergyMode === "has" ? values.drug_allergy : "",
+      contactperson: {
+        relationship: values.relationship,
+        emergency_phone: values.emergency_phone,
+      },
+      address: {
+        house_number: values.house_number,
+        moo: values.Moo,
+        subdistrict: values.subdistict,
+        district: values.distict,
+        province: values.province,
+        postcode: values.postcode,
+      },
+    };
+
     try {
-      await PatientAPI.update(idNum, payload);
+      setSaving(true);
+      console.log("Updating patient with payload:", payload);
+
+      const response = await PatientAPI.update(idNum, payload);
+      console.log("Update response:", response);
+
       message.success("บันทึกสำเร็จ");
-      navigate(`/admin/patient/detail/${idNum}?mode=view`);
+
+      // รีเฟรชข้อมูลหลังอัพเดท
+      await fetchPatientData(idNum);
+
+      // เปลี่ยนกลับเป็น view mode
+      setSearch({ ...Object.fromEntries(search.entries()), mode: "view" });
     } catch (e: any) {
-      console.error(e);
-      message.error(e?.response?.data?.error || e?.message || "บันทึกไม่สำเร็จ");
+      console.error("Update error:", e);
+      const errorMessage =
+        e?.response?.data?.error ||
+        e?.response?.data?.message ||
+        e?.message ||
+        "บันทึกไม่สำเร็จ";
+      message.error(errorMessage);
+    } finally {
+      setSaving(false);
     }
   };
-  
 
   return (
     <div className="wrapper">
-      <NavigateHeader /> 
-      <div style={{ paddingLeft: "3rem" }}>
-        {/* --- row1 --- */}
-        <div className="row1">
-          <div>
-            <div>รหัสคนไข้</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="patientID"
-              name="patientID"
-              value={formData.patientID ?? ""}
-              readOnly
-              autoComplete="off"
-            />
-          </div>
+      <NavigateHeader />
 
-          <div>
-            <div>เลขบัตรประชาชน</div>
-            <input
-              className="inputbox"
-              type="text"
-              id="citizenID"
-              name="citizenID"
-              value={formData.citizenID ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-
-          <div>
-            <label>เพศ</label>
-            <div className="gender-options">
-              <input
-                type="radio"
-                id="male"
-                name="gender"
-                value="male"
-                checked={formData.gender === "male"}
-                disabled={READONLY}
-                onChange={READONLY ? undefined : handleGenderChange}
-              />
-              <label htmlFor="male">ชาย</label>
-              <input
-                type="radio"
-                id="female"
-                name="gender"
-                value="female"
-                checked={formData.gender === "female"}
-                disabled={READONLY}
-                onChange={READONLY ? undefined : handleGenderChange}
-              />
-              <label htmlFor="female">หญิง</label>
-            </div>
-          </div>
-        </div>
-
-        {/* --- row2 --- */}
-        <div className="row2">
-          <div>
-            <div>คำนำหน้า</div>
-            <input
-              className="inputbox"
-              id="prefix"
-              name="prefix"
-              value={formData.prefix ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>ชื่อ</div>
-            <input
-              className="inputbox"
-              id="firstname"
-              name="firstname"
-              value={formData.firstname ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>นามสกุล</div>
-            <input
-              className="inputbox"
-              id="lastname"
-              name="lastname"
-              value={formData.lastname ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>ชื่อเล่น</div>
-            <input
-              className="inputbox"
-              id="nickname"
-              name="nickname"
-              value={formData.nickname ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-
-        {/* --- row3 --- */}
-        <div className="row3">
-          <div>
-            <div>วันเกิด</div>
-            <input
-              className="inputbox"
-              type="date"
-              id="birthdate"
-              name="birthdate"
-              value={formData.birthdate ?? ""}
-              disabled={READONLY}
-              onChange={READONLY ? undefined : handleBirthdateChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>อายุ (ปี)</div>
-            <input
-              className="inputbox"
-              id="age"
-              name="age"
-              value={formData.age ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>โรคประจำตัว</div>
-            <input
-              className="inputbox"
-              id="underlyingDisease"
-              name="underlyingDisease"
-              value={formData.underlyingDisease ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>หมู่เลือด</div>
-            <input
-              className="inputbox"
-              id="bloodtype"
-              name="bloodtype"
-              value={formData.bloodtype ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>เบอร์โทรศัพท์</div>
-            <input
-              className="inputbox"
-              id="phone_number"
-              name="phone_number"
-              value={formData.phone_number ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-
-        {/* --- row5 --- */}
-        <div className="row5">
-          <div>
-            <span
-              style={{
-                fontWeight: 700,
-                width: "100px",
-                marginRight: "3rem",
-                fontSize: "16px",
-              }}
-            >
-              แพ้ยา
-            </span>
-            <input
-              className="drug-allergy-input"
-              id="drug_allergy"
-              name="drug_allergy"
-              placeholder="เช่น เพนิซิลลิน"
-              value={formData.drug_allergy ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-
-        {/* --- row7 --- */}
-        <div className="row7">
-          <div>
-            <span style={{ width: "80px", fontWeight: 700, fontSize: "16px" }}>
-              ผู้ที่ติดต่อได้
-            </span>
-            <span style={{ marginLeft: "2rem", marginRight: "1rem" }}>
-              ความสัมพันธ์
-            </span>
-            <input
-              className="contact-inputbox"
-              id="relationship"
-              name="relationship"
-              value={formData.relationship ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-            <span style={{ marginLeft: "2rem", marginRight: "1rem" }}>
-              เบอร์โทรศัพท์
-            </span>
-            <input
-              className="contact-inputbox"
-              id="emergency_phone"
-              name="emergency_phone"
-              value={formData.emergency_phone ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-
-        {/* --- address --- */}
-        <div style={{ width: "80px", fontWeight: 700, fontSize: "16px" }}>
-          ที่อยู่
-        </div>
-        <br />
-        <div className="address-row1">
-          <div>
-            <div>เลขที่</div>
-            <input
-              className="address-box"
-              id="house_number"
-              name="house_number"
-              value={formData.house_number ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>หมู่</div>
-            <input
-              className="address-box"
-              id="Moo"
-              name="Moo"
-              value={formData.Moo ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>ตำบล/แขวง</div>
-            <input
-              className="address-box"
-              id="subdistict"
-              name="subdistict"
-              value={formData.subdistict ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>อำเภอ/เขต</div>
-            <input
-              className="address-box"
-              id="distict"
-              name="distict"
-              value={formData.distict ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>จังหวัด</div>
-            <input
-              className="address-box"
-              id="province"
-              name="province"
-              value={formData.province ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div>รหัสไปรษณีย์</div>
-            <input
-              className="address-box"
-              id="postcode"
-              name="postcode"
-              value={formData.postcode ?? ""}
-              readOnly={READONLY}
-              onChange={READONLY ? undefined : handleChange}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="button">
-        <button
-          type="button"
-          className="save-button"
-          disabled={READONLY}
-          onClick={handleSave}
-        >
-          บันทึก
-        </button>
-        <button
-          type="button"
-          className="cancel-button"
-          onClick={() => {
-            window.location.href = "/admin/patient";
+      <Card
+        loading={loading}
+        style={{ margin: 16 }}
+        bodyStyle={{ paddingTop: 8 }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
           }}
         >
-          กลับ
-        </button>
-      </div>
+          <h2 style={{ margin: 0 }}>ข้อมูลประจำตัว</h2>
+          {READONLY && (
+            <Button type="primary" onClick={handleEdit}>
+              แก้ไขข้อมูล
+            </Button>
+          )}
+        </div>
+
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          disabled={READONLY}
+          requiredMark="optional"
+        >
+          {/* แถว 1 */}
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="เลขบัตรประชาชน"
+                name="citizenID"
+                rules={[{ required: true, message: "กรุณากรอกเลขบัตรประชาชน" }]}
+              >
+                <Input placeholder="เลขบัตรประชาชน" maxLength={13} />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="คำนำหน้า"
+                name="prefix"
+                rules={[{ required: true, message: "กรุณากรอกคำนำหน้า" }]}
+              >
+                <Input placeholder="คำนำหน้า" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item label="รหัสคนไข้" name="patientID">
+                <Input readOnly />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* แถว 2 */}
+          <Row gutter={16}>
+            <Col xs={24} md={6}>
+              <Form.Item
+                label="ชื่อ"
+                name="firstname"
+                rules={[{ required: true, message: "กรุณากรอกชื่อ" }]}
+              >
+                <Input placeholder="ชื่อ" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={6}>
+              <Form.Item
+                label="นามสกุล"
+                name="lastname"
+                rules={[{ required: true, message: "กรุณากรอกนามสกุล" }]}
+              >
+                <Input placeholder="นามสกุล" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={6}>
+              <Form.Item label="ชื่อเล่น" name="nickname">
+                <Input placeholder="ชื่อเล่น" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={6}>
+              <Form.Item
+                label="หมายเลขโทรศัพท์"
+                name="phone_number"
+                rules={[
+                  { required: true, message: "กรุณากรอกหมายเลขโทรศัพท์" },
+                ]}
+              >
+                <Input placeholder="หมายเลขโทรศัพท์" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* แถว 3 */}
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="เพศ"
+                name="gender"
+                rules={[{ required: true, message: "กรุณาเลือกเพศ" }]}
+              >
+                <Radio.Group>
+                  <Radio value="male">ชาย</Radio>
+                  <Radio value="female">หญิง</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="วันเกิด"
+                name="birthdate"
+                rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  placeholder="Select date"
+                  format="YYYY-MM-DD"
+                  onChange={onBirthChange}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item label="อายุ (ปี)" name="age" initialValue={0}>
+                <Input placeholder="0" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* แถว 4 */}
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item label="โรคประจำตัว" name="congenitadisease">
+                <Input placeholder="โรคประจำตัว" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item label="หมู่เลือด" name="bloodtype">
+                <Select
+                  placeholder="หมู่เลือด"
+                  allowClear
+                  options={[
+                    { value: "A", label: "A" },
+                    { value: "B", label: "B" },
+                    { value: "AB", label: "AB" },
+                    { value: "O", label: "O" },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* แพ้ยา */}
+          <Divider />
+          <Row gutter={16}>
+            <Col xs={24} md={24}>
+              <Form.Item label="แพ้ยา" required>
+                <Space direction="horizontal" wrap>
+                  <Radio.Group
+                    value={allergyMode}
+                    onChange={(e) => {
+                      const v = e.target.value as "none" | "has";
+                      setAllergyMode(v);
+                      if (v === "none")
+                        form.setFieldsValue({ drug_allergy: "" });
+                    }}
+                    disabled={READONLY}
+                  >
+                    <Radio value="none">ปกิเสธการแพ้ยา</Radio>
+                    <Radio value="has">แพ้ยา</Radio>
+                  </Radio.Group>
+                  <Form.Item name="drug_allergy" noStyle>
+                    <Input
+                      placeholder="ชื่อยาที่แพ้ (เช่น เพนิซิลลิน)"
+                      style={{ width: 320 }}
+                      disabled={READONLY || allergyMode === "none"}
+                    />
+                  </Form.Item>
+                </Space>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ผู้ติดต่อได้ */}
+          <Divider />
+          <h4 style={{ marginTop: 0 }}>ผู้ที่ติดต่อได้</h4>
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <Form.Item label="ความสัมพันธ์" name="relationship">
+                <Input placeholder="ความสัมพันธ์" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item label="หมายเลขโทรศัพท์" name="emergency_phone">
+                <Input placeholder="หมายเลขโทรศัพท์" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ที่อยู่ */}
+          <Divider />
+          <h4 style={{ marginTop: 0 }}>ที่อยู่</h4>
+          <Row gutter={16}>
+            <Col xs={24} md={6}>
+              <Form.Item label="เลขที่" name="house_number">
+                <Input placeholder="เลขที่" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={6}>
+              <Form.Item label="หมู่ที่" name="Moo">
+                <Input placeholder="หมู่ที่" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={6}>
+              <Form.Item label="ตำบล/แขวง" name="subdistict">
+                <Input placeholder="ตำบล/แขวง" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={6}>
+              <Form.Item label="อำเภอ/เขต" name="distict">
+                <Input placeholder="อำเภอ/เขต" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item label="จังหวัด" name="province">
+                <Input placeholder="จังหวัด" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item label="รหัสไปรษณีย์" name="postcode">
+                <Input placeholder="รหัสไปรษณีย์" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ปุ่ม */}
+          <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+            <Button onClick={() => navigate("/admin/patient")}>ยกเลิก</Button>
+            {!READONLY && (
+              <>
+                <Button onClick={handleCancel}>ยกเลิกการแก้ไข</Button>
+                <Button type="primary" htmlType="submit" loading={saving}>
+                  บันทึก
+                </Button>
+              </>
+            )}
+          </Space>
+        </Form>
+      </Card>
     </div>
   );
 };
 
 export default PatientDetail;
-function buildPayload(formData: any): Patient {
-  return {
-    citizenID: formData.citizenID,
-    prefix: formData.prefix,
-    firstname: formData.firstname,
-    lastname: formData.lastname,
-    nickname: formData.nickname,
-    congenitadisease: formData.underlyingDisease,
-    blood_type: formData.bloodtype,
-    gender: formData.gender,
-    birthday: formData.birthdate,
-    phone_number: formData.phone_number,
-    age: formData.age ? Number(formData.age) : undefined,
-    drug_allergy: formData.drug_allergy,
-    contactperson: {
-      relationship: formData.relationship,
-      emergency_phone: formData.emergency_phone,
-    },
-    address: {
-      house_number: formData.house_number,
-      moo: formData.Moo,
-      subdistrict: formData.subdistict,
-      district: formData.distict,
-      province: formData.province,
-      postcode: formData.postcode,
-    },
-  };
-}
-

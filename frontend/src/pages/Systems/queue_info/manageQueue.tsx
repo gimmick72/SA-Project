@@ -1,55 +1,49 @@
-// ManageQueue.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Row,
-  Col,
-  Card,
-  Statistic,
-  Divider,
-  DatePicker,
-  Space,
-  Button,
-  Table,
-  Modal,
-  Typography,
-  InputNumber,
-  message,
-  Tag, // NEW
+  Row, Col, Card, Statistic, Divider, DatePicker, Space,
+  Button, Table, Modal, Typography, InputNumber, message, Tag,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
 
-type SegKey = "morning" | "afternoon" | "evening";
+// ⬇️ interfaces/service กลาง (ปรับ path ให้ตรงโปรเจกต์)
+import type { SegKey } from "../../../interface/bookingQueue";
+import {
+  upsertSlots,
+  listSlotsByDate,
+  listBookingsByDate,
+} from "../../../services/booking/bookingApi";
 
-type SlotRow = {
+
+const { Text } = Typography;
+
+// ── UI interfaces ───────────────────────────────────────────
+export interface SlotRow {
   key: string;      // "HHmm"
   time: string;     // "HH:mm"
-  capacity: number; // คิว/ช่วง (จำนวนรับสูงสุดของช่องเวลา)
-};
+  capacity: number; // คิว/ช่วง
+}
 
-type PeriodState = {
+export interface PeriodState {
   range: [Dayjs, Dayjs];
-  capacity: number;   // default คิว/ชั่วโมง (ใน modal ตั้งค่า)
-  slots: SlotRow[];   // เฉพาะที่เปิดรับ (capacity > 0)
+  capacity: number;    // default คิว/ชั่วโมง
+  slots: SlotRow[];    // เฉพาะที่เปิดรับ (capacity > 0)
   selectedKeys: React.Key[];
-};
+}
 
-// NEW: โครงสร้างรายการจอง
-type Booking = {
+export interface Booking {
   id: number;
   patientName: string;
   patientCode?: string;
   phone?: string;
   note?: string;
   status?: "reserved" | "checked_in" | "done" | "cancelled";
-};
+}
 
-const { Text } = Typography;
-
+// ── helpers ─────────────────────────────────────────────────
 const segLabel = (v: SegKey) =>
   v === "morning" ? "ช่วงเช้า" : v === "afternoon" ? "ช่วงบ่าย" : "ช่วงเย็น";
 
-// NEW: ช่วยสร้าง id ของช่องเวลา (ผูกกับวันที่)
 const slotId = (date: Dayjs, hhmm: string) => `${date.format("YYYY-MM-DD")}-${hhmm}`;
 
 const buildSlots = (range: [Dayjs, Dayjs], cap: number): SlotRow[] => {
@@ -65,6 +59,7 @@ const buildSlots = (range: [Dayjs, Dayjs], cap: number): SlotRow[] => {
 
 const ManageQueue: React.FC = () => {
   const [date, setDate] = useState<Dayjs>(dayjs());
+  
 
   const [periods, setPeriods] = useState<Record<SegKey, PeriodState>>({
     morning: {
@@ -87,7 +82,6 @@ const ManageQueue: React.FC = () => {
     },
   });
 
-  /** รีเซ็ตคิวกลับเป็น 0 แต่คงช่วงเวลาเดิมไว้ */
   const resetQueuesToZero = () =>
     setPeriods((prev) => ({
       morning: { ...prev.morning, slots: [], selectedKeys: [] },
@@ -95,15 +89,22 @@ const ManageQueue: React.FC = () => {
       evening: { ...prev.evening, slots: [], selectedKeys: [] },
     }));
 
-  /** ตั้ง timer ให้รีเซ็ตอัตโนมัติเมื่อถึงเที่ยงคืนของวันถัดไป */
+  // โหลดข้อมูลครั้งแรก
+  useEffect(() => {
+    void refreshForDate(date);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // รีเซ็ตตอนเที่ยงคืน แล้วรีเฟรชของวันใหม่
   useEffect(() => {
     const now = dayjs();
     const nextMidnight = now.add(1, "day").startOf("day");
     const ms = nextMidnight.diff(now, "millisecond");
-    const id = window.setTimeout(() => {
+    const id = window.setTimeout(async () => {
       resetQueuesToZero();
-      setDate(dayjs());
-      setBookingsBySlot({}); // NEW: ล้างรายการจองของวันเก่า
+      const today = dayjs();
+      setDate(today);
+      await refreshForDate(today);
       message.info("รีเซ็ตคิวสำหรับวันใหม่แล้ว");
     }, ms);
     return () => window.clearTimeout(id);
@@ -116,31 +117,11 @@ const ManageQueue: React.FC = () => {
     return full.map((s) => ({ ...s, capacity: map.get(s.key) ?? 0 }));
   };
 
-  // ===== NEW: จัดการข้อมูล "รายการจอง" ต่อช่องเวลา =====
-  // map key = `${YYYY-MM-DD}-${HHmm}` → Booking[]
+  // ===== จัดการข้อมูล "รายการจอง" ต่อช่องเวลา =====
   const [bookingsBySlot, setBookingsBySlot] = useState<Record<string, Booking[]>>({});
-
-  // ตัวอย่างการดึงข้อมูลจองจาก backend (ใส่ของจริงแทนส่วน mock นี้)
-  useEffect(() => {
-    // TODO: เรียก API ของคุณ เช่น GET /api/appointments?date=YYYY-MM-DD
-    // แล้วแปลงผลลัพธ์เป็น map ตามรูปแบบด้านล่าง จากนั้น setBookingsBySlot(map)
-    // ---- MOCK DEMO: ลองใส่รายการจองสัก 2 ช่องเวลา ----
-    const demo: Record<string, Booking[]> = {};
-    // 09:00 มี 1 คน
-    demo[slotId(date, "0900")] = [
-      { id: 1, patientName: "น.ส. พิมพ์ชนก ใจดี", phone: "08x-xxx-xxxx", status: "reserved", note: "นัดตรวจ" },
-    ];
-    // 14:00 มี 2 คน
-    demo[slotId(date, "1400")] = [
-      { id: 2, patientName: "นาย ธนกฤต เก่งมาก", patientCode: "PT-0007", status: "checked_in" },
-      { id: 3, patientName: "นาง สมฤดี สุขใจ", phone: "09x-xxx-xxxx", status: "reserved" },
-    ];
-    setBookingsBySlot(demo);
-  }, [date]);
-
   const countBooked = (hhmm: string) => (bookingsBySlot[slotId(date, hhmm)]?.length ?? 0);
 
-  // KPI
+  // ── KPI ───────────────────────────────────────────────────
   const totalOpen = useMemo(
     () =>
       (["morning", "afternoon", "evening"] as SegKey[])
@@ -152,7 +133,6 @@ const ManageQueue: React.FC = () => {
     () => Object.values(bookingsBySlot).reduce((a, arr) => a + arr.length, 0),
     [bookingsBySlot]
   );
-
   const stats = [
     { title: "ทั้งหมด", value: totalOpen },
     { title: "ว่าง", value: Math.max(totalOpen - totalBooked, 0) },
@@ -160,14 +140,13 @@ const ManageQueue: React.FC = () => {
     { title: "รอรับบริการ", value: 0 },
   ];
 
-  // ===== Modal ตั้งค่า (เดิม) =====
+  // ===== Modal ตั้งค่า =====
   const [active, setActive] = useState<SegKey | null>(null);
   const open = active !== null;
   const [tmpRange, setTmpRange] = useState<[Dayjs, Dayjs] | null>(null);
   const [tmpCap, setTmpCap] = useState<number>(1);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [capByKey, setCapByKey] = useState<Record<string, number>>({});
-  const [bulkCap, setBulkCap] = useState<number>(1);
 
   const openModal = (k: SegKey) => {
     setActive(k);
@@ -177,75 +156,104 @@ const ManageQueue: React.FC = () => {
     const defaultKeys =
       periods[k].selectedKeys.length > 0
         ? periods[k].selectedKeys
-        : buildSlots(periods[k].range, periods[k].capacity).map(
-            (s) => `${k}-${s.key}`
-          );
+        : buildSlots(periods[k].range, periods[k].capacity).map((s) => `${k}-${s.key}`);
     setSelectedKeys(defaultKeys);
 
     const prevMap: Record<string, number> = {};
     periods[k].slots.forEach((s) => (prevMap[`${k}-${s.key}`] = s.capacity));
     setCapByKey(prevMap);
-
-    setBulkCap(periods[k].capacity);
   };
 
   const closeModal = () => setActive(null);
 
-  type PreviewRow = SlotRow & { period: SegKey; key: string };
+  interface PreviewRow extends SlotRow { period: SegKey; key: string }
   const previewRows: PreviewRow[] = useMemo(() => {
     if (!active || !tmpRange) return [];
     const base = buildSlots(tmpRange, tmpCap);
     return base.map((s) => {
       const key = `${active}-${s.key}`;
-      return {
-        ...s,
-        key,
-        period: active,
-        capacity: capByKey[key] ?? tmpCap,
-      };
+      return { ...s, key, period: active, capacity: capByKey[key] ?? tmpCap };
     });
   }, [active, tmpRange, tmpCap, capByKey]);
 
-  useEffect(() => {
-    if (!active) return;
-    setSelectedKeys(previewRows.map((r) => r.key));
-  }, [active, previewRows.length]);
-
-  const applyModal = () => {
+  // ✅ บันทึกขึ้น backend แล้วรีเฟรช
+  const applyModal = async () => {
     if (!active || !tmpRange) return;
-    setPeriods((prev) => {
-      const full = buildSlots(tmpRange, tmpCap);
-      const chosen = full
-        .map((s) => {
-          const key = `${active}-${s.key}`;
-          const cap =
-            capByKey[key] ??
-            (selectedKeys.includes(key) ? tmpCap : 0);
-          return { ...s, capacity: cap };
-        })
-        .filter((s) => s.capacity > 0);
 
-      const chosenKeys = chosen.map((s) => `${active}-${s.key}`);
+    // ถ้า "ไม่ติ๊ก" = capacity 0 เสมอ
+    const items = buildSlots(tmpRange, tmpCap)
+      .map((s) => {
+        const key = `${active}-${s.key}`;
+        const isSelected = selectedKeys.includes(key);
+        const cap = isSelected ? (capByKey[key] ?? tmpCap) : 0;
+        return { hhmm: s.key, capacity: cap };
+      })
+      .filter((s) => s.capacity > 0);
 
-      return {
-        ...prev,
-        [active]: {
-          range: tmpRange,
-          capacity: tmpCap,
-          slots: chosen,
-          selectedKeys: chosenKeys,
-        },
-      };
-    });
-    setActive(null);
+    try {
+      await upsertSlots(date, active, items);
+      message.success("บันทึกตารางคิวเรียบร้อย");
+      await refreshForDate(date);
+    } catch (e: any) {
+      message.error(e?.response?.data?.error ?? "บันทึกตารางคิวไม่สำเร็จ");
+    } finally {
+      setActive(null);
+    }
   };
 
-  // เปลี่ยนวัน = ล้างตารางรับ & (ควร) โหลดรายการจองของวันนั้นใหม่
-  const onChangeDate = (d: Dayjs | null) => {
+  // เปลี่ยนวัน = โหลดจาก backend
+  const onChangeDate = async (d: Dayjs | null) => {
     if (!d) return;
     setDate(d);
-    resetQueuesToZero();
-    setBookingsBySlot({}); // NEW
+    await refreshForDate(d);
+  };
+
+  // โหลด slots + bookings จาก backend แล้วยัดเข้า state
+  const refreshForDate = async (d: Dayjs) => {
+    try {
+      const [slots, bks] = await Promise.all([listSlotsByDate(d), listBookingsByDate(d)]);
+
+      // map slots -> periods
+      setPeriods((prev) => {
+        const toSeg = (seg: SegKey): SlotRow[] =>
+          slots
+            .filter((s) => s.segment === seg)
+            .map(
+              (s) =>
+                ({
+                  key: s.hhmm,
+                  time: `${s.hhmm.slice(0, 2)}:${s.hhmm.slice(2, 4)}`,
+                  capacity: s.capacity,
+                } as SlotRow)
+            );
+
+        const m = toSeg("morning");
+        const a = toSeg("afternoon");
+        const e = toSeg("evening");
+
+        return {
+          morning: { ...prev.morning, slots: m, selectedKeys: m.map((s) => `morning-${s.key}`) },
+          afternoon: { ...prev.afternoon, slots: a, selectedKeys: a.map((s) => `afternoon-${s.key}`) },
+          evening: { ...prev.evening, slots: e, selectedKeys: e.map((s) => `evening-${s.key}`) },
+        };
+      });
+
+      // map bookings -> bookingsBySlot
+      const map: Record<string, Booking[]> = {};
+      bks.forEach((b) => {
+        const key = `${dayjs(b.date).format("YYYY-MM-DD")}-${b.hhmm}`;
+        (map[key] ??= []).push({
+          id: b.id,
+          patientName: `${b.firstName} ${b.lastName}`,
+          phone: b.phone,
+          status: (b.status as Booking["status"]) ?? "reserved",
+        });
+      });
+      setBookingsBySlot(map);
+    } catch (e) {
+      resetQueuesToZero();
+      setBookingsBySlot({});
+    }
   };
 
   // ====== View Modal (อ่านอย่างเดียว) + แสดงผู้จอง ======
@@ -253,22 +261,16 @@ const ManageQueue: React.FC = () => {
   const openView = (k: SegKey) => setViewSeg(k);
   const closeView = () => setViewSeg(null);
 
-  // คอลัมน์หลักของการดูตาราง (เพิ่ม “จองแล้ว”)
-  type ViewRow = SlotRow & { booked: number };
+  interface ViewRow extends SlotRow { booked: number }
   const viewCols: ColumnsType<ViewRow> = [
     { title: "เวลา", dataIndex: "time", width: 100 },
     { title: "คิว/ช่วง", dataIndex: "capacity", width: 110 },
     { title: "จองแล้ว", dataIndex: "booked", width: 100 },
   ];
 
-  // คอลัมน์รายการผู้จอง (expanded)
   const bookingCols: ColumnsType<Booking> = [
     { title: "ชื่อผู้จอง", dataIndex: "patientName", width: 220 },
-    {
-      title: "เบอร์",
-      render: (_, r) => r.patientCode ?? r.phone ?? "-",
-      width: 140,
-    },
+    { title: "เบอร์", render: (_, r) => r.patientCode ?? r.phone ?? "-", width: 140 },
     {
       title: "สถานะ",
       dataIndex: "status",
@@ -281,19 +283,15 @@ const ManageQueue: React.FC = () => {
         return <Tag color={color}>{s ?? "reserved"}</Tag>;
       },
     },
-    { title: "หมายเหตุ", dataIndex: "note" },
+  
   ];
 
-  // DataSource สำหรับ View Modal
+  // ✅ แสดงเฉพาะช่องที่เปิดรับจริง
   const viewData: ViewRow[] = useMemo(() => {
     if (!viewSeg) return [];
-    return getDisplaySlots(viewSeg).map((s) => ({
-      ...s,
-      booked: countBooked(s.key),
-    }));
+    return periods[viewSeg].slots.map((s) => ({ ...s, booked: countBooked(s.key) }));
   }, [viewSeg, periods, bookingsBySlot, date]);
 
-  // คอลัมน์ตารางทั่วไปในหน้า (เดิม)
   const baseCols: ColumnsType<SlotRow> = [
     { title: "เวลา", dataIndex: "time", width: 100 },
     { title: "คิว/ช่วง", dataIndex: "capacity", width: 120 },
@@ -329,7 +327,11 @@ const ManageQueue: React.FC = () => {
         <Col>
           <Space>
             <span>วันที่:</span>
-            <DatePicker value={date} onChange={onChangeDate} allowClear={false} />
+            <DatePicker
+              value={date}
+              onChange={onChangeDate}
+              allowClear={false}
+            />
           </Space>
         </Col>
       </Row>
@@ -342,15 +344,24 @@ const ManageQueue: React.FC = () => {
             title="ช่วงเช้า"
             extra={<Text type="secondary">{date.format("YYYY-MM-DD")}</Text>}
             actions={[
-              <Button key="view" type="link" onClick={() => openView("morning")}>
+              <Button
+                key="view"
+                type="link"
+                onClick={() => openView("morning")}
+              >
                 ดูตาราง
               </Button>,
-              <Button key="set" type="link" onClick={() => openModal("morning")}>
+              <Button
+                key="set"
+                type="link"
+                onClick={() => openModal("morning")}
+              >
                 เปิดรับคิว
               </Button>,
             ]}
           >
-            เปิดรับแล้ว {periods.morning.slots.reduce((a, b) => a + b.capacity, 0)} คิว
+            เปิดรับแล้ว{" "}
+            {periods.morning.slots.reduce((a, b) => a + b.capacity, 0)} คิว
           </Card>
         </Col>
 
@@ -360,15 +371,24 @@ const ManageQueue: React.FC = () => {
             title="ช่วงบ่าย"
             extra={<Text type="secondary">{date.format("YYYY-MM-DD")}</Text>}
             actions={[
-              <Button key="view" type="link" onClick={() => openView("afternoon")}>
+              <Button
+                key="view"
+                type="link"
+                onClick={() => openView("afternoon")}
+              >
                 ดูตาราง
               </Button>,
-              <Button key="set" type="link" onClick={() => openModal("afternoon")}>
+              <Button
+                key="set"
+                type="link"
+                onClick={() => openModal("afternoon")}
+              >
                 เปิดรับคิว
               </Button>,
             ]}
           >
-            เปิดรับแล้ว {periods.afternoon.slots.reduce((a, b) => a + b.capacity, 0)} คิว
+            เปิดรับแล้ว{" "}
+            {periods.afternoon.slots.reduce((a, b) => a + b.capacity, 0)} คิว
           </Card>
         </Col>
 
@@ -378,28 +398,36 @@ const ManageQueue: React.FC = () => {
             title="ช่วงเย็น"
             extra={<Text type="secondary">{date.format("YYYY-MM-DD")}</Text>}
             actions={[
-              <Button key="view" type="link" onClick={() => openView("evening")}>
+              <Button
+                key="view"
+                type="link"
+                onClick={() => openView("evening")}
+              >
                 ดูตาราง
               </Button>,
-              <Button key="set" type="link" onClick={() => openModal("evening")}>
+              <Button
+                key="set"
+                type="link"
+                onClick={() => openModal("evening")}
+              >
                 เปิดรับคิว
               </Button>,
             ]}
           >
-            เปิดรับแล้ว {periods.evening.slots.reduce((a, b) => a + b.capacity, 0)} คิว
+            เปิดรับแล้ว{" "}
+            {periods.evening.slots.reduce((a, b) => a + b.capacity, 0)} คิว
           </Card>
         </Col>
       </Row>
 
-   
+      
 
-      {/* ===== View Modal: อ่าน + เห็นรายชื่อผู้จองต่อช่องเวลา ===== */}
+      {/* View Modal */}
       <Modal
         open={!!viewSeg}
         onCancel={closeView}
         footer={null}
         width={600}
-
         title={
           viewSeg ? (
             <div>
@@ -436,7 +464,7 @@ const ManageQueue: React.FC = () => {
         />
       </Modal>
 
-      {/* ===== Modal ตั้งค่า (ของเดิม) ===== */}
+      {/* Setting Modal */}
       <Modal
         open={open}
         onCancel={closeModal}
@@ -448,7 +476,9 @@ const ManageQueue: React.FC = () => {
           <div>
             กำหนดจำนวนรับ{" "}
             <Text type="secondary">วันที่ {date.format("DD-MM-YYYY")}</Text>
-            {active && <Text style={{ marginLeft: 8 }}>{segLabel(active)}</Text>}
+            {active && (
+              <Text style={{ marginLeft: 8 }}>{segLabel(active)}</Text>
+            )}
           </div>
         }
       >
@@ -470,18 +500,25 @@ const ManageQueue: React.FC = () => {
                 title: "คิว/ช่วง",
                 dataIndex: "capacity",
                 width: 160,
-                render: (_: number, record: any) => (
-                  <InputNumber
-                    min={0}
-                    size="small"
-                    value={capByKey[record.key] ?? tmpCap}
-                    onChange={(v) =>
-                      v !== null &&
-                      setCapByKey((prev) => ({ ...prev, [record.key]: v ?? 0 }))
-                    }
-                    style={{ width: 120 }}
-                  />
-                ),
+                render: (_: number, record: any) => {
+                  const isSelected = selectedKeys.includes(record.key);
+                  return (
+                    <InputNumber
+                      min={0}
+                      size="small"
+                      value={capByKey[record.key] ?? tmpCap}
+                      onChange={(v) =>
+                        v !== null &&
+                        setCapByKey((prev) => ({
+                          ...prev,
+                          [record.key]: v ?? 0,
+                        }))
+                      }
+                      style={{ width: 120 }}
+                      disabled={!isSelected} // ✅ ปิดเมื่อไม่ติ๊ก
+                    />
+                  );
+                },
               },
             ]}
             dataSource={(() => {
@@ -498,8 +535,23 @@ const ManageQueue: React.FC = () => {
             })()}
             rowSelection={{
               selectedRowKeys: selectedKeys,
-              onChange: setSelectedKeys,
-              selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+              onChange: (keys) => {
+                setSelectedKeys(keys);
+                // (optional) ล้าง cap ของ key ที่ถูกเอาติ๊กออก
+                const ks = new Set(keys as string[]);
+                setCapByKey((prev) => {
+                  const next = { ...prev };
+                  Object.keys(next).forEach((k) => {
+                    if (!ks.has(k)) delete next[k];
+                  });
+                  return next;
+                });
+              },
+              selections: [
+                Table.SELECTION_ALL,
+                Table.SELECTION_INVERT,
+                Table.SELECTION_NONE,
+              ],
             }}
           />
         )}

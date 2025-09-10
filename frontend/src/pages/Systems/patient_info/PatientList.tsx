@@ -1,10 +1,12 @@
+// src/pages/admin/patient/PatientListPage.tsx
 import "./design/index.css";
 import PatienTable from "./component_patient/table";
 import { useNavigate } from "react-router-dom";
-
+import React, { useState } from "react";
 
 const PatientListPage = () => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <div className="page">
@@ -14,7 +16,13 @@ const PatientListPage = () => {
 
       {/* แถบเครื่องมือ */}
       <div className="toolbar">
-        <input type="search" placeholder="Search" className="search-input" />
+        <input
+          type="search"
+          placeholder="ค้นหาด้วยเลขบัตรประชาชน"
+          className="search-input"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <button onClick={() => navigate("add-patient")} className="add-button">
           เพิ่มประวัติ
         </button>
@@ -22,11 +30,10 @@ const PatientListPage = () => {
 
       {/* พื้นที่ตาราง */}
       <div className="table-wrap">
-      <PatienTable />
-   
+        {/* ส่ง searchTerm ไปที่ Table */}
+        <PatienTable searchTerm={searchTerm} />
       </div>
     </div>
-    
   );
 };
 

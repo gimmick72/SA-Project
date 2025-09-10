@@ -24,16 +24,16 @@ const slotText: Record<TimeSlot, string> = {
   evening: "ช่วงเย็น (18:00–20:00)",
 };
 
-// const statusTag = (s: BookingRow["status"]) => {
-//   const map: Record<BookingRow["status"], { color: string; text: string }> = {
-//     pending:   { color: "gold",   text: "รอยืนยัน" },
-//     confirmed: { color: "blue",   text: "ยืนยันแล้ว" },
-//     done:      { color: "green",  text: "เสร็จสิ้น" },
-//     canceled:  { color: "red",    text: "ยกเลิก" },
-//   };
-//   const t = map[s];
-//   return <Tag color={t.color}>{t.text}</Tag>;
-// };
+const statusTag = (s: BookingRow["status"]) => {
+  const map: Record<BookingRow["status"], { color: string; text: string }> = {
+    pending:   { color: "gold",   text: "รอยืนยัน" },
+    confirmed: { color: "blue",   text: "ยืนยันแล้ว" },
+    done:      { color: "green",  text: "เสร็จสิ้น" },
+    canceled:  { color: "red",    text: "ยกเลิก" },
+  };
+  const t = map[s];
+  return <Tag color={t.color}>{t.text}</Tag>;
+};
 
 const BookedQueuePage: React.FC = () => {
   const [data, setData] = useState<BookingRow[]>([]);

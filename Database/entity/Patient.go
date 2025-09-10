@@ -12,7 +12,7 @@ type Patient struct {
 	FirstName        string    `json:"firstname"`
 	LastName         string    `json:"lastname"`
 	NickName         string    `json:"nickname"`
-	CongenitaDisease string    `json:"congenitadisease"`
+	CongenitalDisease string    `json:"congenital_disease"`
 	BloodType        string    `json:"blood_type"`
 	Gender           string    `json:"gender"`
 	Birthday         time.Time `json:"birthday" gorm:"type:date"`

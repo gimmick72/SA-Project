@@ -9,7 +9,6 @@ const App: React.FC = () => {
   return (
     <React.StrictMode>
       <Router>
-        <ConfigRoutes />
         
       </Router>
     </React.StrictMode>

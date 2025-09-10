@@ -108,7 +108,4 @@ export const GetCaseDataToHistory = {
   getCaseData: (id?: string) => Get(`/api/case-data/${id}`,false)
 }
 
-export const BookingQueueAPI = {
-  getQueue: () => Get(`/api/booking`,false),
-  createBooking: (data: any) => Post(`/api/booking`, data, false),
-}
+

@@ -18,7 +18,7 @@ export interface Patient {
   firstname?: string;
   lastname?: string;
   nickname?: string;
-  congenitadisease?: string;
+  congenitaldisease?: string;
   blood_type?: string;
   gender?: "male" | "female" | "";
 
@@ -35,6 +35,7 @@ export interface Patient {
 
 export interface PatientRow {
   id: string | number;
+  citizenID :string;
   firstname: string;
   lastname: string;
   phonenumber: string;

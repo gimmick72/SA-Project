@@ -1,4 +1,3 @@
-// src/pages/BookingPage.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Layout,
@@ -10,19 +9,34 @@ import {
   DatePicker,
   Radio,
   Button,
-  Typography,
   Space,
   message,
   theme,
   Alert,
   Select,
+  Spin,
 } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import { CalendarOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons";
 import SiteHeader from "./siteHeader";
-import { createBooking, getCapacityByDate, listServices, type ServiceItem, type TimeSlot } from "../../../../services/booking/bookingApi";
+
+// types จาก services
+import type {
+  TimeSlot,
+  IServiceItem,
+  ICapacitySummary,
+  ICreateBookingPayload,
+} from "../../../../services/booking/bookingApi";
+
+// services
+import {
+  createBooking,
+  getCapacityByDate,
+  // ⬇️ ใช้ getService (mock ได้)
+  getService,
+} from "../../../../services/booking/bookingApi";
 
 dayjs.locale("th");
 const { Content } = Layout;
@@ -36,53 +50,58 @@ const timeSlotLabel: Record<TimeSlot, string> = {
 const BookingPage: React.FC = () => {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
+
   const [slot, setSlot] = useState<TimeSlot | undefined>(undefined);
   const [date, setDate] = useState<Dayjs | null>(null);
 
-  const [cap, setCap] = useState<Record<TimeSlot, number>>({
+  const [cap, setCap] = useState<ICapacitySummary>({
     morning: 0,
     afternoon: 0,
     evening: 0,
   });
 
-  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [services, setServices] = useState<IServiceItem[]>([]);
   const [loadingCap, setLoadingCap] = useState(false);
+  const [loadingServices, setLoadingServices] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // ทำให้ summary อัปเดตตามค่าฟอร์มแบบ reactive จริง
+  // watch สำหรับ summary
   const firstName = Form.useWatch("firstName", form);
-  const lastName  = Form.useWatch("lastName", form);
-  const phone     = Form.useWatch("phone", form);
+  const lastName = Form.useWatch("lastName", form);
+  const phone = Form.useWatch("phone", form);
   const serviceId = Form.useWatch("serviceId", form);
 
   const selectedService = useMemo(
-    () => services.find(s => s.id === serviceId),
+    () => services.find((s) => s.id === serviceId),
     [serviceId, services]
   );
 
   const disabledDate = (current: Dayjs) =>
     current.startOf("day").isBefore(dayjs().startOf("day"));
 
-  // โหลด service ตอน mount
+  // โหลด "บริการ" ตอน mount (mock ได้ถ้า API ล้มเหลว)
   useEffect(() => {
     (async () => {
       try {
-        const svcs = await listServices();
+        setLoadingServices(true);
+        const svcs = await getService();
         setServices(svcs);
       } catch (e) {
-        // ถ้า backend ยังไม่มี ลอง mock ชั่วคราว
-        setServices([
-          { id: 1, name: "ตรวจสุขภาพช่องปาก" },
-          { id: 2, name: "ขูดหินปูน" },
-          { id: 3, name: "อุดฟัน" },
-        ]);
+        setServices([]); // กรณีผิดพลาดจริง ๆ
+      } finally {
+        setLoadingServices(false);
       }
     })();
   }, []);
 
-  // โหลดความจุเมื่อเลือกวัน
+  // โหลด capacity เมื่อเลือกวัน
   useEffect(() => {
     (async () => {
+      if (!date) {
+        setCap({ morning: 0, afternoon: 0, evening: 0 });
+        setSlot(undefined);
+        return;
+      }
       setLoadingCap(true);
       try {
         const c = await getCapacityByDate(date);
@@ -91,21 +110,24 @@ const BookingPage: React.FC = () => {
       } catch {
         message.error("ไม่สามารถโหลดจำนวนคิวคงเหลือได้");
         setCap({ morning: 0, afternoon: 0, evening: 0 });
+        setSlot(undefined);
       } finally {
         setLoadingCap(false);
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
 
-  const summary = useMemo(() => {
-    return {
+  const summary = useMemo(
+    () => ({
       name: firstName && lastName ? `${firstName} ${lastName}` : "—",
       phone: phone || "—",
       service: selectedService?.name ?? "—",
       date: date ? date.format("DD MMMM YYYY") : "—",
       slot: slot ? timeSlotLabel[slot] : "—",
-    };
-  }, [firstName, lastName, phone, selectedService, date, slot]);
+    }),
+    [firstName, lastName, phone, selectedService, date, slot]
+  );
 
   const allFull = useMemo(() => Object.values(cap).every((n) => n <= 0), [cap]);
 
@@ -123,23 +145,21 @@ const BookingPage: React.FC = () => {
       return;
     }
 
-    const payload = {
+    const payload: ICreateBookingPayload = {
       firstName: values.firstName,
       lastName: values.lastName,
       phone: values.phone,
       serviceId: values.serviceId,
-      date: date.format("YYYY-MM-DD"),
+      date, // ให้ service แปลงเป็น YYYY-MM-DD เอง
       timeSlot: slot,
     };
 
     try {
       setSubmitting(true);
-      // เรียก backend จริง
-      const resp = await createBooking(payload);
-      console.log("BOOKING_PAYLOAD:", payload, "RESP:", resp);
+      await createBooking(payload);
 
-      // เดโม่: หักคิวคงเหลือด้านหน้า (ของจริง refresh จาก API อีกครั้งจะชัวร์กว่า)
-      setCap((prev) => ({ ...prev, [slot]: Math.max(0, prev[slot] - 1) }));
+      const fresh = await getCapacityByDate(date);
+      setCap(fresh);
 
       message.success("จองคิวสำเร็จ! เราจะติดต่อยืนยันกลับอีกครั้ง");
       form.resetFields();
@@ -165,20 +185,6 @@ const BookingPage: React.FC = () => {
           <Row justify="center">
             <Col xs={24} lg={22} xxl={18}>
               <Row gutter={[24, 24]}>
-                {/* Hero card */}
-                <Col span={24}>
-                  <Card
-                    bordered={false}
-                    style={{
-                      borderRadius: 24,
-                      padding: 0,
-                      background: "linear-gradient(135deg, #E9DDFB 0%, #D9C6FA 100%)",
-                      boxShadow: "0 8px 24px rgba(112, 0, 255, 0.08)",
-                    }}
-                    bodyStyle={{ padding: 0 }}
-                  />
-                </Col>
-
                 {/* Form */}
                 <Col xs={24} lg={14}>
                   <Card
@@ -241,7 +247,6 @@ const BookingPage: React.FC = () => {
                               disabledDate={disabledDate}
                               onChange={(d) => setDate(d)}
                               suffixIcon={<CalendarOutlined />}
-                              loading={loadingCap as any}
                             />
                           </Form.Item>
                         </Col>
@@ -256,10 +261,14 @@ const BookingPage: React.FC = () => {
                           >
                             <Select
                               placeholder="เลือกบริการ"
-                              options={services.map(s => ({ value: s.id, label: s.name }))}
+                              loading={loadingServices}
+                              options={services.map((s) => ({ value: s.id, label: s.name }))}
+                              notFoundContent={loadingServices ? "กำลังโหลด..." : "ไม่พบบริการ"}
                               showSearch
                               filterOption={(input, option) =>
-                                (option?.label as string).toLowerCase().includes(input.toLowerCase())
+                                (option?.label as string)
+                                  .toLowerCase()
+                                  .includes(input.toLowerCase())
                               }
                             />
                           </Form.Item>
@@ -275,26 +284,32 @@ const BookingPage: React.FC = () => {
                                 message="คิวเต็มทุกช่วงเวลาในวันที่เลือก"
                               />
                             )}
-                            <Radio.Group
-                              onChange={(e) => setSlot(e.target.value)}
-                              value={slot}
-                              style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
-                            >
-                              <Radio.Button value="morning" disabled={cap.morning <= 0}>
-                                เช้า {cap.morning <= 0 ? "(เต็ม)" : `(${cap.morning} คิว)`}
-                              </Radio.Button>
-                              <Radio.Button value="afternoon" disabled={cap.afternoon <= 0}>
-                                บ่าย {cap.afternoon <= 0 ? "(เต็ม)" : `(${cap.afternoon} คิว)`}
-                              </Radio.Button>
-                              <Radio.Button value="evening" disabled={cap.evening <= 0}>
-                                เย็น {cap.evening <= 0 ? "(เต็ม)" : `(${cap.evening} คิว)`}
-                              </Radio.Button>
-                            </Radio.Group>
+                            <Spin spinning={loadingCap}>
+                              <Radio.Group
+                                onChange={(e) => setSlot(e.target.value)}
+                                value={slot}
+                                style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+                                disabled={!date}
+                              >
+                                <Radio.Button value="morning" disabled={cap.morning <= 0}>
+                                  เช้า {cap.morning <= 0 ? "(เต็ม)" : `(${cap.morning} คิว)`}
+                                </Radio.Button>
+                                <Radio.Button value="afternoon" disabled={cap.afternoon <= 0}>
+                                  บ่าย {cap.afternoon <= 0 ? "(เต็ม)" : `(${cap.afternoon} คิว)`}
+                                </Radio.Button>
+                                <Radio.Button value="evening" disabled={cap.evening <= 0}>
+                                  เย็น {cap.evening <= 0 ? "(เต็ม)" : `(${cap.evening} คิว)`}
+                                </Radio.Button>
+                              </Radio.Group>
+                            </Spin>
                           </Form.Item>
                         </Col>
                       </Row>
 
-                      <Space size="middle" style={{ width: "100%", justifyContent: "flex-end", marginTop: 8 }}>
+                      <Space
+                        size="middle"
+                        style={{ width: "100%", justifyContent: "flex-end", marginTop: 8 }}
+                      >
                         <Button
                           onClick={() => {
                             form.resetFields();
@@ -309,7 +324,7 @@ const BookingPage: React.FC = () => {
                           type="primary"
                           htmlType="submit"
                           loading={submitting}
-                          disabled={!date || !slot || cap[(slot as TimeSlot)] <= 0}
+                          disabled={!date || !slot || cap[slot as TimeSlot] <= 0}
                           style={{ background: token.colorPrimary }}
                         >
                           จองคิวทันที
@@ -339,24 +354,34 @@ const BookingPage: React.FC = () => {
                       }}
                     >
                       <Row style={{ marginBottom: 8 }}>
-                        <Col span={10}><strong>ชื่อ-สกุล</strong></Col>
-                        <Col span={14}>{summary.name}</Col>
+                        <Col span={10}>
+                          <strong>ชื่อ-สกุล</strong>
+                        </Col>
+                        <Col span={14}>{firstName && lastName ? `${firstName} ${lastName}` : "—"}</Col>
                       </Row>
                       <Row style={{ marginBottom: 8 }}>
-                        <Col span={10}><strong>เบอร์โทร</strong></Col>
-                        <Col span={14}>{summary.phone}</Col>
+                        <Col span={10}>
+                          <strong>เบอร์โทร</strong>
+                        </Col>
+                        <Col span={14}>{phone || "—"}</Col>
                       </Row>
                       <Row style={{ marginBottom: 8 }}>
-                        <Col span={10}><strong>บริการ</strong></Col>
-                        <Col span={14}>{summary.service}</Col>
+                        <Col span={10}>
+                          <strong>บริการ</strong>
+                        </Col>
+                        <Col span={14}>{selectedService?.name ?? "—"}</Col>
                       </Row>
                       <Row style={{ marginBottom: 8 }}>
-                        <Col span={10}><strong>วันที่</strong></Col>
-                        <Col span={14}>{summary.date}</Col>
+                        <Col span={10}>
+                          <strong>วันที่</strong>
+                        </Col>
+                        <Col span={14}>{date ? date.format("DD MMMM YYYY") : "—"}</Col>
                       </Row>
                       <Row>
-                        <Col span={10}><strong>ช่วงเวลา</strong></Col>
-                        <Col span={14}>{summary.slot}</Col>
+                        <Col span={10}>
+                          <strong>ช่วงเวลา</strong>
+                        </Col>
+                        <Col span={14}>{slot ? timeSlotLabel[slot] : "—"}</Col>
                       </Row>
                     </div>
                   </Card>

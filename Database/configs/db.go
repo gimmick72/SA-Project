@@ -1,13 +1,11 @@
 package configs
 
 import (
-
 	"Database/entity"
-	
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
-
 
 var DB *gorm.DB
 
@@ -20,7 +18,6 @@ func ConnectionDB() {
 	}
 	DB = database
 }
-
 
 func SetupDatbase() {
 
@@ -40,10 +37,9 @@ func SetupDatbase() {
 		&entity.CaseData{},
 		&entity.Treatment{},
 
-
 		//BookingQueue
-		&entity.Queue{},
-		&entity.Timeslot{},
+		&entity.QueueSlot{},
+		&entity.Booking{},
 
 		//Medicine
 		&entity.Supply{},

@@ -27,8 +27,18 @@ func main() {
 		router.DELETE("/patients/:id", controllers.DeletePatient) // (เพิ่ม) ลบ
 
 		router.POST("/patients/:id/symptoms", controllers.CreateSymptom) //AddSymptom
-		router.GET("/services", controllers.GetServicetoSymtompOption)   //ดึง service มาเลือกตอนเพิ่มอาการ
+		router.GET("/services", controllers.GetService)   //ดึง service มาเลือกตอนเพิ่มอาการ
 		router.GET("/case-data/:id", controllers.GetCaseHistory)         //ดึง case data
+
+		// Queue settings / capacity
+		router.POST("/queue/slots", controllers.UpsertSlots) // admin
+		router.GET("/queue/slots", controllers.ListSlots)    // admin/view
+		router.GET("/queue/capacity", controllers.GetCapacitySummary)
+
+		// Booking
+		router.POST("/bookings", controllers.CreateBooking)
+		router.POST("/bookings/:id/cancel", controllers.CancelBooking)
+		router.GET("/bookings", controllers.ListBookingsByDate)
 
 		// Supplies
 		router.GET("/supplies", controllers.ListSupplies)

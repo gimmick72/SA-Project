@@ -52,7 +52,7 @@ func CreateSymptom(c *gin.Context) {
 }
 
 // Get Service
-func GetServicetoSymtompOption(c *gin.Context) {
+func GetService(c *gin.Context) {
 	var services []entity.Service
 	if err := configs.DB.
 		Model(&entity.Service{}).
