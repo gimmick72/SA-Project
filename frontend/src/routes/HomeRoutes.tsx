@@ -11,7 +11,7 @@ const BookingPage = Loadable(lazy(() => import("../pages/Home_page/booking/index
 const OurDentist = Loadable(lazy(() => import("../pages/Home_page/ourDentists/index")));
 const ContactUs = Loadable(lazy(() => import("../pages/Home_page/contactUs/index")));
 const PriceGuide = Loadable(lazy(() => import("../pages/Home_page/priceGuide/index")));
-const ServicePage = Loadable(lazy(() => import("../pages/Home_page/services/index")));
+const ServicePage = Loadable(lazy(() => import("../pages/Home_page/services")));
 
 const IndexRoutes: RouteObject[] = [
   {

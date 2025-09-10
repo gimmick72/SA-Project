@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input } from "antd";
 import { OnlinePaymentProps } from "../types";
-import PromptPayQR from "../../../../components/PromptPayQR";
+import PromptPayQR from "../third-party/PromptPayQR";
 import "./OnlinePayment.css";
 
 const OnlinePayment: React.FC<OnlinePaymentProps> = ({ form }) => {

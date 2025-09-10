@@ -1,0 +1,231 @@
+/* Authentication Pages Styles */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.auth-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: -2;
+}
+
+.auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px 32px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.register-card {
+  max-width: 500px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.clinic-logo {
+  margin-bottom: 16px;
+}
+
+.auth-title {
+  color: #1890ff;
+  margin-bottom: 8px !important;
+  font-weight: 600;
+}
+
+.auth-subtitle {
+  color: #666;
+  font-size: 14px;
+}
+
+.role-selection {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.role-radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.role-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.role-button .anticon {
+  font-size: 16px;
+}
+
+.login-button,
+.register-button {
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.login-button:hover,
+.register-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.auth-link {
+  color: #1890ff;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  color: #096dd9;
+  text-decoration: underline;
+}
+
+.demo-credentials {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.form-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  display: block;
+  margin-bottom: 16px;
+  color: #1890ff;
+  font-size: 16px;
+}
+
+/* Form field customizations */
+.ant-input,
+.ant-input-password,
+.ant-picker,
+.ant-select-selector {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.ant-input:focus,
+.ant-input-password:focus,
+.ant-picker:hover,
+.ant-picker-focused,
+.ant-select-focused .ant-select-selector {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.ant-form-item-label > label {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Radio button customizations */
+.ant-radio-button-wrapper {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.ant-radio-button-wrapper:first-child {
+  border-radius: 8px;
+}
+
+.ant-radio-button-wrapper:last-child {
+  border-radius: 8px;
+}
+
+.ant-radio-button-wrapper-checked {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: white;
+}
+
+.ant-radio-button-wrapper-checked:hover {
+  background: #096dd9;
+  border-color: #096dd9;
+}
+
+/* Alert customizations */
+.ant-alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.ant-alert-success {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+}
+
+.ant-alert-error {
+  background: linear-gradient(135deg, #fff2f0 0%, #ffccc7 100%);
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+  .auth-card {
+    margin: 10px;
+    padding: 24px 20px;
+  }
+  
+  .register-card {
+    max-width: none;
+  }
+  
+  .auth-title {
+    font-size: 20px;
+  }
+  
+  .role-radio-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .role-button {
+    justify-content: center;
+  }
+}

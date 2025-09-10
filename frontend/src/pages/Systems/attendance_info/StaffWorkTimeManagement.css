@@ -2,8 +2,6 @@
   padding: 24px;
   background-color: #ffffff;
   min-height: 100vh;
-  overflow-y: auto;
-  max-height: 100vh;
 }
 
 .page-header {
@@ -28,14 +26,10 @@
 
 .management-tabs .ant-tabs-content-holder {
   padding: 0;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
 }
 
 .dashboard-container {
   padding: 24px;
-  overflow-y: auto;
-  max-height: calc(100vh - 240px);
 }
 
 .dashboard-stats-card {

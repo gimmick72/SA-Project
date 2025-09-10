@@ -12,11 +12,11 @@ interface LogoutButtonProps {
 }
 
 const LogoutButton: React.FC<LogoutButtonProps> = ({
-  buttonText = 'Logout',
-  confirmTitle = 'Confirm Logout',
-  confirmContent = 'Are you sure you want to logout?',
-  okText = 'Logout',
-  cancelText = 'Cancel'
+  buttonText = 'ออกจากระบบ',
+  confirmTitle = 'ยืนยันการออกจากระบบ',
+  confirmContent = 'คุณต้องการออกจากระบบหรือไม่?',
+  okText = 'ออกจากระบบ',
+  cancelText = 'ยกเลิก'
 }) => {
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
         // Clear authentication data
         localStorage.removeItem('isAuthenticated');
         localStorage.removeItem('userRole');
-        localStorage.removeItem('username');
+        localStorage.removeItem('userEmail');
         
         // Force page refresh and redirect to login page
         window.location.href = '/auth/login';

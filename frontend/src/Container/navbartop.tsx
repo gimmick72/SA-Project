@@ -20,7 +20,15 @@ const { Search } = Input;
 const NavbarTop: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   
-  const username = localStorage.getItem('username') || 'Admin';
+  const userEmail = localStorage.getItem('userEmail') || 'Admin';
+  const userRole = localStorage.getItem('userRole') || 'staff';
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
+    window.location.href = '/auth/login';
+  };
 
   const userMenuItems: MenuProps['items'] = [
     {
@@ -28,6 +36,7 @@ const NavbarTop: React.FC = () => {
       icon: <LogoutOutlined />,
       label: 'ออกจากระบบ',
       danger: true,
+      onClick: handleLogout,
     },
   ];
 
@@ -49,7 +58,7 @@ const NavbarTop: React.FC = () => {
                 icon={<UserOutlined />}
                 className="youtube-avatar"
               />
-              <span className="youtube-username">{username}</span>
+              <span className="youtube-username">{userEmail}</span>
             </div>
           </Dropdown>
         </Space>

@@ -9,7 +9,6 @@ import StaffCalendarView from './components/StaffCalendarView';
 import './StaffWorkTimeManagement.css';
 
 const { Title } = Typography;
-const { TabPane } = Tabs;
 
 const StaffWorkTimeManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -59,23 +58,36 @@ const StaffWorkTimeManagement: React.FC = () => {
         </Title>
       </div>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab} type="card">
-        <TabPane tab="ภาพรวม" key="dashboard">
-          <StaffDashboard />
-        </TabPane>
-        <TabPane tab="จัดการตาราง" key="schedule">
-          <StaffScheduleManager />
-        </TabPane>
-        <TabPane tab="ปฏิทินตารางงาน" key="calendar">
-          <StaffCalendarView 
-            schedules={mockSchedules}
-            staffMembers={mockStaffMembers}
-            onScheduleAdd={(schedule) => console.log('Add schedule:', schedule)}
-            onScheduleEdit={(schedule) => console.log('Edit schedule:', schedule)}
-            onScheduleDelete={(scheduleId) => console.log('Delete schedule:', scheduleId)}
-          />
-        </TabPane>
-      </Tabs>
+      <Tabs 
+        activeKey={activeTab} 
+        onChange={setActiveTab} 
+        type="card"
+        items={[
+          {
+            key: 'dashboard',
+            label: 'ภาพรวม',
+            children: <StaffDashboard />
+          },
+          {
+            key: 'schedule',
+            label: 'จัดการตาราง',
+            children: <StaffScheduleManager />
+          },
+          {
+            key: 'calendar',
+            label: 'ปฏิทินตารางงาน',
+            children: (
+              <StaffCalendarView 
+                schedules={mockSchedules}
+                staffMembers={mockStaffMembers}
+                onScheduleAdd={(schedule) => console.log('Add schedule:', schedule)}
+                onScheduleEdit={(schedule) => console.log('Edit schedule:', schedule)}
+                onScheduleDelete={(scheduleId) => console.log('Delete schedule:', scheduleId)}
+              />
+            )
+          }
+        ]}
+      />
     </div>
   );
 };

@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
-import { Card, Row, Col, Statistic, Button, Typography, Space, Tabs } from 'antd';
+import React from 'react';
+import { Card, Row, Col, Statistic, Typography } from 'antd';
 import { 
   DollarOutlined, 
   CreditCardOutlined, 
   MobileOutlined,
   TrophyOutlined,
-  CalendarOutlined,
   UserOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 
 const PaymentDashboard: React.FC = () => {
   const navigate = useNavigate();

@@ -1,1 +1,0 @@
-export { PatientAPI } from "./patientApi";
