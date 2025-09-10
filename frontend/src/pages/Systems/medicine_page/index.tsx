@@ -1,7 +1,7 @@
 // src/pages/medicine_page/index.tsx
 
 import React, { useState } from 'react';
-import { Tabs, Card, Typography } from 'antd';
+import { Tabs, Card, Typography, Table } from 'antd';
 import { MedicineBoxOutlined } from '@ant-design/icons';
 import AllSuppliesPage from './AllSuppliesPage';
 import AddSupplyPage from './AddSupplyPage';
@@ -51,6 +51,22 @@ const MedicinePage = () => {
               tabBarStyle={{ marginBottom: 0 }}
               style={{ height: '100%', display: 'flex' ,flex: 1,minHeight: 0}}
             >
+              <Table
+          rowKey="id"
+          loading={loading}
+          dataSource={rows}
+          columns={columns}
+          bordered
+          scroll={{ x: 1200, y: 300 }}
+          style={{ width: "100%" ,height: 4000}}
+         pagination={{
+          current: query.page,
+          pageSize: 4, // ⬅️ บังคับ 4
+          total,
+          showSizeChanger: false, // ⬅️ ปิดการเปลี่ยน pageSize
+        }}
+          onChange={onTableChange}
+        />
               <TabPane 
                 tab={renderTabTitle('1', 'รายการเวชภัณฑ์ทั้งหมด')}
                 key="1"

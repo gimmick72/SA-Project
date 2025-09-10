@@ -78,7 +78,7 @@ type DispenseItem = {
   dispenser: string;
 };
 
-const AllSuppliesPage: React.FC = () => {
+export const AllSuppliesPage: React.FC = () => {
   // ---------- ตารางเวชภัณฑ์ ----------
   const [query, setQuery] = useState<QueryState>({
     q: "",
@@ -402,98 +402,98 @@ const AllSuppliesPage: React.FC = () => {
   };
 
   return (
-    
+
     <div
       style={{
         marginBottom: 20,
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 12,
-    alignItems: "center",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 12,
+        alignItems: "center",
       }}
     >
       {ctx}
 
       {/* แถวฟิลเตอร์ + ปุ่มรายงาน (ชิดขวา, รองรับ wrap) */}
-<div style={{ marginBottom: 20 }}>
-  <Row gutter={[12, 12]} align="middle" justify="space-between" wrap>
-    {/* ฝั่งซ้าย: ฟิลเตอร์ */}
-    <Col flex="auto">
-      <Space size="middle" wrap>
-        <Search
-          placeholder="ค้นหาเวชภัณฑ์ (ชื่อ/รหัส)"
-          allowClear
-          value={query.q}
-          onChange={(e) => setQuery((q) => ({ ...q, q: e.target.value }))}
-          onSearch={() => setQuery((q) => ({ ...q, page: 1 }))}
-          style={{ width: 260 }}
-          prefix={<SearchOutlined />}
-        />
+      <div style={{ marginBottom: 20 }}>
+        <Row gutter={[12, 12]} align="middle" justify="space-between" wrap>
+          {/* ฝั่งซ้าย: ฟิลเตอร์ */}
+          <Col flex="auto">
+            <Space size="middle" wrap>
+              <Search
+                placeholder="ค้นหาเวชภัณฑ์ (ชื่อ/รหัส)"
+                allowClear
+                value={query.q}
+                onChange={(e) => setQuery((q) => ({ ...q, q: e.target.value }))}
+                onSearch={() => setQuery((q) => ({ ...q, page: 1 }))}
+                style={{ width: 260 }}
+                prefix={<SearchOutlined />}
+              />
 
-        <Select
-          style={{ width: 200 }}
-          value={query.category}
-          onChange={(v) => setQuery((q) => ({ ...q, category: v, page: 1 }))}
-          options={[
-            { label: "หมวดหมู่ทั้งหมด", value: "all" },
-            ...Array.from(
-              new Set(
-                [
-                  ...rows.map((r) => r.category).filter(Boolean),
-                  ...(CATEGORY_OPTIONS || []),
-                ].filter(Boolean)
-              )
-            ).map((c) => ({ label: c, value: c }))
-          ]}
-        />
+              <Select
+                style={{ width: 200 }}
+                value={query.category}
+                onChange={(v) => setQuery((q) => ({ ...q, category: v, page: 1 }))}
+                options={[
+                  { label: "หมวดหมู่ทั้งหมด", value: "all" },
+                  ...Array.from(
+                    new Set(
+                      [
+                        ...rows.map((r) => r.category).filter(Boolean),
+                        ...(CATEGORY_OPTIONS || []),
+                      ].filter(Boolean)
+                    )
+                  ).map((c) => ({ label: c, value: c }))
+                ]}
+              />
 
-        <DatePicker
-          placeholder="วันที่นำเข้า"
-          value={query.importDate}
-          onChange={(d) => setQuery((q) => ({ ...q, importDate: d, page: 1 }))}
-          style={{ width: 160 }}
-          allowClear
-        />
-        <DatePicker
-          placeholder="วันหมดอายุ"
-          value={query.expiryDate}
-          onChange={(d) => setQuery((q) => ({ ...q, expiryDate: d, page: 1 }))}
-          style={{ width: 160 }}
-          allowClear
-        />
+              <DatePicker
+                placeholder="วันที่นำเข้า"
+                value={query.importDate}
+                onChange={(d) => setQuery((q) => ({ ...q, importDate: d, page: 1 }))}
+                style={{ width: 160 }}
+                allowClear
+              />
+              <DatePicker
+                placeholder="วันหมดอายุ"
+                value={query.expiryDate}
+                onChange={(d) => setQuery((q) => ({ ...q, expiryDate: d, page: 1 }))}
+                style={{ width: 160 }}
+                allowClear
+              />
 
-        <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>
-          รีเซ็ต
-        </Button>
-      </Space>
-    </Col>
+              <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>
+                รีเซ็ต
+              </Button>
+            </Space>
+          </Col>
 
-    {/* ฝั่งขวา: ปุ่มรายงาน (จะชิดขวาเสมอ) */}
-    <Col>
-      <Button type="primary" onClick={() => setReportOpen(true)}>
-        ดูรายงานการเบิก/จ่าย
-      </Button>
-    </Col>
-  </Row>
-</div>
-        <Table
-          rowKey="id"
-          loading={loading}
-          dataSource={rows}
-          columns={columns}
-          bordered
-          scroll={{ x: 1200, y: 300 }}
-          style={{ width: "100%" }}
-         pagination={{
+          {/* ฝั่งขวา: ปุ่มรายงาน (จะชิดขวาเสมอ) */}
+          <Col>
+            <Button type="primary" onClick={() => setReportOpen(true)}>
+              ดูรายงานการเบิก/จ่าย
+            </Button>
+          </Col>
+        </Row>
+      </div>
+      {/* <Table
+        rowKey="id"
+        loading={loading}
+        dataSource={rows}
+        columns={columns}
+        bordered
+        scroll={{ x: 1200, y: 300 }}
+        style={{ width: "100%", height: 4000 }}
+        pagination={{
           current: query.page,
           pageSize: 4, // ⬅️ บังคับ 4
           total,
           showSizeChanger: false, // ⬅️ ปิดการเปลี่ยน pageSize
         }}
-          onChange={onTableChange}
-        />
-     
-      
+        onChange={onTableChange}
+      /> */}
+
+
 
       {/* Drawer: แก้ไขเวชภัณฑ์ */}
       <Drawer
@@ -548,7 +548,7 @@ const AllSuppliesPage: React.FC = () => {
         width={960}
         open={reportOpen}
         onClose={() => setReportOpen(false)}
-        
+
       >
         <Space style={{ marginBottom: 16 }} wrap>
           <Input
