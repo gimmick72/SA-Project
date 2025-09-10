@@ -1,31 +1,55 @@
-/* Attendance Info System - Unified Theme */
+/* Attendance Info System - Payment Theme */
 .attendance-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  min-height: calc(100vh - 128px);
+  padding: 3%;
+  background-color: #ffffff;
+  min-height: 100vh;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 .attendance-stats-row {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
+}
+
+.page-header {
+  margin-bottom: 3%;
+}
+
+.page-header h2 {
+  margin: 0;
+  color: #000000;
+}
+
+.attendance-tabs {
+  background-color: white;
+  border-radius: 1.5%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.attendance-tabs .ant-tabs-nav {
+  margin-bottom: 0;
+  padding: 0 3%;
+}
+
+.attendance-tabs .ant-tabs-content-holder {
+  padding: 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 25%);
 }
 
 .attendance-controls {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: #ffffff;
-  padding: 16px;
-  border-radius: 8px;
+  padding: 2%;
+  border-radius: 1%;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .attendance-status-select {
-  width: 120px;
+  width: 15%;
 }
 
 .attendance-date-picker {
@@ -33,33 +57,41 @@
 }
 
 .attendance-form-row {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
 }
 
 .attendance-form-col {
-  padding-right: 8px;
+  padding-right: 1%;
 }
 
 .attendance-form-col:last-child {
   padding-right: 0;
 }
 
+/* Form container styling */
+.attendance-form-container {
+  padding: 3%;
+  overflow-y: auto;
+  max-height: calc(100vh - 30%);
+}
+
 /* Card styling for consistency */
 .attendance-card {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  margin-bottom: 16px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 1%;
+  transition: all 0.3s ease;
 }
 
-/* Tab styling for consistency */
-.attendance-tabs .ant-tabs-card > .ant-tabs-content {
-  background: #ffffff;
-  border-radius: 0 0 8px 8px;
+/* Input styling */
+.amount-input {
+  font-size: 18px;
+  font-weight: bold;
 }
 
-.attendance-tabs .ant-tabs-card > .ant-tabs-content > .ant-tabs-tabpane {
-  background: #ffffff;
-  padding: 24px;
+/* Submit button styling */
+.submit-button {
+  width: 100%;
+  height: 6.25%;
+  font-size: 18px;
 }

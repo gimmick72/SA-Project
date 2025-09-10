@@ -6,7 +6,7 @@
 }
 
 .modern-payment-sidebar {
-  width: 240px;
+  width: 200px;
   background: #ffffff;
   border-right: 1px solid #f0f0f0;
   display: flex;
@@ -15,7 +15,7 @@
 }
 
 .modern-payment-header {
-  padding: 20px 16px;
+  padding: 16px 12px;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -32,17 +32,17 @@
 }
 
 .modern-payment-nav {
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .modern-payment-nav-button {
   width: 100%;
   text-align: left;
-  margin-bottom: 8px;
-  height: 48px;
+  margin-bottom: 4px;
+  height: 40px;
   display: flex;
   align-items: center;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid transparent;
   transition: all 0.2s ease;
 }
@@ -70,17 +70,17 @@
 
 .modern-payment-main {
   flex: 1;
-  padding: 32px;
+  padding: 24px;
   background: #ffffff;
   overflow: auto;
 }
 
 .modern-payment-container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   background: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  min-height: calc(100vh - 128px);
+  min-height: calc(100vh - 120px);
 }

@@ -1,18 +1,18 @@
 /* Treatment Payment Flow Styles */
 .treatment-payment-container {
-  max-width: 1000px;
+  max-width: 125%;
   margin: 0 auto;
-  padding: 24px;
+  padding: 3%;
 }
 
 .treatment-payment-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 4%;
 }
 
 .treatment-payment-title {
   color: #1a1a1a;
-  margin-bottom: 8px;
+  margin-bottom: 1%;
 }
 
 .treatment-payment-subtitle {
@@ -20,34 +20,34 @@
 }
 
 .treatment-payment-steps {
-  margin-bottom: 32px;
+  margin-bottom: 4%;
 }
 
 .treatment-payment-content {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 24px;
+  border-radius: 1.5%;
+  padding: 3%;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  min-height: 400px;
+  min-height: 50%;
 }
 
 .treatment-selection-section {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .treatment-selection-title {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
   color: #1a1a1a;
 }
 
 .treatment-add-button {
   width: 100%;
-  height: 50px;
+  height: 6.25%;
   border: 2px dashed #d9d9d9;
   background: #fafafa;
   color: #666;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  border-radius: 1%;
+  margin-bottom: 2%;
 }
 
 .treatment-add-button:hover {
@@ -56,15 +56,15 @@
 }
 
 .treatment-table-container {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .treatment-total-section {
   text-align: right;
-  padding: 16px;
+  padding: 2%;
   background: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 24px;
+  border-radius: 1%;
+  margin-bottom: 3%;
 }
 
 .treatment-total-amount {
@@ -74,43 +74,43 @@
 }
 
 .patient-info-section {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .patient-info-title {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
   color: #1a1a1a;
 }
 
 .doctor-selection-section {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .doctor-selection-title {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
   color: #1a1a1a;
 }
 
 .payment-method-section {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .payment-method-title {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
   color: #1a1a1a;
 }
 
 .payment-method-cards {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 2%;
+  margin-bottom: 2%;
 }
 
 .payment-method-card {
   flex: 1;
-  padding: 16px;
+  padding: 2%;
   border: 2px solid #f0f0f0;
-  border-radius: 8px;
+  border-radius: 1%;
   cursor: pointer;
   text-align: center;
   transition: all 0.3s ease;
@@ -128,7 +128,7 @@
 
 .payment-method-icon {
   font-size: 24px;
-  margin-bottom: 8px;
+  margin-bottom: 1%;
   display: block;
 }
 
@@ -142,17 +142,17 @@
 
 .cash-payment-section {
   background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
-  margin-top: 16px;
+  padding: 2%;
+  border-radius: 1%;
+  margin-top: 2%;
 }
 
 .cash-change-display {
   text-align: center;
-  padding: 16px;
+  padding: 2%;
   background: #e6f7ff;
-  border-radius: 8px;
-  margin-top: 16px;
+  border-radius: 1%;
+  margin-top: 2%;
 }
 
 .cash-change-amount {
@@ -163,19 +163,19 @@
 
 .promptpay-section {
   background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
-  margin-top: 16px;
+  padding: 2%;
+  border-radius: 1%;
+  margin-top: 2%;
 }
 
 .review-section {
   background: #f8f9fa;
-  padding: 24px;
-  border-radius: 8px;
+  padding: 3%;
+  border-radius: 1%;
 }
 
 .review-title {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
   color: #1a1a1a;
 }
 
@@ -183,7 +183,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 1.5% 0;
   border-bottom: 1px solid #e8e8e8;
 }
 
@@ -204,53 +204,53 @@
 
 .success-section {
   text-align: center;
-  padding: 40px 20px;
+  padding: 5% 2.5%;
 }
 
 .success-icon {
   font-size: 64px;
   color: #52c41a;
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .success-title {
   color: #1a1a1a;
-  margin-bottom: 16px;
+  margin-bottom: 2%;
 }
 
 .success-message {
   color: #666;
-  margin-bottom: 32px;
+  margin-bottom: 4%;
 }
 
 .success-actions {
   display: flex;
-  gap: 16px;
+  gap: 2%;
   justify-content: center;
 }
 
 .step-navigation {
   display: flex;
   justify-content: space-between;
-  margin-top: 32px;
-  padding-top: 24px;
+  margin-top: 4%;
+  padding-top: 3%;
   border-top: 1px solid #f0f0f0;
 }
 
 .step-button-back {
-  min-width: 100px;
+  min-width: 12.5%;
 }
 
 .step-button-next {
-  min-width: 100px;
+  min-width: 12.5%;
 }
 
 .treatment-notes-section {
-  margin-top: 16px;
+  margin-top: 2%;
 }
 
 .treatment-notes-title {
-  margin-bottom: 8px;
+  margin-bottom: 1%;
   color: #666;
   font-size: 14px;
 }

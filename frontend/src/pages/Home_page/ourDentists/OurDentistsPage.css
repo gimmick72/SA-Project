@@ -3,21 +3,21 @@
   background: transparent;
   padding: 0;
   width: 100%;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
 .dentists-title {
   text-align: center;
   color: #333333;
-  margin-bottom: 40px;
+  margin-bottom: 4%;
   font-weight: 600;
   width: 100%;
 }
 
 .dentists-carousel {
   width: 100%;
-  max-width: 1000px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -34,10 +34,10 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .dentists-title {
-    margin-bottom: 30px;
+    margin-bottom: 3.5%;
   }
   
   .dentists-content {
-    padding: 0 16px;
+    padding: 0 2%;
   }
 }

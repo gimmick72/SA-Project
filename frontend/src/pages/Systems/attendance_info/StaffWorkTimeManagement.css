@@ -1,11 +1,11 @@
 .staff-work-time-management {
-  padding: 24px;
+  padding: 3%;
   background-color: #ffffff;
   min-height: 100vh;
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .page-header h2 {
@@ -15,13 +15,13 @@
 
 .management-tabs {
   background-color: white;
-  border-radius: 12px;
+  border-radius: 1.5%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .management-tabs .ant-tabs-nav {
   margin-bottom: 0;
-  padding: 0 24px;
+  padding: 0 3%;
 }
 
 .management-tabs .ant-tabs-content-holder {
@@ -29,61 +29,61 @@
 }
 
 .dashboard-container {
-  padding: 24px;
+  padding: 3%;
 }
 
 .dashboard-stats-card {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .stat-card {
   text-align: center;
-  border-radius: 8px;
+  border-radius: 1%;
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-0.25%);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card.working {
-  border-left: 4px solid #52c41a;
+  border-left: 0.5% solid #52c41a;
 }
 
 .stat-card.break {
-  border-left: 4px solid #faad14;
+  border-left: 0.5% solid #faad14;
 }
 
 .stat-card.pending {
-  border-left: 4px solid #f5222d;
+  border-left: 0.5% solid #f5222d;
 }
 
 .stat-card.hours {
-  border-left: 4px solid #722ed1;
+  border-left: 0.5% solid #722ed1;
 }
 
 .stat-card.overtime {
-  border-left: 4px solid #fa8c16;
+  border-left: 0.5% solid #fa8c16;
 }
 
 .quick-actions-card {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
   text-align: center;
 }
 
 .recent-activities {
-  height: 300px;
+  height: 37.5%;
 }
 
 .activity-list {
-  max-height: 220px;
+  max-height: 27.5%;
   overflow-y: auto;
 }
 
 .activity-item {
   display: flex;
-  padding: 12px 0;
+  padding: 1.5% 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -92,7 +92,7 @@
 }
 
 .activity-time {
-  width: 60px;
+  width: 7.5%;
   font-size: 12px;
   color: #666;
   font-weight: 500;

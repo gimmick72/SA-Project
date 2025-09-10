@@ -1,19 +1,19 @@
 .staff-dashboard {
-  margin-bottom: 24px;
+  margin-bottom: 3%;
 }
 
 .dashboard-stats {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
 }
 
 .stat-card {
   text-align: center;
-  border-radius: 8px;
+  border-radius: 1%;
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-0.25%);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -33,14 +33,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 1.5%;
 }
 
 .role-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-width: 120px;
+  gap: 1%;
+  min-width: 15%;
 }
 
 .staff-item {
@@ -60,7 +60,7 @@
 
 .ant-progress {
   flex: 1;
-  margin-left: 12px;
+  margin-left: 1.5%;
 }
 
 .ant-statistic-content-value {
@@ -69,5 +69,5 @@
 }
 
 .ant-list-item {
-  padding: 8px 0;
+  padding: 1% 0;
 }

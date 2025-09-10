@@ -1,17 +1,17 @@
 .promptpay-card {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
 }
 
 .qr-section {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 2.5%;
 }
 
 .bank-header {
   background-color: #6B46C1;
   color: white;
-  padding: 12px;
-  border-radius: 8px 8px 0 0;
+  padding: 1.5%;
+  border-radius: 1% 1% 0 0;
   margin-bottom: 0;
 }
 
@@ -23,11 +23,11 @@
 .qr-display {
   background-color: #1E40AF;
   color: white;
-  padding: 16px;
+  padding: 2%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 1.5%;
 }
 
 .qr-icon {
@@ -42,14 +42,14 @@
 
 .promptpay-logo {
   background-color: white;
-  padding: 12px;
+  padding: 1.5%;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .promptpay-logo-text {
   border: 2px solid #1E40AF;
-  border-radius: 4px;
-  padding: 8px 16px;
+  border-radius: 0.5%;
+  padding: 1% 2%;
   display: inline-block;
   font-size: 16px;
   font-weight: bold;
@@ -62,21 +62,21 @@
 
 .qr-code-container {
   background-color: white;
-  padding: 20px;
+  padding: 2.5%;
   display: flex;
   justify-content: center;
-  min-height: 200px;
+  min-height: 25%;
   align-items: center;
 }
 
 .qr-code-image {
-  max-width: 200px;
+  max-width: 25%;
   height: auto;
 }
 
 .payment-details {
   background-color: white;
-  padding: 16px;
+  padding: 2%;
   border: 1px solid #d9d9d9;
   border-top: none;
 }
@@ -84,13 +84,13 @@
 .payment-detail-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 1%;
 }
 
 .payment-divider {
   height: 1px;
   background-color: #d9d9d9;
-  margin: 12px 0;
+  margin: 1.5% 0;
 }
 
 .amount-row {
@@ -107,24 +107,24 @@
 
 .amount-note {
   font-size: 12px;
-  margin-top: 8px;
+  margin-top: 1%;
 }
 
 .footer-bar {
   background-color: #6B46C1;
-  height: 20px;
-  border-radius: 0 0 8px 8px;
+  height: 2.5%;
+  border-radius: 0 0 1% 1%;
 }
 
 .manual-payment {
-  margin-top: 16px;
+  margin-top: 2%;
 }
 
 .manual-payment-box {
   background-color: #f6f6f6;
-  padding: 12px;
-  border-radius: 6px;
-  margin-top: 8px;
+  padding: 1.5%;
+  border-radius: 0.75%;
+  margin-top: 1%;
 }
 
 .manual-payment-content {
@@ -134,7 +134,7 @@
 }
 
 .manual-payment-amount {
-  margin-top: 8px;
+  margin-top: 1%;
 }
 
 .amount-highlight {
@@ -142,25 +142,25 @@
 }
 
 .instructions {
-  margin-top: 16px;
-  padding: 12px;
+  margin-top: 2%;
+  padding: 1.5%;
   background-color: #e6f7ff;
   border: 1px solid #91d5ff;
-  border-radius: 6px;
+  border-radius: 0.75%;
 }
 
 .instructions-title {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 1%;
 }
 
 .instructions-list {
   margin: 0;
-  padding-left: 20px;
+  padding-left: 2.5%;
   font-size: 14px;
 }
 
 .refresh-button-container {
   text-align: center;
-  margin-top: 16px;
+  margin-top: 2%;
 }

@@ -1,27 +1,27 @@
 .staff-schedule-manager {
-  padding: 20px;
+  padding: 2.5%;
   background: #f5f5f5;
   min-height: 100vh;
   overflow-y: auto;
-  max-height: calc(100vh - 64px);
+  max-height: calc(100vh - 8%);
 }
 
 .quick-stat-card {
-  border-radius: 8px;
+  border-radius: 1%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .quick-stat-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  transform: translateY(-0.25%);
 }
 
 .quick-stat-card .ant-statistic-title {
   font-size: 12px;
   font-weight: 500;
   color: #666;
-  margin-bottom: 4px;
+  margin-bottom: 0.5%;
 }
 
 .quick-stat-card .ant-statistic-content {
@@ -34,23 +34,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding: 16px;
+  margin-bottom: 2%;
+  padding: 2%;
   background: white;
-  border-radius: 8px;
+  border-radius: 1%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .schedule-filters {
   display: flex;
-  gap: 12px;
+  gap: 1.5%;
   align-items: center;
 }
 
 .schedule-actions {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 1%;
+  margin-bottom: 3%;
 }
 
 .schedule-header h3 {
@@ -60,7 +60,7 @@
 
 .schedule-controls {
   display: flex;
-  gap: 12px;
+  gap: 1.5%;
   align-items: center;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .schedule-form-row {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
 }
 
 .modal-actions {

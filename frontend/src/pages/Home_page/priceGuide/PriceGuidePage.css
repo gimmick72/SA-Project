@@ -1,36 +1,36 @@
 /* PriceGuidePage Styles - Admin Theme */
 .price-guide-content {
   background: transparent;
-  padding: 24px;
+  padding: 3%;
   min-height: 100vh;
 }
 
 .price-guide-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 4%;
 }
 
 .price-guide-title {
   color: #333333;
-  margin-bottom: 16px;
+  margin-bottom: 2%;
   font-weight: 600;
 }
 
 .price-guide-description {
   color: #666666;
   font-size: 16px;
-  max-width: 600px;
+  max-width: 75%;
   margin: 0 auto;
 }
 
 .promotion-header {
   text-align: center;
-  margin: 48px 0 32px 0;
+  margin: 6% 0 4% 0;
 }
 
 .promotion-title {
   color: #333333;
-  margin-bottom: 8px;
+  margin-bottom: 1%;
   font-weight: 600;
 }
 
@@ -42,7 +42,7 @@
 
 /* Carousel styling */
 .ant-carousel .slick-dots {
-  bottom: -40px;
+  bottom: -5%;
 }
 
 .ant-carousel .slick-dots li button {
@@ -56,10 +56,10 @@
 
 @media (max-width: 768px) {
   .price-guide-header {
-    margin-bottom: 24px;
+    margin-bottom: 3%;
   }
   
   .promotion-header {
-    margin: 32px 0 24px 0;
+    margin: 4% 0 3% 0;
   }
 }

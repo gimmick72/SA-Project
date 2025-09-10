@@ -1,12 +1,12 @@
 .staff-calendar-view {
-  padding: 20px;
+  padding: 2.5%;
   background: #f5f5f5;
   min-height: 100vh;
 }
 
 .calendar-header {
-  margin-bottom: 16px;
-  border-radius: 8px;
+  margin-bottom: 2%;
+  border-radius: 1%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -19,14 +19,14 @@
 .calendar-navigation {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 2%;
 }
 
 .calendar-title {
   margin: 0 !important;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 1%;
 }
 
 .week-range {
@@ -36,12 +36,12 @@
 
 .calendar-filters {
   display: flex;
-  gap: 12px;
+  gap: 1.5%;
   align-items: center;
 }
 
 .calendar-grid {
-  border-radius: 8px;
+  border-radius: 1%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
@@ -53,13 +53,13 @@
 
 .calendar-header-row {
   display: grid;
-  grid-template-columns: 80px repeat(7, 1fr);
+  grid-template-columns: 10% repeat(7, 1fr);
   border-bottom: 2px solid #e8e8e8;
   background: #fafafa;
 }
 
 .time-column-header {
-  padding: 16px 8px;
+  padding: 2% 1%;
   font-weight: 600;
   text-align: center;
   border-right: 1px solid #e8e8e8;
@@ -67,7 +67,7 @@
 }
 
 .day-header {
-  padding: 16px 8px;
+  padding: 2% 1%;
   text-align: center;
   border-right: 1px solid #e8e8e8;
   background: #fafafa;
@@ -84,23 +84,23 @@
   font-size: 18px;
   font-weight: 700;
   color: #1890ff;
-  margin-top: 4px;
+  margin-top: 0.5%;
 }
 
 .calendar-body {
-  max-height: 600px;
+  max-height: 75%;
   overflow-y: auto;
 }
 
 .time-row {
   display: grid;
-  grid-template-columns: 80px repeat(7, 1fr);
+  grid-template-columns: 10% repeat(7, 1fr);
   border-bottom: 1px solid #e8e8e8;
-  min-height: 60px;
+  min-height: 7.5%;
 }
 
 .time-label {
-  padding: 8px;
+  padding: 1%;
   font-size: 12px;
   color: #666;
   text-align: center;
@@ -114,10 +114,10 @@
 
 .time-slot {
   border-right: 1px solid #e8e8e8;
-  padding: 4px;
+  padding: 0.5%;
   cursor: pointer;
   position: relative;
-  min-height: 60px;
+  min-height: 7.5%;
   transition: background-color 0.2s ease;
 }
 
@@ -128,9 +128,9 @@
 .schedule-item {
   background: #1890ff;
   color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  margin: 2px 0;
+  padding: 0.5% 1%;
+  border-radius: 0.5%;
+  margin: 0.25% 0;
   font-size: 11px;
   line-height: 1.2;
   cursor: pointer;
@@ -141,24 +141,24 @@
 }
 
 .schedule-item:hover {
-  transform: translateY(-1px);
+  transform: translateY(-0.125%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .schedule-item.scheduled {
   opacity: 0.8;
-  border-left: 4px solid #faad14;
+  border-left: 0.5% solid #faad14;
 }
 
 .schedule-item.confirmed {
   opacity: 1;
-  border-left: 4px solid #52c41a;
+  border-left: 0.5% solid #52c41a;
 }
 
 .schedule-item.cancelled {
   opacity: 0.5;
   background: #ff4d4f;
-  border-left: 4px solid #ff7875;
+  border-left: 0.5% solid #ff7875;
   text-decoration: line-through;
 }
 
@@ -172,7 +172,7 @@
 .schedule-time {
   font-size: 10px;
   opacity: 0.9;
-  margin-top: 2px;
+  margin-top: 0.25%;
 }
 
 /* Today highlight */
@@ -184,12 +184,12 @@
   background: #1890ff;
   color: white;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 3.5%;
+  height: 3.5%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 4px auto 0;
+  margin: 0.5% auto 0;
 }
 
 .time-slot.today {
@@ -216,14 +216,14 @@
 /* Responsive design */
 @media (max-width: 1200px) {
   .calendar-container {
-    min-width: 800px;
+    min-width: 100%;
   }
 }
 
 @media (max-width: 768px) {
   .calendar-controls {
     flex-direction: column;
-    gap: 16px;
+    gap: 2%;
     align-items: stretch;
   }
   
@@ -238,7 +238,7 @@
 
 /* Modal styling */
 .ant-modal .ant-form-item {
-  margin-bottom: 16px;
+  margin-bottom: 2%;
 }
 
 .ant-modal .ant-form-item-label > label {
@@ -250,12 +250,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 400px;
+  height: 50%;
 }
 
 .calendar-empty {
   text-align: center;
-  padding: 40px;
+  padding: 5%;
   color: #999;
 }
 
@@ -267,5 +267,5 @@
 
 .time-slot.drop-target {
   background: #e6f7ff;
-  border: 2px dashed #1890ff;
+  border: 0.25% dashed #1890ff;
 }
