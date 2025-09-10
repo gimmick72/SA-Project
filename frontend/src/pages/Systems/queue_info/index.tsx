@@ -10,7 +10,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Patient, RoomScheduleData as RoomDataFromTypes, ViewMode } from "./types";
 import dayjs, { Dayjs } from "dayjs";
-import { assignPatientApi, fetchRoomsByDate } from "../../../services/Queue/schedule";
+import { assignPatientApi, fetchRoomsByDate } from "../../../services/queue/schedule";
 
 const { Content } = Layout;
 

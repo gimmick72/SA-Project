@@ -14,7 +14,7 @@
     width: 1200px;
     height: 470px;
     margin: 0;
-    border: solid 1px #b8b8b8ff;
+    border: none 1px rgb(214, 21, 21);
     border-Radius: 8px;
     margin-Bottom: 30px;
     overflow: 'auto';

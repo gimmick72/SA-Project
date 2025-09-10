@@ -377,7 +377,7 @@ const StaffDetails: React.FC = () => {
           color: "black ",
           // borderRadius: '25px',
         }}
-          onClick={() => navigate('/staff')}>ย้อนกลับ</Button>
+          onClick={() => navigate('/admin/staff')}>ย้อนกลับ</Button>
       ) : (
         <><div style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
           <Button

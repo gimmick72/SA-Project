@@ -239,7 +239,7 @@ const StaffInfoPaeg: React.FC = () => {
                   backgroundColor: '#fff',
                   whiteSpace: 'nowrap',
                 }}
-                onClick={() => navigate(`/api/staff/PersonalData/${staff.Employee_ID}`)}
+                onClick={() => navigate(`/admin/PersonalData/${staff.Employee_ID}`)}
               >
                 <span style={{ flex: '1 0 100px' }}>{formatEmployeeIdForDisplay(staff.Employee_ID)}</span>
                 <span style={{ flex: '1 0 150px' }}>{staff.title}</span>

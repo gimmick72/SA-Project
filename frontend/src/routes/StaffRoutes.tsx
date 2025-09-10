@@ -13,6 +13,7 @@ const QueueInfoPage = Loadable(lazy(() => import("../pages/Systems/queue_info/in
 const PaymentInfoPage = Loadable(lazy(() => import("../pages/Systems/payment_info/index")));
 const AttendanceInfoPage = Loadable(lazy(() => import("../pages/Systems/attendance_info/index")));
 const ServiceInfoPage = Loadable(lazy(() => import("../pages/Systems/service_info/index")));
+const StaffDetail = Loadable(lazy(() => import("../pages/Systems/staff_info/StaffDetail")))
 
 
 import {PatientRoute} from "../routes/PatientRoute/patient_route";
@@ -64,6 +65,11 @@ const AdminRoutes: RouteObject[] = [
         path: "service",
         element: <ServiceInfoPage />,
       },
+
+      {
+        path: "PersonalData/:Employee_ID", 
+        element: <StaffDetail />
+      }
     ],
   },
 ];
