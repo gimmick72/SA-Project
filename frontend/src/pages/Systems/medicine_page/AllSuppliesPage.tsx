@@ -86,7 +86,7 @@ export const AllSuppliesPage: React.FC = () => {
     importDate: null,
     expiryDate: null,
     page: 1,
-    pageSize: 4, // ⬅️ แก้เป็น 4
+    pageSize: 10, // ⬅️ แก้เป็น 4
     sortBy: "created_at",
     order: "desc",
   });
@@ -151,7 +151,7 @@ export const AllSuppliesPage: React.FC = () => {
       importDate: null,
       expiryDate: null,
       page: 1,
-      pageSize: 4,
+      pageSize: 10,
       sortBy: "created_at",
       order: "desc",
     });
@@ -333,7 +333,7 @@ export const AllSuppliesPage: React.FC = () => {
   }>({
     q: "",
     page: 1,
-    page_size: 4,
+    page_size: 10,
     sort_by: "recorded_at",
     order: "desc",
   });
@@ -402,20 +402,16 @@ export const AllSuppliesPage: React.FC = () => {
   };
 
   return (
+      <div style={{  flex: 1,
+          border: '1px solid #f0f0f0',
+          borderTop: 'none',
+          borderRadius: '0 0 4px 4px',
+          overflowY: 'auto',
+          overflowX: 'auto',
+          maxHeight: 10000,backgroundColor: '##FFF'}}>
 
-    <div
-      style={{
-        marginBottom: 20,
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 12,
-        alignItems: "center",
-      }}
-    >
-      {ctx}
-
-      {/* แถวฟิลเตอร์ + ปุ่มรายงาน (ชิดขวา, รองรับ wrap) */}
-      <div style={{ marginBottom: 20 }}>
+        {/* แถวฟิลเตอร์ + ปุ่มรายงาน (ชิดขวา, รองรับ wrap) */}
+      <div style={{ marginBottom: 20 , flex: 1, minHeight: 0, flexDirection: 'column', width: '100%',height: '100%',display: 'flex',backgroundColor: '##FFF',borderRadius: 16,padding: 16}}>
         <Row gutter={[12, 12]} align="middle" justify="space-between" wrap>
           {/* ฝั่งซ้าย: ฟิลเตอร์ */}
           <Col flex="auto">
@@ -476,26 +472,25 @@ export const AllSuppliesPage: React.FC = () => {
           </Col>
         </Row>
       </div>
-      {/* <Table
+
+      {/* ตาราง */}
+      <Table
+        style={{ width: "100%", height: "100%",backgroundColor: '##FFF', borderRadius: 16,padding: 16, flexDirection: 'column' , flex: 1 }}
         rowKey="id"
         loading={loading}
         dataSource={rows}
         columns={columns}
         bordered
-        scroll={{ x: 1200, y: 300 }}
-        style={{ width: "100%", height: 4000 }}
+        scroll={{ x: 1200, y: 390 }}
         pagination={{
           current: query.page,
-          pageSize: 4, // ⬅️ บังคับ 4
+          pageSize: 10, // ⬅️ บังคับ 4
           total,
-          showSizeChanger: false, // ⬅️ ปิดการเปลี่ยน pageSize
+          showSizeChanger: true, // ⬅️ ปิดการเปลี่ยน pageSize
         }}
         onChange={onTableChange}
-      /> */}
-
-
-
-      {/* Drawer: แก้ไขเวชภัณฑ์ */}
+      />
+       {/* Drawer: แก้ไขเวชภัณฑ์ */}
       <Drawer
         title={editing ? `แก้ไขเวชภัณฑ์: ${editing.name}` : "แก้ไขเวชภัณฑ์"}
         width={520}
@@ -603,7 +598,8 @@ export const AllSuppliesPage: React.FC = () => {
           onChange={onReportTableChange}
         />
       </Drawer>
-    </div>
+      </div>
+  
   );
 };
 

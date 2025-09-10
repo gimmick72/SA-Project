@@ -42,8 +42,43 @@ const AddSupplyPage: React.FC = () => {
   const categories = ['ยาเม็ด', 'ของเหลว', 'อุปกรณ์ทำแผล'];
 
   return (
-    <Card title="แบบฟอร์มเพิ่มเวชภัณฑ์"style={{  borderRadius: 12, marginTop: 24, width: '100%', marginLeft: 'auto', marginRight: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column'
-              ,flex: 1,minHeight: 0, border: '2px solid #4FFE0A'}}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        minHeight: 0,
+        height: '100%',
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: 0,
+        border: '2px solid #FFF'
+      }}
+    >
+      <Card
+        title="แบบฟอร์มเพิ่มเวชภัณฑ์"
+        style={{
+          borderRadius: 12,
+          marginTop: 24,
+          width: '99%',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+          maxHeight: '100%',
+          border: '2px solid #FFF', // สีเขียวเหมือน index
+        }}
+        bodyStyle={{
+          flex: 1,
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: 0,
+        }}
+      >
       <Form
         form={form}
         layout="vertical"
@@ -107,7 +142,9 @@ const AddSupplyPage: React.FC = () => {
           </Space>
         </Form.Item>
       </Form>
-    </Card>
+      </Card>
+    </div>
+  
   );
 };
 

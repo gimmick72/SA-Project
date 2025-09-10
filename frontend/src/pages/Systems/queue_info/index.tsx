@@ -10,7 +10,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Patient, RoomScheduleData as RoomDataFromTypes, ViewMode } from "./types";
 import dayjs, { Dayjs } from "dayjs";
-import { assignPatientApi, fetchRoomsByDate } from "../../../services/Queue/schedule";
+import { assignPatientApi, fetchRoomsByDate } from "../../../services/queue/schedule";
 
 const { Content } = Layout;
 
@@ -109,12 +109,13 @@ const QueuePage: React.FC = () => {
   );
 
   return (
+    <div style={{ display: 'flex',padding: '4px', height: '100%', flexDirection: 'column', overflowY: 'auto',overflowX: 'auto'}}>
       <DndProvider backend={HTML5Backend}>
-        <Layout style={{ padding: 24, background: "#fff", height: "100%", minHeight: 0 }}>
+      
           <Content style={{ height: "100%", minHeight: 0 }}>
             {/* Toolbar */}
             <Card
-              style={{ marginBottom: 12, borderRadius: 12 }}
+              style={{ marginBottom: 0, borderRadius: 12,border: '2px solid #68CFD9' }}
               bodyStyle={{
                 display: "flex",
                 alignItems: "center",
@@ -163,15 +164,17 @@ const QueuePage: React.FC = () => {
               </Col>
 
               {/* ตารางห้อง (เลื่อนขวาได้) */}
-              <Col xs={24} md={18} style={{ height: "100%", minHeight: 0 }}>
+              <Col xs={24} md={18} style={{ height: "100%", minHeight: 0, border: '2px solid #444CEB',flex:1,}}>
                 <div
                   style={{
-                    height: "500px",
-                    overflowY: "auto",
+                    height: "auto",
+                    
                     borderRadius: 12,
                     background: "#ffffffff",
                     paddingRight: 8,
-                    border: "1px solid #ffffffff",
+                    border: "1px solid #000",
+                    marginBottom: 0,
+                    flex: 1,
                   }}
                 >
                   <Spin spinning={loading}>
@@ -198,8 +201,10 @@ const QueuePage: React.FC = () => {
               </Col>
             </Row>
           </Content>
-        </Layout>
+        
       </DndProvider>
+    </div>
+      
   );
 };
 

@@ -155,29 +155,28 @@ const DispensePage: React.FC = () => {
   ];
 
   return (
-    <Card
+    <div style={{marginBottom:0,display: 'flex'}}>
+      <Card
       title="การเบิก/จ่ายเวชภัณฑ์"
-      bordered
       style={{
-        borderRadius: 12,
-        border: "2px solid #ffffffff",
-        backgroundColor: "#ffffffff",
-        width: "1325px",
-        height: "475px",
+        padding: '16px', height: '100%', display: 'flex', flexDirection: 'column',backgroundColor: "#fff",flex: 1,
       }}
       bodyStyle={{
-        background: "#ffffffff",
+        background: "#fff",
         borderRadius: 8,
         border: "2px solid #ffffffff",
-        width: "1300px",
-        height: "425px",
+        width: "100%",
+        maxHeight: "100%",
+        
+
       }}
     >
+      {/* //ฟอร์มซ้าย  */}
       <Row gutter={32}>
-        {/* ฟอร์มซ้าย */}
+        
         <Col span={12}>
           <Form form={form} layout="vertical" name="dispense_form">
-            {/* รหัสเคส + รหัสเวชภัณฑ์ */}
+            {/* //รหัสเคสรหัสเวชภัณฑ์ */}
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -211,7 +210,7 @@ const DispensePage: React.FC = () => {
                   </Select>
                 </Form.Item>
               </Col>
-            </Row>
+            </Row> 
 
             {/* ชื่อเวชภัณฑ์ + ประเภท */}
             <Row gutter={16}>
@@ -261,7 +260,7 @@ const DispensePage: React.FC = () => {
 
         {/* รายการเบิกขวา */}
         <Col span={12}>
-          <Card bordered style={{ borderRadius: 8, minHeight: 375 }}>
+          <Card bordered style={{ borderRadius: 8, minHeight: '100%' }}>
             <Table
               dataSource={dispenseList}
               columns={columns}
@@ -288,6 +287,8 @@ const DispensePage: React.FC = () => {
         </Col>
       </Row>
     </Card>
+    </div>
+    
   );
 };
 

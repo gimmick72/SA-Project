@@ -184,7 +184,7 @@ const StaffInfoPaeg: React.FC = () => {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '10px 16px',
-        backgroundColor: '#f8f8f8',
+        backgroundColor: '#FFCD05',
         borderRadius: '20px 20px 0 0',
         borderBottom: '1px solid #e0e0e0',
         fontWeight: 'bold',
@@ -208,6 +208,7 @@ const StaffInfoPaeg: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           overflow: 'auto',
+          backgroundColor: '#4A0A0A',
         }}
       >
 
@@ -236,7 +237,7 @@ const StaffInfoPaeg: React.FC = () => {
                   padding: '10px 16px',
                   borderBottom: '1px dotted #eee',
                   cursor: 'pointer',
-                  backgroundColor: '#fff',
+                  backgroundColor: '#89CC89',
                   whiteSpace: 'nowrap',
                 }}
                 onClick={() => navigate(`/api/staff/PersonalData/${staff.Employee_ID}`)}
