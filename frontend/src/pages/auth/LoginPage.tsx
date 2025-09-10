@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Typography, Radio, Alert, Space, Divider } from 'antd';
-import { UserOutlined, LockOutlined, MedicineBoxOutlined, TeamOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, MedicineBoxOutlined, TeamOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
 // Removed authService import - using mock authentication
 import './AuthPages.css';
@@ -170,6 +170,17 @@ const LoginPage: React.FC = () => {
             </Text>
             
             <Divider style={{ margin: '16px 0' }}>หรือ</Divider>
+            
+            <Link to="/home">
+              <Button 
+                type="default" 
+                icon={<HomeOutlined />}
+                block
+                style={{ marginBottom: '16px' }}
+              >
+                เข้าชมเว็บไซต์โดยไม่ต้องเข้าสู่ระบบ
+              </Button>
+            </Link>
             
             <div className="demo-credentials">
               <Text type="secondary" style={{ fontSize: '12px' }}>
