@@ -3,7 +3,7 @@ import type { RouteObject } from "react-router-dom";
 import Loadable from "../components/third-patry/Loadable";
 import FullLayout from "../layout/FullLayout";
 
-const HomeInfoPage = Loadable(lazy(() => import("../pages/Systems/home_info/index")));
+const HomeInfoPage = Loadable(lazy(() => import("../pages/Systems/home/home_info")));
 const PatientInfoPage = Loadable(lazy(() => import("../pages/Systems/patient_info/index"))); 
 const TreatmentInfoPage = Loadable(lazy(() => import("../pages/Systems/treatment_info/index")));
 const ScheduleInfoPage = Loadable(lazy(() => import("../pages/Systems/schedule_info/index")));

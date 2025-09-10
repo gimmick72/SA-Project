@@ -1,0 +1,22 @@
+.credit-card-payment-card {
+  margin-bottom: 16px;
+}
+
+.card-holder-input {
+  text-transform: uppercase;
+}
+
+.expiry-date-field {
+  width: 50%;
+}
+
+.cvv-field {
+  width: 50%;
+}
+
+.security-notice {
+  padding: 12px;
+  background-color: #fff2e8;
+  border: 1px solid #ffcc99;
+  border-radius: 6px;
+}
