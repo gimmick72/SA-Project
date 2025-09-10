@@ -13,7 +13,7 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<'patient' | 'staff'>('patient');
+  const [selectedRole] = useState<'patient'>('patient');
   const navigate = useNavigate();
 
   const handleRegister = async (values: any) => {
@@ -49,18 +49,7 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  const handleRoleChange = (e: any) => {
-    setSelectedRole(e.target.value);
-    setError('');
-    setSuccess('');
-    // Clear role-specific fields when switching roles
-    form.setFieldsValue({
-      phoneNumber: undefined,
-      dateOfBirth: undefined,
-      department: undefined,
-      position: undefined
-    });
-  };
+  // Removed role change handler - patients only
 
   const departments = [
     'General Dentistry',
@@ -105,23 +94,14 @@ const RegisterPage: React.FC = () => {
 
         <Divider />
 
-        {/* Role Selection */}
+        {/* Patient Registration Only */}
         <div className="role-selection">
-          <Text strong style={{ marginBottom: '12px', display: 'block' }}>
-            เลือกประเภทผู้ใช้งาน:
+          <Text strong style={{ marginBottom: '12px', display: 'block', color: '#1890ff' }}>
+            สมัครสมาชิกสำหรับผู้ป่วย
           </Text>
-          <Radio.Group 
-            value={selectedRole} 
-            onChange={handleRoleChange}
-            className="role-radio-group"
-          >
-            <Radio.Button value="patient" className="role-button">
-              <UserOutlined /> ผู้ป่วย
-            </Radio.Button>
-            <Radio.Button value="staff" className="role-button">
-              <TeamOutlined /> เจ้าหน้าที่
-            </Radio.Button>
-          </Radio.Group>
+          <Text type="secondary" style={{ fontSize: '14px' }}>
+            หมายเหตุ: การสมัครสมาชิกสำหรับเจ้าหน้าที่ กรุณาติดต่อผู้ดูแลระบบ
+          </Text>
         </div>
 
         {error && (
@@ -237,74 +217,38 @@ const RegisterPage: React.FC = () => {
             </Form.Item>
           </div>
 
-          {/* Role-specific fields */}
-          {selectedRole === 'patient' && (
-            <div className="form-section">
-              <Text strong className="section-title">ข้อมูลผู้ป่วย</Text>
-              
-              <Form.Item
-                name="phoneNumber"
-                label="หมายเลขโทรศัพท์"
-                rules={[
-                  { required: true, message: 'กรุณากรอกหมายเลขโทรศัพท์' },
-                  { pattern: /^[0-9]{10}$/, message: 'หมายเลขโทรศัพท์ต้องเป็นตัวเลข 10 หลัก' }
-                ]}
-              >
-                <Input 
-                  prefix={<PhoneOutlined />} 
-                  placeholder="กรอกหมายเลขโทรศัพท์ (10 หลัก)"
-                />
-              </Form.Item>
+          {/* Patient-specific fields only */}
+          <div className="form-section">
+            <Text strong className="section-title">ข้อมูลผู้ป่วย</Text>
+            
+            <Form.Item
+              name="phoneNumber"
+              label="หมายเลขโทรศัพท์"
+              rules={[
+                { required: true, message: 'กรุณากรอกหมายเลขโทรศัพท์' },
+                { pattern: /^[0-9]{10}$/, message: 'หมายเลขโทรศัพท์ต้องเป็นตัวเลข 10 หลัก' }
+              ]}
+            >
+              <Input 
+                prefix={<PhoneOutlined />} 
+                placeholder="กรอกหมายเลขโทรศัพท์ (10 หลัก)"
+              />
+            </Form.Item>
 
-              <Form.Item
-                name="dateOfBirth"
-                label="วันเกิด"
-                rules={[
-                  { required: true, message: 'กรุณาเลือกวันเกิด' }
-                ]}
-              >
-                <DatePicker 
-                  placeholder="เลือกวันเกิดของคุณ"
-                  style={{ width: '100%' }}
-                  format="DD/MM/YYYY"
-                />
-              </Form.Item>
-            </div>
-          )}
-
-          {selectedRole === 'staff' && (
-            <div className="form-section">
-              <Text strong className="section-title">ข้อมูลเจ้าหน้าที่</Text>
-              
-              <Form.Item
-                name="department"
-                label="แผนก"
-                rules={[
-                  { required: true, message: 'กรุณาเลือกแผนก' }
-                ]}
-              >
-                <Select placeholder="เลือกแผนกของคุณ">
-                  {departments.map(dept => (
-                    <Option key={dept} value={dept}>{dept}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
-              <Form.Item
-                name="position"
-                label="ตำแหน่ง"
-                rules={[
-                  { required: true, message: 'กรุณาเลือกตำแหน่ง' }
-                ]}
-              >
-                <Select placeholder="เลือกตำแหน่งของคุณ">
-                  {positions.map(pos => (
-                    <Option key={pos} value={pos}>{pos}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </div>
-          )}
+            <Form.Item
+              name="dateOfBirth"
+              label="วันเกิด"
+              rules={[
+                { required: true, message: 'กรุณาเลือกวันเกิด' }
+              ]}
+            >
+              <DatePicker 
+                placeholder="เลือกวันเกิดของคุณ"
+                style={{ width: '100%' }}
+                format="DD/MM/YYYY"
+              />
+            </Form.Item>
+          </div>
 
           <Form.Item>
             <Button 
