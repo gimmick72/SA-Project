@@ -32,26 +32,26 @@ const MedicinePage = () => {
   };
 
   return (
-        <div style={{ padding: 0, width: '100%', height: '100%', boxSizing: 'border-box',overflow: 'hidden', }}>
-          <div style={{ marginBottom: 24
-            
-            , display: 'flex', alignItems: 'center' }}>
+        <div style={{ flex: 1,padding: '16px', height: '100%', display: 'flex', flexDirection: 'column',backgroundColor: '#FFCD05' }}>
+          <div style={{ marginBottom: 10 , display: 'flex',  border: '2px solid #D20103',alignItems: 'center' }}>
             <Title level={2} style={{ margin: 0 }}>
               เวชภัณฑ์
             </Title>
           </div>
           <Card
-            style={{ borderRadius: 12, marginTop: 24, border: '2px solid #ffffffff', width: '100%', maxWidth: 1400, marginLeft: 'auto', marginRight: 'auto', height: '20', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}
-            bodyStyle={{ padding: '0 24px 24px 24px', height: '100%' }}
+            style={{ borderRadius: 40,marginBottom: 0 , width: '100%', marginLeft: 'auto', marginRight: 'auto', flexDirection: 'column'
+              ,flex: 1,minHeight: 0, border: '2px solid #4FFE0A'
+             }}
+           
           >
             <Tabs
               defaultActiveKey="1"
               activeKey={activeKey}
               onChange={onTabChange}
               tabBarStyle={{ marginBottom: 0 }}
-              style={{ height: '100%' }}
+              style={{ height: '100%', display: 'flex' ,flex: 1,minHeight: 0}}
             >
-              <TabPane
+              <TabPane 
                 tab={renderTabTitle('1', 'รายการเวชภัณฑ์ทั้งหมด')}
                 key="1"
               >
@@ -71,6 +71,7 @@ const MedicinePage = () => {
               </TabPane>
             </Tabs>
           </Card>
+          
         </div>
   );
   

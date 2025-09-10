@@ -2,16 +2,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Input, Table, Button, Space, Select, DatePicker, Tag, Tooltip,
-  message, Popconfirm, Drawer, Form, InputNumber
+  message, Popconfirm, Drawer, Form, InputNumber,
+  Col,
+  Row
 } from "antd";
 import { SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import type { ColumnsType } from "antd/es/table";
 import type { TableProps } from "antd";
-import { fetchSupplies, deleteSupply, fetchDispenses } from "../../../services/Supply/supply";
+import { fetchSupplies, deleteSupply, fetchDispenses, updateSupply } from "../../../services/supply/supply";
 
 // 👉 เพิ่ม: service อัปเดต (ถ้ายังไม่มีใน services/supply.ts ให้เพิ่มตามตัวอย่างท้ายข้อความ)
-import { updateSupply } from "../../../services/Supply/supply";
+// import {  } from "../../../services/Supply/supply";
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -84,7 +86,7 @@ const AllSuppliesPage: React.FC = () => {
     importDate: null,
     expiryDate: null,
     page: 1,
-    pageSize: 10,
+    pageSize: 4, // ⬅️ แก้เป็น 4
     sortBy: "created_at",
     order: "desc",
   });
@@ -149,7 +151,7 @@ const AllSuppliesPage: React.FC = () => {
       importDate: null,
       expiryDate: null,
       page: 1,
-      pageSize: 10,
+      pageSize: 4,
       sortBy: "created_at",
       order: "desc",
     });
@@ -211,6 +213,7 @@ const AllSuppliesPage: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
+      console.log("Deleting", id);
       await deleteSupply(id);
       msg.success("ลบรายการสำเร็จ");
       window.dispatchEvent(new Event("suppliesUpdated"));
@@ -271,20 +274,22 @@ const AllSuppliesPage: React.FC = () => {
         width: 120,
         render: (_, record) => (
           <Space size="middle">
-            <Tooltip title="ลบ">
-                <Button icon={<DeleteOutlined />} danger />
-              </Tooltip>
-            <Tooltip title="แก้ไข">
-              <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-            </Tooltip>
             <Popconfirm
               title="คุณต้องการลบรายการนี้ใช่ไหม?"
-              onConfirm={() => handleDelete(record.id)}
+              onConfirm={() => handleDelete(record.id)}  // << เรียกใช้ฟังก์ชันลบที่นี่
               okText="ใช่"
               cancelText="ไม่"
             >
+              <Tooltip title="ลบ">
+                <Button icon={<DeleteOutlined />} danger />
+              </Tooltip>
             </Popconfirm>
+
+            <Tooltip title="แก้ไข">
+              <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+            </Tooltip>
           </Space>
+
         ),
       },
     ],
@@ -328,7 +333,7 @@ const AllSuppliesPage: React.FC = () => {
   }>({
     q: "",
     page: 1,
-    page_size: 10,
+    page_size: 4,
     sort_by: "recorded_at",
     order: "desc",
   });
@@ -397,80 +402,80 @@ const AllSuppliesPage: React.FC = () => {
   };
 
   return (
+    
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-        padding: 16,
-        width: "100%",
-        boxSizing: "border-box",
+        marginBottom: 20,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 12,
+    alignItems: "center",
       }}
     >
       {ctx}
 
-      {/* แถวฟิลเตอร์ + ปุ่มรายงาน */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 16,
-          alignItems: "center",
-          marginTop: 8,
-          marginBottom: 8,
-          width: "100%",
-        }}
-      >
-        <Space size="middle" wrap>
-          <Search
-            placeholder="ค้นหาเวชภัณฑ์ (ชื่อ/รหัส)"
-            allowClear
-            value={query.q}
-            onChange={(e) => setQuery((q) => ({ ...q, q: e.target.value }))}
-            onSearch={() => setQuery((q) => ({ ...q, page: 1 }))}
-            style={{ width: 260 }}
-            prefix={<SearchOutlined />}
-          />
+      {/* แถวฟิลเตอร์ + ปุ่มรายงาน (ชิดขวา, รองรับ wrap) */}
+<div style={{ marginBottom: 20 }}>
+  <Row gutter={[12, 12]} align="middle" justify="space-between" wrap>
+    {/* ฝั่งซ้าย: ฟิลเตอร์ */}
+    <Col flex="auto">
+      <Space size="middle" wrap>
+        <Search
+          placeholder="ค้นหาเวชภัณฑ์ (ชื่อ/รหัส)"
+          allowClear
+          value={query.q}
+          onChange={(e) => setQuery((q) => ({ ...q, q: e.target.value }))}
+          onSearch={() => setQuery((q) => ({ ...q, page: 1 }))}
+          style={{ width: 260 }}
+          prefix={<SearchOutlined />}
+        />
 
-          <Select
-            style={{ width: 200 }}
-            value={query.category}
-            onChange={(v) => setQuery((q) => ({ ...q, category: v, page: 1 }))}
-            options={[
-              { label: "หมวดหมู่ทั้งหมด", value: "all" },
-              ...Array.from(new Set([ ...rows.map((r) => r.category).filter(Boolean), ...CATEGORY_OPTIONS ])).map(c => ({ label: c, value: c }))
-            ]}
-          />
+        <Select
+          style={{ width: 200 }}
+          value={query.category}
+          onChange={(v) => setQuery((q) => ({ ...q, category: v, page: 1 }))}
+          options={[
+            { label: "หมวดหมู่ทั้งหมด", value: "all" },
+            ...Array.from(
+              new Set(
+                [
+                  ...rows.map((r) => r.category).filter(Boolean),
+                  ...(CATEGORY_OPTIONS || []),
+                ].filter(Boolean)
+              )
+            ).map((c) => ({ label: c, value: c }))
+          ]}
+        />
 
-          <DatePicker
-            placeholder="วันที่นำเข้า"
-            value={query.importDate}
-            onChange={(d) => setQuery((q) => ({ ...q, importDate: d, page: 1 }))}
-            style={{ width: 160 }}
-            allowClear
-          />
-          <DatePicker
-            placeholder="วันหมดอายุ"
-            value={query.expiryDate}
-            onChange={(d) => setQuery((q) => ({ ...q, expiryDate: d, page: 1 }))}
-            style={{ width: 160 }}
-            allowClear
-          />
+        <DatePicker
+          placeholder="วันที่นำเข้า"
+          value={query.importDate}
+          onChange={(d) => setQuery((q) => ({ ...q, importDate: d, page: 1 }))}
+          style={{ width: 160 }}
+          allowClear
+        />
+        <DatePicker
+          placeholder="วันหมดอายุ"
+          value={query.expiryDate}
+          onChange={(d) => setQuery((q) => ({ ...q, expiryDate: d, page: 1 }))}
+          style={{ width: 160 }}
+          allowClear
+        />
 
-          <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>
-            รีเซ็ต
-          </Button>
-        </Space>
+        <Button icon={<ReloadOutlined />} onClick={handleResetFilters}>
+          รีเซ็ต
+        </Button>
+      </Space>
+    </Col>
 
-        <Space style={{ marginLeft: "auto" }}>
-          <Button type="primary" onClick={() => setReportOpen(true)}>
-            ดูรายงานการเบิก/จ่าย
-          </Button>
-        </Space>
-      </div>
-
-      {/* ตารางหลัก */}
-      <div style={{ flex: "1 1 auto", minHeight: 0 }}>
+    {/* ฝั่งขวา: ปุ่มรายงาน (จะชิดขวาเสมอ) */}
+    <Col>
+      <Button type="primary" onClick={() => setReportOpen(true)}>
+        ดูรายงานการเบิก/จ่าย
+      </Button>
+    </Col>
+  </Row>
+</div>
         <Table
           rowKey="id"
           loading={loading}
@@ -479,15 +484,16 @@ const AllSuppliesPage: React.FC = () => {
           bordered
           scroll={{ x: 1200, y: 300 }}
           style={{ width: "100%" }}
-          pagination={{
-            current: query.page,
-            pageSize: query.pageSize,
-            total,
-            showSizeChanger: true,
-          }}
+         pagination={{
+          current: query.page,
+          pageSize: 4, // ⬅️ บังคับ 4
+          total,
+          showSizeChanger: false, // ⬅️ ปิดการเปลี่ยน pageSize
+        }}
           onChange={onTableChange}
         />
-      </div>
+     
+      
 
       {/* Drawer: แก้ไขเวชภัณฑ์ */}
       <Drawer
@@ -495,7 +501,6 @@ const AllSuppliesPage: React.FC = () => {
         width={520}
         open={editOpen}
         onClose={() => { setEditOpen(false); setEditing(null); }}
-        destroyOnClose
         extra={
           <Space>
             <Button onClick={() => { form.resetFields(); if (editing) handleEdit(editing); }}>
@@ -517,7 +522,7 @@ const AllSuppliesPage: React.FC = () => {
           <Form.Item label="หมวดหมู่" name="category" rules={[{ required: true, message: "กรุณาเลือกหมวดหมู่" }]}>
             <Select
               options={[
-                ...Array.from(new Set([ ...rows.map((r) => r.category).filter(Boolean), ...CATEGORY_OPTIONS ])).map(c => ({ label: c, value: c }))
+                ...Array.from(new Set([...rows.map((r) => r.category).filter(Boolean), ...CATEGORY_OPTIONS])).map(c => ({ label: c, value: c }))
               ]}
               placeholder="เลือกหมวดหมู่"
             />
@@ -543,7 +548,7 @@ const AllSuppliesPage: React.FC = () => {
         width={960}
         open={reportOpen}
         onClose={() => setReportOpen(false)}
-        destroyOnClose
+        
       >
         <Space style={{ marginBottom: 16 }} wrap>
           <Input
@@ -572,7 +577,7 @@ const AllSuppliesPage: React.FC = () => {
               setReportQuery({
                 q: "",
                 page: 1,
-                page_size: 10,
+                page_size: 4,
                 sort_by: "recorded_at",
                 order: "desc",
               })

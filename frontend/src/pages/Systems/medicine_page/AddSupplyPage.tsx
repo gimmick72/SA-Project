@@ -2,7 +2,7 @@
 import React from 'react';
 import { Form, Input, Button, InputNumber, Select, DatePicker, message, Card, Space, Row, Col } from 'antd';
 import dayjs from 'dayjs';
-import { createSupply } from '../../../services/Supply/supply';
+import { createSupply } from '../../../services/supply/supply';
 
 const { Option } = Select;
 
@@ -42,7 +42,8 @@ const AddSupplyPage: React.FC = () => {
   const categories = ['ยาเม็ด', 'ของเหลว', 'อุปกรณ์ทำแผล'];
 
   return (
-    <Card title="แบบฟอร์มเพิ่มเวชภัณฑ์" bordered style={{ width: '1300px', height: '475px', borderRadius: '12px' }}>
+    <Card title="แบบฟอร์มเพิ่มเวชภัณฑ์"style={{  borderRadius: 12, marginTop: 24, width: '100%', marginLeft: 'auto', marginRight: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column'
+              ,flex: 1,minHeight: 0, border: '2px solid #4FFE0A'}}>
       <Form
         form={form}
         layout="vertical"

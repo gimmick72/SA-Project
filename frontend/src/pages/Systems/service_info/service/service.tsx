@@ -201,17 +201,20 @@ const Servicecomponent = () => {
 
     return (
         // กล่องใหญ่ครอบทั้งหมด
+        
         <div style={{
             width: '100%',
-            maxWidth: '1200px',
+            maxHeight: '100%',
+            // maxWidth: '1200px',
             margin: '0 auto 0 auto',
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
             boxSizing: 'border-box',
             position: 'relative',
-            background: '#fff',
+            background: '#fff124',
             border: 'none 2px #accc',
+            minWidth: '100%',
         }}>
 
             {/* แถบเครื่องมือ -> ค้นหา, หมวดหมู่, เพิ่มรายการ */}
@@ -222,6 +225,8 @@ const Servicecomponent = () => {
                 alignItems: 'center',
                 width: '100%',
                 border: 'none 2px #000',
+                minWidth: '100%',
+                
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     {/* ช่องค้นหาข้อมูล */}
@@ -267,7 +272,7 @@ const Servicecomponent = () => {
             {/* ตารางแสดงข้อมูล */}
             <div className="table-container" >
                 <table className="item-table">
-                    <thead style={{ display: "flix" }}>
+                    <thead style={{ }}>
                         <tr >
                             <th style={{ width: '26%' }}>บริการ</th>
                             <th style={{ width: '20%' }}>ราคา</th>
