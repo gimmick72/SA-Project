@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"Database/controllers"
+	"Database/controllers/staff"
 	"github.com/gin-gonic/gin"
 )
 

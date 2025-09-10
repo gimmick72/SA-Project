@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"Database/controllers"
+	"Database/controllers/dentistManagement"
 )
 
 func DentisMenagementRouter(router *gin.RouterGroup) {

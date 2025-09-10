@@ -1,15 +1,18 @@
 
 import { useRoutes } from "react-router-dom";
 import { Navigate } from "react-router-dom";
-import StaffRoutes from "./StaffRoutes";
-import HomeRoutes from "./HomeRoutes";
 import { lazy, useState, useEffect } from "react";
 import Loadable from "../components/third-patry/Loadable";
+import StaffRoutes from "./StaffRoutes";
+import HomeRoutes from "./HomeRoutes";
+import SuperAdminRoutes from "./SuperAdminRouter";
+
 
 // Authentication Pages - inline definition to avoid module issues
 const LoginPage = Loadable(lazy(() => import("../pages/Authentication/LoginPage")));
 const RegisterPage = Loadable(lazy(() => import("../pages/Authentication/RegisterPage")));
 const AuthenticationIndex = Loadable(lazy(() => import("../pages/Authentication/index")));
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -74,7 +77,8 @@ function ConfigRoutes() {
   const routes = [
     ...HomeRoutes,
     ...authRoutes,
-    ...protectedStaffRoutes
+    ...protectedStaffRoutes,
+    ...SuperAdminRoutes,
   ];
 
   return useRoutes(routes);

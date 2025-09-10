@@ -1,8 +1,9 @@
 package routers
 
 import (
-	"Database/controllers"
+	"Database/controllers/room_queue"
 	"github.com/gin-gonic/gin"
+
 )
 
 func Schedule_QueueRouter(router *gin.RouterGroup) {

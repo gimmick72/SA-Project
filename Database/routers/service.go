@@ -1,8 +1,10 @@
 package routers
 
 import (
-	"Database/controllers"
+	"Database/controllers/Service"
 	"github.com/gin-gonic/gin"
+
+
 )
 
 func ServiceRouter(router *gin.RouterGroup) {

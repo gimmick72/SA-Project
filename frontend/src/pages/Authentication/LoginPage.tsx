@@ -108,7 +108,7 @@ const LoginPage: React.FC = () => {
             </Link>
           </Text>
           <br />
-          <Link to="/home" style={{ color: "#722ED1" }}>
+          <Link to="/" style={{ color: "#722ED1" }}>
             ← กลับหน้าแรก
           </Link>
         </div>
