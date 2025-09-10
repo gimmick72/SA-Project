@@ -10,7 +10,7 @@ const ScheduleInfoPage = Loadable(lazy(() => import("../pages/Systems/schedule_i
 const MedicineInfoPage = Loadable(lazy(() => import("../pages/Systems/medicine_page/index")));
 const StaffInfoPage = Loadable(lazy(() => import("../pages/Systems/staff_info/index")));
 const QueueInfoPage = Loadable(lazy(() => import("../pages/Systems/queue_info/index")));
-const PaymentInfoPage = Loadable(lazy(() => import("../pages/Systems/payment_info/index")));
+const PaymentRoutes = Loadable(lazy(() => import("../pages/Systems/payment_info/routes")));
 const AttendanceInfoPage = Loadable(lazy(() => import("../pages/Systems/attendance_info/index")));
 const ServiceInfoPage = Loadable(lazy(() => import("../pages/Systems/service_info/index")));
 
@@ -50,8 +50,8 @@ const AdminRoutes: RouteObject[] = [
         element: <QueueInfoPage />,
       },
       {
-        path: "payment",
-        element: <PaymentInfoPage />,
+        path: "payment/*",
+        element: <PaymentRoutes />,
       },
       {
         path: "attendance",

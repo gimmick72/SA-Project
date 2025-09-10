@@ -1,0 +1,86 @@
+/* Modern Payment Layout Styles */
+.modern-payment-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.modern-payment-sidebar {
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.modern-payment-header {
+  padding: 20px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modern-payment-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: block;
+}
+
+.modern-payment-actions {
+  flex: 1;
+  padding: 8px;
+}
+
+.modern-payment-nav {
+  margin-top: 24px;
+}
+
+.modern-payment-nav-button {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 8px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.modern-payment-nav-button:hover {
+  background: #f8f9fa;
+  border-color: #e9ecef;
+}
+
+.modern-payment-nav-button.active {
+  background: #f0f8ff;
+  border-color: #d6e4ff;
+  color: #1890ff;
+}
+
+.modern-payment-nav-button .ant-btn-icon {
+  margin-right: 8px;
+}
+
+.modern-payment-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.modern-payment-main {
+  flex: 1;
+  padding: 32px;
+  background: #ffffff;
+  overflow: auto;
+}
+
+.modern-payment-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  min-height: calc(100vh - 128px);
+}

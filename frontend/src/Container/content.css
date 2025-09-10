@@ -1,8 +1,9 @@
 .content-layout {
-  margin: 30px;
+  margin: 0;
+  padding: 32px;
   flex-grow: 1;
   background-color: #ffffff;
   color: #333333;
   min-height: calc(100vh - 116px);
-  border-radius: 8px;
+  border-radius: 0;
 }

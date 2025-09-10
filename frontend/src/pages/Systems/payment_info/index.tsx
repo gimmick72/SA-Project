@@ -1,8 +1,8 @@
 import React from 'react';
-import PaymentDashboard from './pages/PaymentDashboard';
+import TreatmentPaymentFlow from './components/TreatmentPaymentFlow';
 
 const PaymentInfoIndex: React.FC = () => {
-  return <PaymentDashboard />;
+  return <TreatmentPaymentFlow />;
 };
 
 export default PaymentInfoIndex;

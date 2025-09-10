@@ -22,26 +22,6 @@ export interface PaymentFormData {
   change?: number;
 }
 
-// Cash payment specific interface
-export interface CashPaymentData {
-  amount: number;
-  receivedAmount: number;
-  change?: number;
-}
-
-// Credit card payment specific interface
-export interface CreditCardData {
-  cardNumber: string;
-  cardHolder: string;
-  expiryDate: string;
-  cvv: string;
-}
-
-// Online payment specific interface
-export interface OnlinePaymentData {
-  phoneNumber: string;
-  qrCode?: string;
-}
 
 // Payment status types
 export type PaymentStatus = 'form' | 'success' | 'error';

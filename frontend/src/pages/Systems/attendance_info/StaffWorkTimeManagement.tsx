@@ -51,9 +51,17 @@ const StaffWorkTimeManagement: React.FC = () => {
   ];
 
   return (
-    <div className="staff-work-time-management">
-      <div className="page-header">
-        <Title level={2}>
+    <div style={{
+      maxWidth: '1200px',
+      margin: '0 auto',
+      background: '#ffffff',
+      borderRadius: '12px',
+      padding: '24px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+      minHeight: 'calc(100vh - 128px)'
+    }}>
+      <div style={{ marginBottom: '24px' }}>
+        <Title level={2} style={{ margin: 0, color: '#1a1a1a' }}>
           <CalendarOutlined /> ระบบจัดการตารางงานพนักงาน
         </Title>
       </div>
@@ -62,6 +70,10 @@ const StaffWorkTimeManagement: React.FC = () => {
         activeKey={activeTab} 
         onChange={setActiveTab} 
         type="card"
+        style={{
+          background: '#ffffff',
+          borderRadius: '8px'
+        }}
         items={[
           {
             key: 'dashboard',
