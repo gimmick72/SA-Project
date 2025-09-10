@@ -1,15 +1,40 @@
+/* IndexLayout.css - Admin Theme Style */
 .index-layout {
   min-height: 100vh;
   background: #f5f5f5;
-  margin-top: 56px;
 }
 
 .index-layout-content {
+  padding: 0;
+  background: #f5f5f5;
+  min-height: calc(100vh - 64px);
+  margin-top: 64px;
+}
+
+.index-content-wrapper {
   background: #ffffff;
-  color: #333333;
   padding: 24px;
-  margin: 30px;
-  border-radius: 8px;
-  min-height: calc(100vh - 116px - 56px);
-  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: calc(100% - 48px);
+  max-width: 1200px;
+  margin: 0 auto 24px auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .index-content-wrapper {
+    padding: 16px;
+    margin: 16px;
+    border-radius: 8px;
+  }
+  
+  .index-layout-content {
+    margin-top: 64px;
+  }
 }

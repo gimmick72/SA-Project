@@ -1,8 +1,8 @@
 import React from "react";
+import PriceGuidePage from "./PriceGuidePage";
 
 const PriceGuide = () => {
-  return (
-    <div>PriceGuide</div>
-  )
-}
-export default PriceGuide
+  return <PriceGuidePage />;
+};
+
+export default PriceGuide;

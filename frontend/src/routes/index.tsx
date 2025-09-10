@@ -6,25 +6,24 @@ import AuthRoutes from "./AuthRoutes";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 function ConfigRoutes() {
-  // Combine all routes with authentication
+  // Combine all routes with proper structure
   const routes = [
+    // Home routes (public)
     ...HomeRoutes,
+    
+    // Auth routes (public)
     ...AuthRoutes,
-    // Protected Staff Routes
-    {
-      path: "/admin/*",
+    
+    // Protected Staff Routes - wrap each admin route with protection
+    ...StaffRoutes.map(route => ({
+      ...route,
       element: (
         <ProtectedRoute requiredRole="staff">
-          {StaffRoutes.find(route => route.path === "/admin")?.element}
+          {route.element}
         </ProtectedRoute>
-      ),
-      children: StaffRoutes.find(route => route.path === "/admin")?.children
-    },
-    // Default redirect based on authentication
-    {
-      path: "/",
-      element: <Navigate to="/home" replace />
-    },
+      )
+    })),
+    
     // Catch-all route for unmatched paths
     {
       path: "*",

@@ -201,11 +201,12 @@ const TreatmentEntry: React.FC = () => {
                     name="unitPrice"
                     rules={[{ required: true, message: 'กรุณาระบุราคา' }]}
                   >
-                    <InputNumber
+                    <InputNumber<number>
                       min={0}
-                      formatter={value => `฿ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                      parser={value => {
-                        const parsed = parseFloat(value!.replace(/฿\s?|(,*)/g, ''));
+                      formatter={(value) => `฿ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                      parser={(value) => {
+                        if (!value) return 0;
+                        const parsed = parseFloat(value.replace(/฿\s?|(,*)/g, ''));
                         return isNaN(parsed) ? 0 : parsed;
                       }}
                       className="unit-price-input"

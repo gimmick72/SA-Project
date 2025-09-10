@@ -6,14 +6,14 @@ import "./IndexLayout.css";
 
 const IndexLayout = () => {
   return (
-    <div>
+    <Layout className="index-layout">
       <Navbar />
-      <Layout className="index-layout">
-        <Layout.Content className="index-layout-content">
+      <Layout.Content className="index-layout-content">
+        <div className="index-content-wrapper">
           <Outlet />
-        </Layout.Content>
-      </Layout>
-    </div>
+        </div>
+      </Layout.Content>
+    </Layout>
   )
 }
 export default IndexLayout

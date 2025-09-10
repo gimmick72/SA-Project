@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react";
+import OurDentistsPage from "./OurDentistsPage";
 
 const OurDentists = () => {
-  return (
-    <div>OurDentists</div>
-  )
-}
-export default OurDentists
+  return <OurDentistsPage />;
+};
+
+export default OurDentists;

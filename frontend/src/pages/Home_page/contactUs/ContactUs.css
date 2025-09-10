@@ -1,0 +1,100 @@
+/* Contact Page Styles - Admin Theme */
+.contact-content {
+  background: transparent;
+  padding: 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.contact-title {
+  text-align: center;
+  color: #333333;
+  margin-bottom: 40px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.contact-row {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.contact-info-card,
+.contact-form-card {
+  background: #f9f9f9;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  height: 100%;
+}
+
+.contact-section-title {
+  color: #333333;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  color: #666666;
+}
+
+.contact-icon {
+  color: #1890ff;
+  margin-right: 12px;
+  font-size: 16px;
+}
+
+.social-buttons {
+  margin-top: 24px;
+}
+
+.facebook-btn {
+  background-color: #3b5998;
+  border-color: #3b5998;
+  color: #fff;
+}
+
+.facebook-btn:hover {
+  background-color: #2d4373;
+  border-color: #2d4373;
+}
+
+.line-btn {
+  background-color: #00C300;
+  border-color: #00C300;
+  color: #fff;
+}
+
+.line-btn:hover {
+  background-color: #00a000;
+  border-color: #00a000;
+}
+
+.submit-btn {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.submit-btn:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .contact-title {
+    margin-bottom: 24px;
+  }
+  
+  .contact-content {
+    padding: 0 16px;
+  }
+  
+  .social-buttons {
+    margin-top: 16px;
+  }
+}

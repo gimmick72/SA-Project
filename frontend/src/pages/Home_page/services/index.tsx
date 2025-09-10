@@ -1,8 +1,8 @@
 import React from "react";
+import ServicesPage from "./ServicesPage";
 
 const ServicePage = () => {
-  return (
-    <div>ServicePage</div>
-  )
-}
-export default ServicePage
+  return <ServicesPage />;
+};
+
+export default ServicePage;

@@ -1,0 +1,17 @@
+/* Home Page App Container */
+.app {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Global styles for smooth transitions */
+* {
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}

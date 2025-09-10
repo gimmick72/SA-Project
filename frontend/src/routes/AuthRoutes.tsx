@@ -1,22 +1,18 @@
 import { lazy } from "react";
+import Loadable from "../components/third-patry/Loadable";
 
 // Lazy load authentication components
-const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
-const RegisterPage = lazy(() => import("../pages/auth/RegisterPage"));
+const LoginPage = Loadable(lazy(() => import("../pages/auth/LoginPage")));
+const RegisterPage = Loadable(lazy(() => import("../pages/auth/RegisterPage")));
 
 const AuthRoutes = [
   {
-    path: "/auth",
-    children: [
-      {
-        path: "login",
-        element: <LoginPage />
-      },
-      {
-        path: "register", 
-        element: <RegisterPage />
-      }
-    ]
+    path: "/auth/login",
+    element: <LoginPage />
+  },
+  {
+    path: "/auth/register", 
+    element: <RegisterPage />
   }
 ];
 

@@ -1,0 +1,38 @@
+/* BookingPage Styles - Admin Theme */
+.booking-container {
+  background: transparent;
+  padding: 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.booking-card {
+  border-radius: 12px;
+  padding: 0;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
+}
+
+.booking-hero-content {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.booking-hero-title {
+  color: #333333;
+  margin-top: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .booking-container {
+    padding: 0 16px;
+  }
+  
+  .booking-hero-content {
+    padding: 16px;
+  }
+}

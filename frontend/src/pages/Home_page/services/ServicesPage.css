@@ -1,0 +1,37 @@
+/* Services Page Styles - Admin Theme */
+.services-container {
+  background: transparent;
+  padding: 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.services-title {
+  text-align: center;
+  color: #333333;
+  margin-bottom: 40px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.services-grid {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.service-card-col {
+  margin-bottom: 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .services-title {
+    margin-bottom: 30px;
+  }
+  
+  .services-container {
+    padding: 0 16px;
+  }
+}

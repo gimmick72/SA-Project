@@ -6,7 +6,7 @@ import Avatar from "antd/es/avatar";
 import { UserOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import Logo from "../../assets/logo.png";
-import LogoutButton from "../../components/LogoutButton";
+import SharedNavbar from "../../components/SharedNavbar";
 import "./navbar.css";
 
 const { Header } = Layout;
@@ -21,10 +21,6 @@ const items = [
 ];
 
 const HomePage: React.FC = () => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userRole = localStorage.getItem('userRole');
-  const userEmail = localStorage.getItem('userEmail');
-
   return (
     <Header className="navbar-header">
       <div className="navbar-logo-section">
@@ -45,24 +41,7 @@ const HomePage: React.FC = () => {
         items={items}
       />
 
-      {isAuthenticated ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: 'white', fontSize: '14px' }}>
-            {userEmail} ({userRole === 'staff' ? 'เจ้าหน้าที่' : 'ผู้ป่วย'})
-          </span>
-          {userRole === 'staff' && (
-            <Link to="/admin" style={{ color: 'white', marginRight: '8px' }}>
-              จัดการระบบ
-            </Link>
-          )}
-          <LogoutButton />
-        </div>
-      ) : (
-        <Link to="/auth/login" className="navbar-login-link">
-          <UserOutlined className="navbar-login-icon" />
-          {" "}เข้าสู่ระบบ
-        </Link>
-      )}
+      <SharedNavbar variant="index" />
     </Header>
   );
 };

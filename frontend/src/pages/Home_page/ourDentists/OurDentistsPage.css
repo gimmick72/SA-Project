@@ -1,0 +1,43 @@
+/* Our Dentists Page Styles - Admin Theme */
+.dentists-content {
+  background: transparent;
+  padding: 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dentists-title {
+  text-align: center;
+  color: #333333;
+  margin-bottom: 40px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.dentists-carousel {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Carousel dot styling */
+.dentists-carousel .ant-carousel .slick-dots li button {
+  background: #d9d9d9;
+  border-radius: 50%;
+}
+
+.dentists-carousel .ant-carousel .slick-dots li.slick-active button {
+  background: #1890ff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dentists-title {
+    margin-bottom: 30px;
+  }
+  
+  .dentists-content {
+    padding: 0 16px;
+  }
+}
