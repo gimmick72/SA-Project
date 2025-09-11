@@ -214,7 +214,7 @@ const MyCalendar: React.FC = () => {
         events={events}
         startAccessor="start"
         endAccessor="end"
-        titleAccessor="room"
+        titleAccessor={(e: EventType) => `${e.room} — ${e.dentist}`}
         selectable
         views={[Views.MONTH, Views.WEEK, Views.DAY]}
         view={view}

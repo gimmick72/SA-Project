@@ -9,6 +9,7 @@ type EventType = {
   room: string;
   start: Date;
   end: Date;
+  dentist: string;
 };
 
 type Props = {
@@ -36,6 +37,8 @@ const ShowEven: React.FC<Props> = ({ event, visible, onClose, onEdit, onDelete }
       onCancel={onClose}
     >
       <div style={{ marginBottom: 16 }}>
+        <p><strong>ชื่อหมอ:</strong> {event?.dentist || '-'}</p>
+        
         <p><strong>ห้อง:</strong> {event?.room}</p>
         <p>
           <strong>วัน:</strong> {event ? format(event.start, 'dd/MM/yyyy', { locale: th }) : '-'}
