@@ -25,6 +25,7 @@ type Patient struct {
 	Address          *Address           `json:"address,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Histories        []HistoryPatient   `json:"histories" gorm:"foreignKey:PatientID "`
 	InitialSymptomps []InitialSymptomps `json:"initialsymptomps" gorm:"foreignKey:PatientID;references:ID"`
+	CaseData		[]CaseData		`json:"case_data" gorm:"foreignKey:PatientID;references:ID"`
 
 }
 

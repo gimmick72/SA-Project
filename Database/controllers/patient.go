@@ -81,6 +81,9 @@ func GetPatientByID(c *gin.Context) {
 		Preload("ContactPerson").
 		Preload("InitialSymptomps").
 		Preload("Histories").
+		Preload("CaseData").
+        Preload("CaseData.Department").
+        Preload("CaseData.Treatments").
 		First(&patient, id).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ไม่พบข้อมูลคนไข้"})
 		return
