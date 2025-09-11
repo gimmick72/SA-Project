@@ -1,0 +1,16 @@
+/* ซ้าย: ปุ่มย้อน/ถัดไป */
+.bottonday button{  
+  background-color: #ffffff;
+  border: solid 2px #CBC6FF;
+  border-radius: 15px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.bottonday button:hover{
+   background-color: #f1f1fc;
+   border: solid 2px #a09adc;
+}

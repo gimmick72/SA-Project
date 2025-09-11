@@ -1,10 +1,11 @@
 import React from "react";
 import { CalendarOutlined } from "@ant-design/icons";
+import QueuePage from "./queuePage";
 
 const QueueInfoPage = () => {
   return (
     <div style={{
-      maxWidth: '1200px',
+      maxWidth: '100%',
       margin: '0 auto',
       background: '#ffffff',
       borderRadius: '12px',
@@ -18,7 +19,7 @@ const QueueInfoPage = () => {
           ระบบจัดการคิว
         </h2>
       </div>
-      <p>ยินดีต้อนรับสู่ระบบจัดการคิวผู้ป่วย!</p>
+      <QueuePage/>
     </div>
   );
 };

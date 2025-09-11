@@ -1,0 +1,600 @@
+import { useEffect, useState } from "react";
+import './service.css';
+import { Modal, Input, Button, Card, Select } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import 'antd/dist/reset.css';
+import { updateService, getAllService, getAllCategory, createService, deleteService, createCategory, editCategory, deleteCategory } from "../../../../services/Service/Service";
+
+
+interface Service {
+    id?: number;
+    name_service: string;
+    detail_service: string;
+    cost: number;
+    category_id: number;
+}
+
+
+interface Category {
+    id?: number;
+    name_category: string;
+}
+
+
+const Servicecomponent = () => {
+    const [service, setService] = useState<Service[]>([]);
+    const [category, setCategory] = useState<Category[]>([]);
+    const [searchText, setSearchText] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+    const [editIndex, setEditIndex] = useState<number | null>(null);
+    const [newItem, setNewItem] = useState<Omit<Service, 'id'>>({
+        name_service: "",
+        cost: undefined!,
+        detail_service: "",
+        category_id: undefined!,
+    });
+    const [items, setItems] = useState<Service[]>([]);
+    const [modal, setModal] = useState<{
+        visible: boolean;
+        type: 'add' | 'view' | null;
+        detail: string;
+        itemIndex: number | null;
+    }>({ visible: false, type: null, detail: '', itemIndex: null });
+
+    // สำหรับ confirm delete
+    const [isCardVisible, setIsCardVisible] = useState(false);
+    const [itemIdToDelete, setItemIdToDelete] = useState<null | number>(null);
+
+    // ดึงข้อมูล Service และ Category
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const servicesData = await getAllService();
+                const categoriesData = await getAllCategory();
+
+                // console.log("Raw servicesData:", servicesData);
+                // console.log("Raw categoriesData:", categoriesData);
+
+                // เก็บเฉพาะ field ที่จำเป็นสำหรับ Service
+                const formattedServices = servicesData.map(s => ({
+                    id: s.id,
+                    name_service: s.name_service,
+                    detail_service: s.detail_service,
+                    cost: s.cost,
+                    category_id: s.category_id,
+                }));
+
+                // เก็บเฉพาะ field ที่จำเป็นสำหรับ Category
+                const formattedCategories = categoriesData.map(c => ({
+                    id: c.id,
+                    name_category: c.name_category,
+                }));
+
+                setService(formattedServices);
+                setCategory(formattedCategories);
+                setItems(formattedServices); // สำหรับ edit/delete/add
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // ฟังก์ชันหาชื่อหมวดหมู่จาก ID
+    const getCategoryName = (id: number) => {
+        const foundCategory = category.find(cat => cat.id === id);
+        return foundCategory ? foundCategory.name_category : "-";
+
+    };
+
+    // ฟังก์ชันเปลี่ยนค่า field ของ service
+    const handleChange = (field: keyof Service, value: any, index?: number) => {
+        if (index === undefined) {
+            setNewItem(prev => ({ ...prev, [field]: value }));
+        } else {
+            const updated = [...items];
+            updated[index] = { ...updated[index], [field]: value };
+            setItems(updated);
+        }
+    };
+
+
+
+    const [tempCategory, setTempCategory] = useState<string | null>(null);
+
+    const handleAddItem = async () => {
+        try {
+            if (!newItem.name_service || isNaN(newItem.cost)) {
+                return;
+            }
+
+            let categoryId = newItem.category_id;
+
+            // ✅ เช็คก่อนว่าเลือกหมวดหมู่หรือยัง
+            if (tempCategory) {
+                // ถ้าเป็นตัวเลข → คือ id เดิม
+                if (!isNaN(Number(tempCategory))) {
+                    categoryId = Number(tempCategory);
+                } else {
+                    // ถ้าเป็น string → แปลว่าพิมพ์ใหม่ → สร้าง category ใหม่
+                    const newCat = await createCategory({ name_category: tempCategory });
+                    setCategory(prev => [...prev, newCat]); // อัปเดต state ให้มีใน dropdown ด้วย
+                    categoryId = newCat.id!;
+                }
+            }
+
+            // ✅ สุดท้ายสร้าง service โดยใช้ categoryId ที่ได้
+            const createdService = await createService({
+                ...newItem,
+                category_id: categoryId!,
+            });
+
+            setItems([...items, createdService]);
+
+            // reset form
+            setNewItem({
+                name_service: "",
+                cost: undefined!,
+                detail_service: "",
+                category_id: undefined!,
+            });
+            setTempCategory(null);
+        } catch (error) {
+            console.error("❌ Failed to create service:", error);
+        }
+    };
+
+    // แก้ไขข้อมูล
+    const handleEdit = (index: number) => setEditIndex(index);
+
+
+    const handleSave = async () => {
+        if (editIndex !== null) {
+            const item = items[editIndex];
+            try {
+                const updatedService = await updateService(item.id!, item);
+                const updatedItems = [...items];
+                updatedItems[editIndex] = updatedService;
+                setItems(updatedItems);
+            } catch (error) {
+                console.error('Failed to update service:', error);
+            }
+        }
+        setEditIndex(null);
+    };
+
+
+    // ลบข้อมูล
+    const confirmDelete = (id: number) => {
+        setItemIdToDelete(id);
+        setIsCardVisible(true);
+    };
+
+    const handleOk = async () => {
+        if (itemIdToDelete !== null) {
+            try {
+                await deleteService(itemIdToDelete); // เรียก API ลบ
+                setItems(prev => prev.filter(item => item.id !== itemIdToDelete)); // อัปเดตรายการใน frontend
+            } catch (error) {
+                console.error('Failed to delete service:', error);
+            }
+        }
+        setItemIdToDelete(null);
+        setIsCardVisible(false);
+    };
+
+
+    const handleCancel = () => {
+        setItemIdToDelete(null);
+        setIsCardVisible(false);
+    };
+
+    // modal add/view
+    const openModal = (type: 'add' | 'view', index: number | null) => {
+        if (type === 'add') {
+            setModal({ visible: true, type, detail: '', itemIndex: null });
+        } else if (index !== null) {
+            setModal({ visible: true, type, detail: items[index].detail_service, itemIndex: index });
+        }
+    };
+    const handleModalSave = () => {
+        if (modal.type === 'view' && modal.itemIndex !== null) {
+            const updated = [...items];
+            updated[modal.itemIndex].detail_service = modal.detail;
+            setItems(updated);
+        }
+        setModal({ visible: false, type: null, detail: '', itemIndex: null });
+    };
+
+    // filter service ตาม search + category
+    const filteredServices = items.filter(s => {
+        const matchesSearch =
+            (s.name_service?.toLowerCase() ?? "").includes(searchText.toLowerCase()) ||
+            (s.detail_service?.toLowerCase() ?? "").includes(searchText.toLowerCase());
+
+        const matchesCategory =
+            selectedCategory === null || s.category_id === selectedCategory;
+
+        return matchesSearch && matchesCategory;
+    });
+
+    const [isCategoryModal, setIsCategoryModal] = useState(false);
+    const [editingCat, setEditingCat] = useState<Category | null>(null);
+    const [editCatName, setEditCatName] = useState("");
+
+    // แก้ไขหมวดหมู่
+    const editcategory = () => {
+        setIsCategoryModal(true);
+        setEditingCat(null);
+        setEditCatName("");
+    };
+
+    const handleEditCategory = async () => {
+        if (editingCat && editCatName.trim()) {
+            try {
+                const updated = await editCategory(editingCat.id!, { name_category: editCatName });
+                setCategory(prev =>
+                    prev.map(c => (c.id === updated.id ? updated : c))
+                );
+                setEditingCat(null);
+                setEditCatName("");
+            } catch (err) {
+                console.error("❌ Failed to edit category:", err);
+            }
+        }
+    };
+
+    const handleDeleteCategory = async (id: number) => {
+        try {
+            await deleteCategory(id);
+            setCategory(prev => prev.filter(c => c.id !== id));
+        } catch (err) {
+            console.error("❌ Failed to delete category:", err);
+        }
+    };
+
+    // สำหรับ confirm delete category
+    const [isCategoryConfirmVisible, setIsCategoryConfirmVisible] = useState(false);
+    const [catIdToDelete, setCatIdToDelete] = useState<null | number>(null);
+
+    const confirmDeleteCategory = (id: number) => {
+        setCatIdToDelete(id);
+        setIsCategoryConfirmVisible(true);
+    };
+
+    const handleDeleteCategoryOk = async () => {
+        if (catIdToDelete !== null) {
+            try {
+                await deleteCategory(catIdToDelete);
+                setCategory(prev => prev.filter(c => c.id !== catIdToDelete));
+            } catch (err) {
+                console.error("❌ Failed to delete category:", err);
+            }
+        }
+        setCatIdToDelete(null);
+        setIsCategoryConfirmVisible(false);
+    };
+
+    const handleDeleteCategoryCancel = () => {
+        setCatIdToDelete(null);
+        setIsCategoryConfirmVisible(false);
+    };
+
+
+    return (
+        // กล่องใหญ่ครอบทั้งหมด
+        <div style={{
+            maxWidth: '100%',
+            height:500,
+            margin: '0 auto 0 auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            boxSizing: 'border-box',
+            position: 'relative',
+            background: '#fff',
+            border: 'none 2px #accc',
+        }}>
+
+            {/* แถบเครื่องมือ -> ค้นหา, หมวดหมู่, เพิ่มรายการ */}
+            <div style={{
+                display: 'flex',
+                gap: '20px',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                border: 'none 2px #000',
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    {/* ช่องค้นหาข้อมูล */}
+                    <Input.Search
+                        placeholder="ค้นหาบริการหรือรายละเอียด..."
+                        allowClear
+                        value={searchText}
+                        onChange={e => setSearchText(e.target.value)}
+                        style={{ width: 300, marginLeft: 0 }}
+                    />
+
+                    {/* ตัวเลือกหมวดหมู่ */}
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                        <div style={{ fontSize: '18px', fontWeight: 'bold' }}>หมวดหมู่</div>
+                        <select
+                            className="select_category"
+                            value={selectedCategory ?? ""}
+                            onChange={e => setSelectedCategory(e.target.value ? Number(e.target.value) : null)}
+                        >
+                            <option value="">-- แสดงทั้งหมด --</option>
+                            {category.map(cat => (
+                                <option key={cat.id} value={cat.id}>{cat.name_category}</option>
+                            ))}
+                        </select>
+
+                        {/* แก้ไขหมวดหมู่ */}
+                        <Button
+                            className="edit_category"
+                            type="primary"
+                            icon={<EditOutlined />}
+                            onClick={() => editcategory()} // ใส่ฟังก์ชันที่ต้องการ
+                        >
+                        </Button>
+
+                    </div>
+
+                </div>
+
+                {/* ปุ่มเพิ่มรายการ */}
+                <div >
+                    <Button className="add_Button"
+                        type="primary" onClick={() => openModal('add', null)}>+ เพิ่มบริการ</Button>
+                </div>
+            </div>
+
+            {/* ตารางแสดงข้อมูล */}
+            <div className="table-container" >
+                <table className="item-table">
+                    <thead style={{ display: "flix" }}>
+                        <tr >
+                            <th style={{ width: '26%' }}>บริการ</th>
+                            <th style={{ width: '20%' }}>ราคา</th>
+                            <th style={{ width: '18%' }}>หมวดหมู่</th>
+                            <th style={{ width: '18%' }}>รายละเอียด</th>
+                            <th style={{ width: '18%' }}>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredServices.map((service, index) => (
+                            <tr key={service.id}>
+                                <td>
+                                    {editIndex === index ? (
+                                        <Input
+                                            value={service.name_service}
+                                            onChange={(e) => handleChange('name_service', e.target.value, index)}
+                                        />
+                                    ) : service.name_service}
+                                </td>
+                                <td>
+                                    {editIndex === index ? (
+                                        <Input
+                                            type="number"
+                                            value={service.cost}
+                                            onChange={(e) => handleChange('cost', Number(e.target.value), index)}
+                                        />
+                                    ) : service.cost}
+                                </td>
+                                <td>{getCategoryName(service.category_id)}</td>
+                                <td>
+                                    <Button onClick={() => openModal('view', index)}>ดูรายละเอียด</Button>
+                                </td>
+
+                                <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <Button danger onClick={() => confirmDelete(service.id!)}><DeleteOutlined /> ลบ </Button>
+
+                                        {editIndex === index ? (
+                                            <Button style={{ marginLeft: "10px" }}
+                                                onClick={handleSave}>บันทึก</Button>
+                                        ) : (
+                                            <Button style={{ marginLeft: "10px" }}
+                                                onClick={() => handleEdit(index)}>แก้ไข</Button>
+                                        )}
+                                    </div>
+
+                                    {isCardVisible && (
+                                        <div
+                                            style={{
+                                                position: "fixed",
+                                                top: 0,
+                                                left: 0,
+                                                width: "100%",
+                                                height: "100%",
+                                                backgroundColor: "rgba(0,0,0,0)", // overlay
+                                                zIndex: 999,
+                                                pointerEvents: "auto", // ปิดการคลิก background ไม่ได้
+                                            }}
+                                        >
+                                            <Card
+                                                title="ยืนยันการลบ"
+                                                style={{
+                                                    width: 450,
+                                                    position: "absolute",
+                                                    top: "40%",
+                                                    left: "55%",
+                                                    transform: "translate(-50%, -50%)",
+                                                    zIndex: 1000,
+                                                    border: "2px solid #CBC6FF",
+                                                    pointerEvents: "auto", // ทำให้ card สามารถคลิกได้
+                                                }}
+                                                actions={[
+                                                    <Button key="cancel" onClick={handleCancel} style={{ width: 120 }}>
+                                                        ยกเลิก
+                                                    </Button>,
+                                                    <Button key="ok" type="primary" danger onClick={handleOk} style={{ width: 120 }}>
+                                                        ยืนยัน
+                                                    </Button>,
+                                                ]}
+                                            >
+                                                <p>คุณต้องการลบรายการนี้ใช่หรือไม่?</p>
+                                            </Card>
+                                        </div>
+                                    )}
+
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <Modal
+                open={modal.visible}
+                title={modal.type === 'add' ? 'เพิ่มบริการใหม่' : 'ดูรายละเอียด'}
+                onOk={() => {
+                    if (modal.type === 'add') {
+                        handleAddItem();   // ดึงค่าจาก newItem โดยตรง
+                    } else {
+                        handleModalSave();
+                    }
+                    setModal({ visible: false, type: null, detail: '', itemIndex: null });
+                }}
+                onCancel={() => setModal({ visible: false, type: null, detail: '', itemIndex: null })}
+                okText="บันทึก"
+                cancelText="ยกเลิก"
+                centered
+            >
+                {modal.type === 'add' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <Input
+                            placeholder="ชื่อบริการ"
+                            value={newItem.name_service}
+                            onChange={(e) => handleChange('name_service', e.target.value)}
+                        />
+                        <Input
+                            type="number"
+                            placeholder="ราคา"
+                            value={newItem.cost}
+                            onChange={(e) => handleChange('cost', Number(e.target.value))}
+                        />
+
+                        <Select
+                            mode="tags"
+                            style={{ width: '100%' }}
+                            placeholder="เลือกหรือเพิ่มหมวดหมู่"
+                            value={tempCategory ? [tempCategory] : []}
+                            onChange={(value) => {
+                                const latest = value[value.length - 1]; // เอาค่าล่าสุดที่เลือก/พิมพ์
+                                setTempCategory(latest || null);
+                            }}
+                        >
+                            {category.map(cat => (
+                                <Select.Option key={cat.id} value={cat.id!.toString()}>
+                                    {cat.name_category}
+                                </Select.Option>
+                            ))}
+                        </Select>
+
+                        <Input.TextArea
+                            rows={4}
+                            placeholder="รายละเอียด"
+                            value={newItem.detail_service}   // ใช้ newItem.detail
+                            onChange={e => handleChange('detail_service', e.target.value)}
+                        />
+                    </div>
+                ) : (
+                    <Input.TextArea
+                        rows={4}
+                        placeholder="พิมพ์รายละเอียดที่นี่..."
+                        value={modal.detail}
+                        onChange={e => setModal({ ...modal, detail: e.target.value })}
+                    />
+                )}
+            </Modal>
+
+
+            {/* แก้ไขcategory */}
+            <Modal
+                open={isCategoryModal}
+                title="จัดการหมวดหมู่"
+                onCancel={() => setIsCategoryModal(false)}
+                footer={null}
+                centered
+            >
+                {category.map(cat => (
+                    <div key={cat.id} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                        {editingCat?.id === cat.id ? (
+                            <>
+                                <Input
+                                    value={editCatName}
+                                    onChange={(e) => setEditCatName(e.target.value)}
+                                    style={{ flex: 1 }}
+                                />
+                                <Button type="primary" onClick={handleEditCategory}>
+                                    บันทึก
+                                </Button>
+                                <Button onClick={() => setEditingCat(null)}>ยกเลิก</Button>
+                            </>
+                        ) : (
+                            <>
+                                <span style={{ flex: 1 }}>{cat.name_category}</span>
+                                <Button
+                                    type="default"
+                                    onClick={() => {
+                                        setEditingCat(cat);
+                                        setEditCatName(cat.name_category);
+                                    }}
+                                >
+                                    แก้ไข
+                                </Button>
+                                <Button danger onClick={() => confirmDeleteCategory(cat.id!)}>
+                                    ลบ
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                ))}
+            </Modal>
+
+            {/* ยืนยันลบ category */}
+            {isCategoryConfirmVisible && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0,0,0,0)",
+                        zIndex: 9999,
+                        pointerEvents: "auto",
+                    }}
+                >
+                    <Card
+                        title="ยืนยันการลบหมวดหมู่"
+                        style={{
+                            width: 450,
+                            position: "absolute",
+                            top: "40%",
+                            left: "55%",
+                            transform: "translate(-50%, -50%)",
+                            zIndex: 1000,
+                            border: "2px solid #CBC6FF",
+                            pointerEvents: "auto",
+                        }}
+                        actions={[
+                            <Button key="cancel" onClick={handleDeleteCategoryCancel} style={{ width: 120 }}>
+                                ยกเลิก
+                            </Button>,
+                            <Button key="ok" type="primary" danger onClick={handleDeleteCategoryOk} style={{ width: 120 }}>
+                                ยืนยัน
+                            </Button>,
+                        ]}
+                    >
+                        <p>คุณต้องการลบหมวดหมู่นี้ใช่หรือไม่?</p>
+                    </Card>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default Servicecomponent;

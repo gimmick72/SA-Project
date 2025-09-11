@@ -1,10 +1,11 @@
 import React from "react";
 import { MedicineBoxOutlined } from "@ant-design/icons";
+import SwitchPage from "./SwitchPage/switchpage";
 
 const ServiceInfoPage = () => {
   return (
     <div style={{
-      maxWidth: '1200px',
+      maxWidth: '100%',
       margin: '0 auto',
       background: '#ffffff',
       borderRadius: '12px',
@@ -18,7 +19,7 @@ const ServiceInfoPage = () => {
           ระบบจัดการบริการ
         </h2>
       </div>
-      <p>ยินดีต้อนรับสู่ระบบจัดการบริการทางการแพทย์!</p>
+      <SwitchPage />
     </div>
   );
 };
