@@ -1,9 +1,7 @@
 // InitialPage.tsx
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./design/initial.css";
-
 import {
   Typography,
   Form,
@@ -150,7 +148,7 @@ const InitialPage: React.FC = () => {
   return (
     <div className="wrapper">
       {contextHolder}
-      {/* 🔵 overlay ขณะ submit */}
+     
       <Spin fullscreen spinning={submitting} />
 
       <div className="header">

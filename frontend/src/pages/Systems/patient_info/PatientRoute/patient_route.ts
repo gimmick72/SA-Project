@@ -4,14 +4,12 @@ import type { RouteObject } from "react-router-dom";
 import Loadable from "../../../../components/third-patry/Loadable";
 
 // patient info pages
-const PatientListPage = Loadable(lazy(() => import("../PatientList")));
 const PatientDetailPage = Loadable(lazy(() => import("../PatientDetailPage")));
 const InitialSymptoms = Loadable(lazy(() => import("../InitialPage")));
 const HistoryPage = Loadable(lazy(() => import("../HistoryPage")));
 const AddPatientPage = Loadable(lazy(() => import("../AddPatientPage")));
 
 const PatientRoute: RouteObject[] = [
-  { index: true, element: React.createElement(PatientListPage) },
   { path: "detail/:id", element: React.createElement(PatientDetailPage) },          
   { path: "initial-symptoms/:id", element: React.createElement(InitialSymptoms) },  
   { path: "patient-history/:id", element: React.createElement(HistoryPage) },

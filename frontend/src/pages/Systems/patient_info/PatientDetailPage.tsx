@@ -76,7 +76,6 @@ const calcAgeFromBirth = (yyyy_mm_dd: string): string => {
   return String(hasntBirthday ? age - 1 : age);
 };
 
-
 /* ---------- Component ---------- */
 const PatientDetail: React.FC = () => {
   const [form] = Form.useForm();
@@ -174,7 +173,8 @@ const PatientDetail: React.FC = () => {
         : undefined,
       phone_number: values.phone_number,
       age: values.age ? Number(values.age) : undefined,
-      drug_allergy: allergyMode === "has" ? values.drug_allergy : "",
+      drug_allergy:
+        allergyMode === "has" ? (values.drug_allergy || "").trim() : "",
       contactperson: {
         relationship: values.relationship,
         emergency_phone: values.emergency_phone,
@@ -370,38 +370,58 @@ const PatientDetail: React.FC = () => {
                     { value: "B", label: "B" },
                     { value: "AB", label: "AB" },
                     { value: "O", label: "O" },
+                    { value: "none", label: "ไม่ทราบ" },
                   ]}
                 />
               </Form.Item>
             </Col>
           </Row>
 
-          {/* แพ้ยา */}
           <Divider />
           <Row gutter={16}>
-            <Col xs={24} md={24}>
+            <Col xs={24}>
               <Form.Item label="แพ้ยา" required>
-                <Space direction="horizontal" wrap>
+                <Space wrap>
                   <Radio.Group
                     value={allergyMode}
                     onChange={(e) => {
                       const v = e.target.value as "none" | "has";
                       setAllergyMode(v);
-                      if (v === "none")
-                        form.setFieldsValue({ drug_allergy: "" });
+                      if (v === "none") {
+                        // ล้างค่าที่เคยพิมพ์ไว้เมื่อสลับมา "ไม่แพ้ยา"
+                        form.setFieldsValue({ drug_allergy: undefined });
+                      }
                     }}
                     disabled={READONLY}
                   >
-                    <Radio value="none">ปกิเสธการแพ้ยา</Radio>
+                    <Radio value="none">ไม่แพ้ยา</Radio>
                     <Radio value="has">แพ้ยา</Radio>
                   </Radio.Group>
-                  <Form.Item name="drug_allergy" noStyle>
+
+                  {allergyMode === "none" ? (
+                    // แสดง "ช่อง" แต่ปิดแก้ไขและไม่ผูกกับ name เพื่อไม่ส่งค่า
                     <Input
-                      placeholder="ชื่อยาที่แพ้ (เช่น เพนิซิลลิน)"
+                      value="ไม่แพ้ยา"
                       style={{ width: 320 }}
-                      disabled={READONLY || allergyMode === "none"}
+                      disabled
+                      readOnly
                     />
-                  </Form.Item>
+                  ) : (
+                    // โหมดแพ้ยา: ต้องกรอกชื่อยา
+                    <Form.Item
+                      name="drug_allergy"
+                      rules={[
+                        { required: true, message: "กรุณาระบุชื่อยาที่แพ้" },
+                      ]}
+                      noStyle
+                    >
+                      <Input
+                        placeholder="ชื่อยาที่แพ้ (เช่น เพนิซิลลิน)"
+                        style={{ width: 320 }}
+                        disabled={READONLY}
+                      />
+                    </Form.Item>
+                  )}
                 </Space>
               </Form.Item>
             </Col>
@@ -462,18 +482,29 @@ const PatientDetail: React.FC = () => {
           </Row>
 
           {/* ปุ่ม */}
-          <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-            <Button onClick={() => navigate("/admin/patient")}>ยกเลิก</Button>
-            {!READONLY && (
-              <>
-                <Button onClick={handleCancel}>ยกเลิกการแก้ไข</Button>
-                <Button type="primary" htmlType="submit" loading={saving}>
-                  บันทึก
-                </Button>
-              </>
-            )}
-          </Space>
         </Form>
+        {/* ปุ่ม */}
+        <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+          {READONLY ? (
+            // โหมดดูอย่างเดียว → มีเฉพาะปุ่มกลับ
+            <Button
+              type="default"
+              htmlType="button"
+              onClick={() => navigate("/admin/patient")} // หรือ navigate(-1)
+              style={{ backgroundColor: "#f0f0f0", borderColor: "#d9d9d9" }}
+            >
+              กลับ
+            </Button>
+          ) : (
+            // โหมดแก้ไข → ซ่อนปุ่มกลับ, แสดงยกเลิก/บันทึกเท่านั้น
+            <>
+              <Button onClick={handleCancel}>ยกเลิกการแก้ไข</Button>
+              <Button type="primary" htmlType="submit" loading={saving}>
+                บันทึก
+              </Button>
+            </>
+          )}
+        </Space> 
       </Card>
     </div>
   );

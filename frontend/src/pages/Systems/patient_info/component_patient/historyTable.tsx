@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Typography, Button, Space, Drawer, Descriptions, Tag } from "antd";
+import { Table, Typography, Button, Space, Drawer, Descriptions, Tag, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useParams, useNavigate } from "react-router-dom";
 import { GetCaseDataToHistory } from "../../../../services/patient/patientApi";
@@ -81,7 +81,8 @@ const HistoryTable: React.FC = () => {
       list.sort((a, b) => dayjs(b.visitDate).valueOf() - dayjs(a.visitDate).valueOf());
       setRows(list);
     } catch (err) {
-      console.error("[GET] /api/case-data/:id error =", err);
+      message.error("Network Error");
+     
     } finally {
       setLoading(false);
     }

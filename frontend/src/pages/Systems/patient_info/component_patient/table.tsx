@@ -47,10 +47,12 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
       setLoading(true);
       const r = await PatientAPI.getAll(); // ได้ res.data โดยตรงแล้ว
       setData(toRows(r));
-    } catch (e: any) {
-      console.error(e);
-      msg.error(e?.response?.data?.error || e?.message || "โหลดข้อมูลไม่สำเร็จ");
-      setData([]);
+    } catch (error) {
+      if(error){
+        
+        message.error("Network error.");
+        setData([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -58,7 +60,6 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ===== กรองด้วย citizenID (ฝั่ง client) =====
@@ -96,17 +97,11 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
             <Button
               size="small"
               disabled={disabled}
-              onClick={() => navigate(`/admin/patient/detail/${id}?mode=view`)}
+              onClick={() => navigate(`/admin/patient/detail/${id}`)}
             >
               รายละเอียด
             </Button>
-            <Button
-              size="small"
-              disabled={disabled}
-              onClick={() => navigate(`/admin/patient/detail/${id}?mode=edit`)}
-            >
-              แก้ไข
-            </Button>
+            
             <Popconfirm
               title="ยืนยันการลบ?"
               okText="ลบ"

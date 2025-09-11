@@ -2,6 +2,7 @@
 
 import "../patient_info/design/pateint.css";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { PatientAPI } from "../../../services/patient/patientApi";
 import type {
   Patient,
@@ -30,6 +31,7 @@ const AddPatientPage: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<Patient>();
+  const navigate = useNavigate();
 
   const handleSubmit = async (
     patient: Patient & { drugAllergyType?: "hasAllergy" | "noAllergy" }
@@ -37,9 +39,9 @@ const AddPatientPage: React.FC = () => {
     try {
       setSubmitting(true);
 
-      const DataOnly = patient.birthday
-        ? dayjs(patient.birthday).startOf("day").format("YYYY-MM-DDTHH:mm:ssZ")
-        : "";
+      // const DataOnly = patient.birthday
+      //   ? dayjs(patient.birthday).startOf("day").format("YYYY-MM-DDTHH:mm:ssZ")
+      //   : "";
 
       if (patient.drugAllergyType === "noAllergy") {
         patient.drug_allergy = "none";
@@ -50,7 +52,10 @@ const AddPatientPage: React.FC = () => {
 
       await PatientAPI.createPatient(patient);
       messageApi.success("บันทึกข้อมูลสำเร็จ");
-      form.resetFields();
+      // form.resetFields();
+      setTimeout(() => {
+        navigate("/admin/patient");
+      }, 2500);
     } catch (error: any) {
       console.error("Error submitting form:", error);
       messageApi.error(
@@ -101,7 +106,7 @@ const AddPatientPage: React.FC = () => {
                 emergency_phone: "",
               },
               address: {
-                house_number: "", // ✅ ใช้ house_number
+                house_number: "", 
                 moo: "",
                 subdistrict: "",
                 district: "",
@@ -140,6 +145,8 @@ const AddPatientPage: React.FC = () => {
                   rules={[{ required: true, message: "กรุณาเลือกคำนำหน้า" }]}
                 >
                   <Select placeholder="เลือกคำนำหน้า">
+                  <Option value="เด็กหญิง">เด็กชาย</Option>
+                  <Option value="เด็กหญิง">เด็กหญิง</Option>
                     <Option value="นาย">นาย</Option>
                     <Option value="นางสาว">นางสาว</Option>
                     <Option value="นาง">นาง</Option>
@@ -282,7 +289,7 @@ const AddPatientPage: React.FC = () => {
                     }}
                   >
                     <Radio value="noAllergy" style={{ marginRight: 16 }}>
-                      ปฏิเสธการแพ้ยา
+                      ไม่แพ้ยา
                     </Radio>
                     <Radio value="hasAllergy">แพ้ยา</Radio>
                   </Radio.Group>
@@ -418,7 +425,7 @@ const AddPatientPage: React.FC = () => {
                       form.setFieldsValue({
                         address: {
                           ...form.getFieldValue("address"),
-                          postcode: value, // merge ไม่ทับ field อื่น
+                          postcode: value, 
                         },
                       });
                     }}
@@ -435,6 +442,7 @@ const AddPatientPage: React.FC = () => {
                 disabled={submitting}
               >
                 {submitting ? "กำลังบันทึก..." : "บันทึก"}
+
               </button>
               <button
                 type="button"
