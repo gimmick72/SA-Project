@@ -1,16 +1,19 @@
 // src/pages/queue_info/index.tsx
 import React, { useEffect, useCallback, useState } from "react";
 import {
-  Row, Col, Layout, Card, Segmented, DatePicker, Button,
+  Row, Col, Layout, Card, DatePicker, Button,
   Space, Typography, message, Spin, Empty
 } from "antd";
 import QueueSidebar from "./QueueSidebar";
 import RoomSchedule from "./RoomSchedule";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Patient, RoomScheduleData as RoomDataFromTypes, ViewMode } from "./types";
+import { Patient, RoomScheduleData as RoomDataFromTypes } from "./types";
 import dayjs, { Dayjs } from "dayjs";
+import "dayjs/locale/th";
 import { assignPatientApi, fetchRoomsByDate } from "../../../services/queue/schedule";
+
+dayjs.locale("th");
 
 const { Content } = Layout;
 
@@ -24,16 +27,16 @@ async function fetchPatients(): Promise<Patient[]> {
 
 const QueuePage: React.FC = () => {
   const [date, setDate] = useState<Dayjs>(dayjs());
-  const [view, setView] = useState<ViewMode>("day");
 
   const [patients, setPatients] = useState<Patient[]>([]);
   const [rooms, setRooms] = useState<RoomDataFromTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false);
 
-  // ใช้ความสูง panel แบบยืดหยุ่น (ลดเลขได้ตาม header จริงของคุณ)
-  const PANEL_HEIGHT = "calc(100vh - 220px)";
+  // ปรับเลขตามความสูง header/topbar ของโปรเจกต์จริง
+  const PANEL_HEIGHT = "calc(150vh - 200px)";
 
+  // โหลดคิวทั้งหมด (sidebar)
   useEffect(() => {
     let alive = true;
     const run = async () => {
@@ -49,9 +52,12 @@ const QueuePage: React.FC = () => {
       }
     };
     run();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
+  // โหลดตารางห้องตามวันที่
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -69,11 +75,21 @@ const QueuePage: React.FC = () => {
     load();
   }, [load]);
 
+  // จัดคิว (ลาก-วาง)
   const handleAssignPatient = useCallback(
-    async (roomId: string, time: string, patient: Patient | null, from?: { roomId: string; time: string }) => {
+    async (
+      roomId: string,
+      time: string,
+      patient: Patient | null,
+      from?: { roomId: string; time: string }
+    ) => {
       const prevRooms = rooms;
+      // optimistic update
       setRooms((current) => {
-        const clone = current.map((r) => ({ ...r, timeSlots: r.timeSlots.map((s) => ({ ...s })) }));
+        const clone = current.map((r) => ({
+          ...r,
+          timeSlots: r.timeSlots.map((s) => ({ ...s })),
+        }));
         if (from) {
           const rf = clone.find((r) => r.roomId === from.roomId);
           const sf = rf?.timeSlots.find((t) => t.time === from.time);
@@ -101,7 +117,7 @@ const QueuePage: React.FC = () => {
         });
         await load();
       } catch (e: any) {
-        setRooms(prevRooms);
+        setRooms(prevRooms); // rollback
         message.error(e?.message || "บันทึกการจัดคิวไม่สำเร็จ");
       }
     },
@@ -109,103 +125,89 @@ const QueuePage: React.FC = () => {
   );
 
   return (
-    <div style={{ display: 'flex',padding: '4px', height: '100%', flexDirection: 'column', overflowY: 'auto',overflowX: 'auto'}}>
-      <DndProvider backend={HTML5Backend}>
+  <div
+    style={{
+      display: "flex",
+      padding: '1rem',
+      height: "100%",
+      flexDirection: "column",
+      overflowY: "auto",
+      overflowX: "auto",
       
-          <Content style={{ height: "100%", minHeight: 0 }}>
-            {/* Toolbar */}
-            <Card
-              style={{ marginBottom: 0, borderRadius: 12,border: '2px solid #68CFD9' }}
-              bodyStyle={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 16,
-                flexWrap: "wrap",
+    }}
+  >
+    <DndProvider backend={HTML5Backend}>
+        {/* Toolbar: วันที่อยู่บนสุด */}
+        <Card style={{ marginBottom: 1 }} size="small" >
+          <Space size="small" wrap>
+            <DatePicker
+              allowClear={false}
+              value={date}
+              picker="date"
+              onChange={(d) => d && setDate(d)}
+              size="small"
+              style={{ width: 150 }}
+            />
+            <Button onClick={() => setDate(dayjs())}>Today</Button>
+          </Space>
+        </Card>
+
+        {/* Panels: ใต้วันที่ = ซ้าย (คิวทั้งหมด) | ขวา (ตารางห้อง) */}
+        <Row gutter={10} style={{ height: PANEL_HEIGHT, minHeight: 0 }}>
+          {/* ซ้าย: คิวทั้งหมด */}
+          <Col xs={24} md={6} style={{ height: "100%", minHeight: 0 }}>
+            <Spin spinning={loadingPatients}>
+              <div
+                style={{
+                  height: "100%",
+                  minHeight: 0,
+                  overflow: "hidden",
+                }}
+              >
+                <QueueSidebar patients={patients} maxHeight="100%" />
+              </div>
+            </Spin>
+          </Col>
+
+          {/* ขวา: ตารางห้อง */}
+          <Col xs={20} md={18} style={{ height: "100%", }}>
+            <div
+              style={{
+                height: "100%",marginBottom: 0,
+                minHeight: 0,
+                borderRadius: 5,
+                background: "#fff",
+               
+                overflow: "hidden",
               }}
             >
-              <Space size="middle" wrap>
-                <Segmented
-                  value={view}
-                  options={[
-                    { label: "วัน", value: "day" },
-                    { label: "สัปดาห์", value: "week" },
-                  ]}
-                  onChange={(val) => setView(val as ViewMode)}
-                />
-                <DatePicker
-                  allowClear={false}
-                  value={date}
-                  picker={view === "week" ? "week" : "date"}
-                  onChange={(d) => d && setDate(d)}
-                />
-                <Button onClick={() => setDate(dayjs())}>Today</Button>
-              </Space>
-
-              <Typography.Text type="secondary">
-                {view === "day"
-                  ? date.format("dddd, D MMM YYYY")
-                  : `${date.startOf("week").format("D MMM")} - ${date.endOf("week").format("D MMM YYYY")}`}
-              </Typography.Text>
-            </Card>
-
-            {/* Panels */}
-            <Row gutter={16} style={{ height: PANEL_HEIGHT, minHeight: 0 }}>
-              {/* Sidebar: คิวทั้งหมด (เลื่อนซ้ายได้) */}
-              <Col xs={24} md={6} style={{ height: "100%", minHeight: 0 }}>
-                <Spin spinning={loadingPatients}>
-                  <div style={{ height: "100%", minHeight: 0, overflow: "hidden" }}>
-                    <QueueSidebar /* ให้การ์ดภายในสูงเต็ม แล้วใช้การ scroll ของมันเอง */
-                      patients={patients}
-                      maxHeight="100%"
-                    />
+              <Spin spinning={loading}>
+                {rooms.length === 0 ? (
+                  <div style={{ padding: 32 }}>
+                    <Empty description="ยังไม่มีข้อมูลห้องในวันนี้" />
                   </div>
-                </Spin>
-              </Col>
-
-              {/* ตารางห้อง (เลื่อนขวาได้) */}
-              <Col xs={24} md={18} style={{ height: "100%", minHeight: 0, border: '2px solid #444CEB',flex:1,}}>
-                <div
-                  style={{
-                    height: "auto",
-                    
-                    borderRadius: 12,
-                    background: "#ffffffff",
-                    paddingRight: 8,
-                    border: "1px solid #000",
-                    marginBottom: 0,
-                    flex: 1,
-                  }}
-                >
-                  <Spin spinning={loading}>
-                    {rooms.length === 0 ? (
-                      <div style={{ padding: 32 }}>
-                        <Empty description="ยังไม่มีข้อมูลห้องในวันนี้" />
-                      </div>
-                    ) : (
-                      <Row gutter={[16, 16]}>
-                        {rooms.map((room) => (
-                          <Col key={room.roomId} xs={24} sm={12} lg={6}>
-                            <RoomSchedule
-                              room={room}
-                              onAssignPatient={handleAssignPatient}
-                              currentDate={date}
-                              viewMode={view}
-                            />
-                          </Col>
-                        ))}
-                      </Row>
-                    )}
-                  </Spin>
-                </div>
-              </Col>
-            </Row>
-          </Content>
-        
-      </DndProvider>
-    </div>
+                ) : (
+                 
+                  <Row gutter={[16, 16]}>
+                    {rooms.map((room) => (
+                      <Col key={room.roomId} xs={24} sm={12} lg={6}>
+                        <RoomSchedule
+                          room={room}
+                          onAssignPatient={handleAssignPatient}
+                          currentDate={date} viewMode={"week"}                        />
+                      </Col>
+                    ))}
+                  </Row>
+                )}
+              </Spin>
+            </div>
+          </Col>
+        </Row>
       
-  );
+    </DndProvider>
+  </div>
+);
+
 };
 
 export default QueuePage;

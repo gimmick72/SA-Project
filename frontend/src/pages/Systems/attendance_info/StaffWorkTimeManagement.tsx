@@ -52,7 +52,7 @@ const StaffWorkTimeManagement: React.FC = () => {
   ];
 
   return (
-    <div className="staff-work-time-management">
+    <div style={{padding: '16px', height: '100%', display: 'flex', flexDirection: 'column',border: "1px solid #6ddfdb"}}>
       <div className="page-header">
         <Title level={2}>
           <CalendarOutlined /> ระบบจัดการตารางงานพนักงาน

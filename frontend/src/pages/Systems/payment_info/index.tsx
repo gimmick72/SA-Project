@@ -104,14 +104,10 @@ const PaymentInfoPage = () => {
 
   // Show payment form
   return (
-    <div style={{ 
-      padding: '24px',
-      height: '100vh',
-      overflow: 'auto'
-    }}>
-      <Title level={2}>ชำระเงิน</Title>
+    <div style={{ padding: '16px', height: '100%', display: 'flex', flexDirection: 'column',border: "1px solid #6ddfdb", }}>
+      <Title level={2} style={{ fontWeight: 'bold', marginBottom: '20px', marginTop: '0px' }}>ชำระเงิน</Title>
       
-      <Card style={{ maxWidth: 800, margin: '0 auto' }}>
+      <Card style={{ backgroundColor: '##FFF', height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto',overflowX: 'auto',border: "1px solid #6ddfdb"}}>
         <Form
           form={form}
           layout="vertical"
