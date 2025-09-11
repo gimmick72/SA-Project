@@ -1,5 +1,6 @@
 import React from "react";
 import { UserOutlined } from "@ant-design/icons";
+import PatientListPage from "./patientPage";
 
 const PatientInfoPage = () => {
   return (
@@ -18,7 +19,7 @@ const PatientInfoPage = () => {
           ระบบจัดการข้อมูลผู้ป่วย
         </h2>
       </div>
-      <p>ยินดีต้อนรับสู่ระบบจัดการข้อมูลผู้ป่วย!</p>
+      <PatientListPage />
     </div>
   );
 };

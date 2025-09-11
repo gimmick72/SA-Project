@@ -5,6 +5,7 @@
   height: 100vh;
   position: fixed;
   z-index: 1000;
+  box-Shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .youtube-sidebar .ant-layout-sider-children {
@@ -47,6 +48,7 @@
 }
 
 .youtube-logo {
+  border: 2px solid #8E55D9 !important;;
   width: 32px;
   height: 32px;
   border-radius: 50%;
