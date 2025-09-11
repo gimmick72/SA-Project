@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Tabs, Table, Button, Modal, Form, Input, Select, InputNumber, Switch, message, Tag, Space, Popconfirm, DatePicker } from "antd";
-import { UserOutlined, PlusOutlined, TeamOutlined, EditOutlined, DeleteOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { Tabs, Table, Button, Modal, Form, Input, Select, InputNumber, Switch, message, Tag, Space, Popconfirm, DatePicker, Card, Divider } from "antd";
+import { UserOutlined, PlusOutlined, TeamOutlined, EditOutlined, DeleteOutlined, ClockCircleOutlined, UserAddOutlined, KeyOutlined } from "@ant-design/icons";
 import {
   fetchStaff,
   createStaff,
@@ -33,6 +33,11 @@ const StaffInfoPage = () => {
   const [attendanceModalVisible, setAttendanceModalVisible] = useState(false);
   const [attendanceForm] = Form.useForm();
 
+  // Admin registration state
+  const [adminRegisterForm] = Form.useForm();
+  const [adminRegisterLoading, setAdminRegisterLoading] = useState(false);
+  const [adminList, setAdminList] = useState<Staff[]>([]);
+
   // Load staff
   const loadStaff = async () => {
     setStaffLoading(true);
@@ -62,7 +67,53 @@ const StaffInfoPage = () => {
   useEffect(() => {
     loadStaff();
     loadAttendance();
+    loadAdminList();
   }, []);
+
+  // Load admin list
+  const loadAdminList = async () => {
+    try {
+      const response = await fetchStaff();
+      // Filter only admin users (you can adjust this logic based on your requirements)
+      const admins = response.data.filter(staff => 
+        staff.position?.toLowerCase().includes('admin') || 
+        staff.position?.toLowerCase().includes('ผู้จัดการ') ||
+        staff.department?.toLowerCase().includes('admin')
+      );
+      setAdminList(admins);
+    } catch (error: any) {
+      console.error('Failed to load admin list:', error);
+    }
+  };
+
+  // Admin registration handlers
+  const handleAdminRegister = async (values: any) => {
+    setAdminRegisterLoading(true);
+    try {
+      // Create admin payload with admin-specific defaults
+      const adminPayload: CreateStaffPayload = {
+        ...values,
+        position: values.position || 'ผู้ดูแลระบบ',
+        department: values.department || 'แผนกเทคโนโลยีสารสนเทศ',
+        salary: values.salary || 35000,
+        hire_date: new Date().toISOString().split('T')[0],
+        is_active: true,
+        qualifications: values.qualifications ? values.qualifications.split(',').map((item: string) => item.trim()) : [],
+        specializations: ['ระบบจัดการ', 'การดูแลระบบ']
+      };
+
+      const newAdmin = await createStaff(adminPayload);
+      setStaff(prev => [...prev, newAdmin]);
+      setAdminList(prev => [...prev, newAdmin]);
+      
+      message.success('ลงทะเบียนผู้ดูแลระบบสำเร็จ');
+      adminRegisterForm.resetFields();
+    } catch (error: any) {
+      message.error(error.message || 'ลงทะเบียนไม่สำเร็จ');
+    } finally {
+      setAdminRegisterLoading(false);
+    }
+  };
 
   // Staff handlers
   const handleAddStaff = () => {
@@ -346,6 +397,244 @@ const StaffInfoPage = () => {
             }}
             scroll={{ x: 1000 }}
           />
+        </TabPane>
+
+        <TabPane 
+          tab={
+            <span>
+              <UserAddOutlined />
+              ลงทะเบียนผู้ดูแลระบบ
+            </span>
+          } 
+          key="admin-register"
+        >
+          <Card 
+            title={
+              <span>
+                <KeyOutlined style={{ marginRight: '8px' }} />
+                ลงทะเบียนผู้ดูแลระบบใหม่
+              </span>
+            }
+            style={{ marginBottom: '24px' }}
+          >
+            <Form
+              form={adminRegisterForm}
+              layout="vertical"
+              onFinish={handleAdminRegister}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <Form.Item
+                  name="staff_code"
+                  label="รหัสผู้ดูแลระบบ"
+                  rules={[{ required: true, message: 'กรุณากรอกรหัสผู้ดูแลระบบ' }]}
+                >
+                  <Input placeholder="เช่น ADM001" />
+                </Form.Item>
+
+                <Form.Item
+                  name="email"
+                  label="อีเมล"
+                  rules={[
+                    { required: true, message: 'กรุณากรอกอีเมล' },
+                    { type: 'email', message: 'รูปแบบอีเมลไม่ถูกต้อง' }
+                  ]}
+                >
+                  <Input placeholder="admin@clinic.com" />
+                </Form.Item>
+
+                <Form.Item
+                  name="first_name"
+                  label="ชื่อ"
+                  rules={[{ required: true, message: 'กรุณากรอกชื่อ' }]}
+                >
+                  <Input placeholder="ชื่อ" />
+                </Form.Item>
+
+                <Form.Item
+                  name="last_name"
+                  label="นามสกุล"
+                  rules={[{ required: true, message: 'กรุณากรอกนามสกุล' }]}
+                >
+                  <Input placeholder="นามสกุล" />
+                </Form.Item>
+
+                <Form.Item
+                  name="phone"
+                  label="เบอร์โทรศัพท์"
+                  rules={[{ required: true, message: 'กรุณากรอกเบอร์โทรศัพท์' }]}
+                >
+                  <Input placeholder="081-234-5678" />
+                </Form.Item>
+
+                <Form.Item
+                  name="position"
+                  label="ตำแหน่ง"
+                  initialValue="ผู้ดูแลระบบ"
+                >
+                  <Select defaultValue="ผู้ดูแลระบบ">
+                    <Option value="ผู้ดูแลระบบ">ผู้ดูแลระบบ</Option>
+                    <Option value="ผู้จัดการระบบ">ผู้จัดการระบบ</Option>
+                    <Option value="ผู้ดูแลฐานข้อมูล">ผู้ดูแลฐานข้อมูล</Option>
+                    <Option value="ผู้ดูแลเครือข่าย">ผู้ดูแลเครือข่าย</Option>
+                  </Select>
+                </Form.Item>
+
+                <Form.Item
+                  name="department"
+                  label="แผนก"
+                  initialValue="แผนกเทคโนโลยีสารสนเทศ"
+                >
+                  <Select defaultValue="แผนกเทคโนโลยีสารสนเทศ">
+                    <Option value="แผนกเทคโนโลยีสารสนเทศ">แผนกเทคโนโลยีสารสนเทศ</Option>
+                    <Option value="แผนกบริหาร">แผนกบริหาร</Option>
+                    <Option value="แผนกการเงิน">แผนกการเงิน</Option>
+                  </Select>
+                </Form.Item>
+
+                <Form.Item
+                  name="salary"
+                  label="เงินเดือน (บาท)"
+                  initialValue={35000}
+                >
+                  <InputNumber min={0} style={{ width: '100%' }} placeholder="35000" />
+                </Form.Item>
+              </div>
+
+              <Form.Item
+                name="address"
+                label="ที่อยู่"
+              >
+                <Input.TextArea rows={2} placeholder="ที่อยู่" />
+              </Form.Item>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <Form.Item
+                  name="emergency_contact"
+                  label="ผู้ติดต่อฉุกเฉิน"
+                >
+                  <Input placeholder="ชื่อผู้ติดต่อฉุกเฉิน" />
+                </Form.Item>
+
+                <Form.Item
+                  name="emergency_phone"
+                  label="เบอร์ติดต่อฉุกเฉิน"
+                >
+                  <Input placeholder="081-234-5679" />
+                </Form.Item>
+              </div>
+
+              <Form.Item
+                name="qualifications"
+                label="คุณวุฒิ"
+              >
+                <Input placeholder="คั่นด้วยเครื่องหมายจุลภาค เช่น ปริญญาตรีคอมพิวเตอร์, ใบรับรองระบบ" />
+              </Form.Item>
+
+              <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+                <Space>
+                  <Button onClick={() => adminRegisterForm.resetFields()}>
+                    ล้างข้อมูล
+                  </Button>
+                  <Button 
+                    type="primary" 
+                    htmlType="submit"
+                    loading={adminRegisterLoading}
+                    icon={<UserAddOutlined />}
+                  >
+                    ลงทะเบียนผู้ดูแลระบบ
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Form>
+          </Card>
+
+          <Divider />
+
+          <Card title="รายชื่อผู้ดูแลระบบ">
+            <Table
+              columns={[
+                {
+                  title: 'รหัส',
+                  dataIndex: 'staff_code',
+                  key: 'staff_code',
+                  width: 100,
+                },
+                {
+                  title: 'ชื่อ-นามสกุล',
+                  key: 'full_name',
+                  width: 200,
+                  render: (_: any, record: Staff) => `${record.first_name} ${record.last_name}`,
+                },
+                {
+                  title: 'อีเมล',
+                  dataIndex: 'email',
+                  key: 'email',
+                  width: 200,
+                },
+                {
+                  title: 'ตำแหน่ง',
+                  dataIndex: 'position',
+                  key: 'position',
+                  width: 150,
+                },
+                {
+                  title: 'แผนก',
+                  dataIndex: 'department',
+                  key: 'department',
+                  width: 150,
+                },
+                {
+                  title: 'สถานะ',
+                  dataIndex: 'is_active',
+                  key: 'is_active',
+                  width: 100,
+                  align: 'center' as const,
+                  render: (is_active: boolean) => (
+                    <Tag color={is_active ? 'green' : 'red'}>
+                      {is_active ? 'ใช้งาน' : 'ปิดใช้งาน'}
+                    </Tag>
+                  ),
+                },
+                {
+                  title: 'การจัดการ',
+                  key: 'actions',
+                  width: 150,
+                  align: 'center' as const,
+                  render: (_: any, record: Staff) => (
+                    <Space>
+                      <Button
+                        type="primary"
+                        size="small"
+                        icon={<EditOutlined />}
+                        onClick={() => handleEditStaff(record)}
+                      />
+                      <Popconfirm
+                        title="ยืนยันการลบ"
+                        description="คุณต้องการลบผู้ดูแลระบบคนนี้หรือไม่?"
+                        onConfirm={() => handleDeleteStaff(record.id)}
+                        okText="ยืนยัน"
+                        cancelText="ยกเลิก"
+                      >
+                        <Button
+                          danger
+                          size="small"
+                          icon={<DeleteOutlined />}
+                        />
+                      </Popconfirm>
+                    </Space>
+                  ),
+                },
+              ]}
+              dataSource={adminList}
+              rowKey="id"
+              pagination={{
+                pageSize: 5,
+                showSizeChanger: false,
+                showTotal: (total, range) => `${range[0]}-${range[1]} จาก ${total} รายการ`,
+              }}
+              scroll={{ x: 800 }}
+            />
+          </Card>
         </TabPane>
 
         <TabPane 
