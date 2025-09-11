@@ -1,7 +1,46 @@
-import React from "react";
-import { MedicineBoxOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Tabs, Card } from "antd";
+import { MedicineBoxOutlined, PlusOutlined, UnorderedListOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import AddSupplyPage from "./AddSupplyPage";
+import AllSuppliesPage from "./AllSuppliesPage";
+import DispensePage from "./DispensePage";
 
 const MedicineInfoPage = () => {
+  const [activeTab, setActiveTab] = useState("1");
+
+  const tabItems = [
+    {
+      key: "1",
+      label: (
+        <span>
+          <UnorderedListOutlined />
+          รายการเวชภัณฑ์
+        </span>
+      ),
+      children: <AllSuppliesPage />
+    },
+    {
+      key: "2", 
+      label: (
+        <span>
+          <PlusOutlined />
+          เพิ่มเวชภัณฑ์
+        </span>
+      ),
+      children: <AddSupplyPage />
+    },
+    {
+      key: "3",
+      label: (
+        <span>
+          <ShoppingCartOutlined />
+          จ่ายเวชภัณฑ์
+        </span>
+      ),
+      children: <DispensePage />
+    }
+  ];
+
   return (
     <div style={{
       maxWidth: '1200px',
@@ -18,7 +57,18 @@ const MedicineInfoPage = () => {
           ระบบจัดการยาและเวชภัณฑ์
         </h2>
       </div>
-      <p>ยินดีต้อนรับสู่ระบบจัดการยาและเวชภัณฑ์!</p>
+      
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        type="card"
+        style={{
+          background: '#ffffff',
+          borderRadius: '8px'
+        }}
+        size="large"
+      />
     </div>
   );
 };

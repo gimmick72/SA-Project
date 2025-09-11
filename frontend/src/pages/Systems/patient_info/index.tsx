@@ -1,7 +1,46 @@
-import React from "react";
-import { UserOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Tabs, Card } from "antd";
+import { UserOutlined, PlusOutlined, UnorderedListOutlined, HistoryOutlined, FileTextOutlined } from "@ant-design/icons";
+import PatientList from "./PatientList";
+import AddPatientPage from "./AddPatientPage";
+import HistoryPage from "./HistoryPage";
 
 const PatientInfoPage = () => {
+  const [activeTab, setActiveTab] = useState("1");
+
+  const tabItems = [
+    {
+      key: "1",
+      label: (
+        <span>
+          <UnorderedListOutlined />
+          รายชื่อผู้ป่วย
+        </span>
+      ),
+      children: <PatientList />
+    },
+    {
+      key: "2", 
+      label: (
+        <span>
+          <PlusOutlined />
+          เพิ่มผู้ป่วยใหม่
+        </span>
+      ),
+      children: <AddPatientPage />
+    },
+    {
+      key: "3",
+      label: (
+        <span>
+          <HistoryOutlined />
+          ประวัติการรักษา
+        </span>
+      ),
+      children: <HistoryPage />
+    }
+  ];
+
   return (
     <div style={{
       maxWidth: '1200px',
@@ -18,7 +57,18 @@ const PatientInfoPage = () => {
           ระบบจัดการข้อมูลผู้ป่วย
         </h2>
       </div>
-      <p>ยินดีต้อนรับสู่ระบบจัดการข้อมูลผู้ป่วย!</p>
+      
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems}
+        type="card"
+        style={{
+          background: '#ffffff',
+          borderRadius: '8px'
+        }}
+        size="large"
+      />
     </div>
   );
 };

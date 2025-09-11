@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Form, Input, Button, Select, InputNumber, Steps, Typography, Space, Divider, message, Row, Col, Table, Tag } from 'antd';
-import { DollarOutlined, MobileOutlined, FileTextOutlined, CheckCircleOutlined, PrinterOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DollarOutlined, MobileOutlined, FileTextOutlined, CheckCircleOutlined, HistoryOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import PromptPayQR from '../third-party/PromptPayQR';
+import ReceiptGenerator from './ReceiptGenerator';
 import './TreatmentPaymentFlow.css';
 
 const { Title, Text } = Typography;
@@ -74,7 +75,7 @@ const TreatmentPaymentFlow: React.FC = () => {
     },
     {
       title: 'ใบเสร็จ',
-      icon: <PrinterOutlined />
+      icon: <HistoryOutlined />
     }
   ];
 
@@ -155,12 +156,11 @@ const TreatmentPaymentFlow: React.FC = () => {
     }
   };
 
-  const handlePrintReceipt = () => {
-    message.success('กำลังพิมพ์ใบเสร็จ...');
-    // Reset form
-    form.resetFields();
-    setTreatmentData({});
-    setCurrentStep(0);
+  const handleViewHistory = () => {
+    message.info('กำลังเปิดประวัติการชำระเงิน...');
+    // Here you could navigate to payment history page or open a modal
+    // For now, we'll just show a message
+    message.success('ดูประวัติการชำระเงินได้ในเมนูหลัก');
   };
 
   const renderStepContent = () => {
@@ -540,7 +540,7 @@ const TreatmentPaymentFlow: React.FC = () => {
             
             <Card style={{ marginTop: '24px', textAlign: 'left' }} title="ใบเสร็จรับเงิน">
               <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                <Text strong style={{ fontSize: '18px' }}>คลินิกทันตกรรม ABC</Text>
+                <Text strong style={{ fontSize: '18px' }}>คลินิกทันตกรรม TooThoot</Text>
                 <br />
                 <Text>วันที่: {new Date().toLocaleDateString('th-TH')}</Text>
               </div>
@@ -598,6 +598,25 @@ const TreatmentPaymentFlow: React.FC = () => {
                 )}
               </div>
             </Card>
+
+            {/* PDF Receipt Generator */}
+            <ReceiptGenerator 
+              paymentData={{
+                patientName: treatmentData.patientName || '',
+                patientPhone: treatmentData.patientId || '', // Using patientId as phone for now
+                patientAddress: '123 ถนนผู้ป่วย กรุงเทพฯ 10110',
+                treatmentType: treatmentData.treatments?.map(t => t.type).join(', ') || '',
+                amount: treatmentData.amount || 0,
+                paymentMethod: treatmentData.paymentMethod === 'cash' ? 'เงินสด' : 'PromptPay',
+                paymentDate: new Date().toISOString(),
+                dentistName: treatmentData.dentistName || '',
+                appointmentDate: new Date().toISOString(),
+                appointmentTime: new Date().toLocaleTimeString('th-TH', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })
+              }}
+            />
           </div>
         );
 
@@ -644,8 +663,8 @@ const TreatmentPaymentFlow: React.FC = () => {
           
           {currentStep === 4 && (
             <Space>
-              <Button type="primary" icon={<PrinterOutlined />} onClick={handlePrintReceipt}>
-                พิมพ์ใบเสร็จ
+              <Button type="primary" icon={<HistoryOutlined />} onClick={handleViewHistory}>
+                ดูประวัติ
               </Button>
               <Button onClick={() => {
                 form.resetFields();

@@ -1,0 +1,72 @@
+/*select_category*/
+.select_category {
+    width: 200px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.option_category {
+    cursor: pointer;
+}
+
+/* table */
+.table-container {
+    width: 1200px;
+    height: 470px;
+    margin: 0;
+    border: solid 1px #b8b8b8ff;
+    border-Radius: 8px;
+    margin-Bottom: 30px;
+    overflow: 'auto';
+}
+
+.item-table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    overflow: auto;
+}
+
+.item-table th,
+.item-table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f5f2f9;
+}
+
+
+.add_Button {
+    background-color: #9288ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.add_Button:hover {
+    background-color: #6f63e8 !important;
+}
+
+/* ปุ่มจัดการ category */
+.edit_category {
+    width: 25px !important;
+    height: 25px !important;
+    margin-left: -10px !important;
+    background-color: #9288ff !important;
+}
+
+.edit_category:hover {
+     background-color: #6f63e8 !important;
+}
