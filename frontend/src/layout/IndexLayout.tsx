@@ -9,9 +9,7 @@ const IndexLayout = () => {
     <Layout className="index-layout">
       <Navbar />
       <Layout.Content className="index-layout-content">
-        <div className="index-content-wrapper">
           <Outlet />
-        </div>
       </Layout.Content>
     </Layout>
   )

@@ -3,11 +3,11 @@ import { Routes, Route } from "react-router-dom";
 import "./index.css";
 
 // Lazy load components
-const HomePage = lazy(() => import("./HomePage"));
-const OurDentists = lazy(() => import("./ourDentists"));
-const Services = lazy(() => import("./services"));
-const ContactPage = lazy(() => import("./contactUs"));
-const Booking = lazy(() => import("./booking"));
+const HomePage = lazy(() => import("../Home_page/First_pages/HomePage/HomePage"));
+const OurDentists = lazy(() => import("../Home_page/First_pages/OurDentistsPage/OurDentistsPage"));
+const Services = lazy(() => import("../Home_page/First_pages/Services/ServicesPage"));
+const ContactPage = lazy(() => import("../Home_page/First_pages/ContactUs/ContactUs"));
+const Booking = lazy(() => import("../Home_page/First_pages/booking_page"));
 
 const HomePageRoutes: React.FC = () => {
   return (

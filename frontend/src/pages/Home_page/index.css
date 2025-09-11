@@ -1,9 +1,10 @@
 /* Home Page App Container */
 .app {
-  height: 100vh;
+  height: auto;
   overflow-y: auto;
   scroll-behavior: smooth;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-top: 55px;
 }
 
 /* Global styles for smooth transitions */

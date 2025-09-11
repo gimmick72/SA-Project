@@ -12,7 +12,7 @@ import "./navbar.css";
 const { Header } = Layout;
 const { Title } = Typography;
 
-const items = [
+const Items = [
   { key: "home", label: <Link to="/home">หน้าแรก</Link> },
   { key: "dentists", label: <Link to="/dentists">ทันตแพทย์ของเรา</Link> },
   { key: "services", label: <Link to="/services">บริการ</Link> },
@@ -38,8 +38,27 @@ const HomePage: React.FC = () => {
       <Menu
         mode="horizontal"
         className="navbar-menu"
-        items={items}
-      />
+      >
+        
+       <Menu.Item key="home">
+            <a href="#home">หน้าแรก</a>
+          </Menu.Item>
+          {/* <Menu.Item key="Promo">
+            <a href="#Promo">หน้าแรก</a>
+          </Menu.Item> */}
+          <Menu.Item key="dentists">
+            <a href="#dentists">ทันตแพทย์ของเรา</a>
+          </Menu.Item>
+          <Menu.Item key="services">
+            <a href="#services">บริการ</a>
+          </Menu.Item>
+          <Menu.Item key="contact">
+            <a href="#contact">ติดต่อเรา</a>
+          </Menu.Item>
+          <Menu.Item key="allbooking">
+            <Link to="allbooking">จองคิว</Link>
+          </Menu.Item>
+        </Menu>
 
       <SharedNavbar variant="index" />
     </Header>
