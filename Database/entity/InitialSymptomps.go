@@ -19,4 +19,14 @@ type InitialSymptomps struct {
 
 	PatientID uint
 	Patient   Patient `gorm:"foreignKey:PatientID;references:ID"`
+
+	StatusID uint
+	Status   Status `gorm:"foreignKey:StatusID;references:ID"`
 }
+
+type Status struct{
+	gorm.Model
+	StatusName string
+}
+
+

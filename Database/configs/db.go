@@ -157,6 +157,18 @@ func MockData() {
 		log.Println("⚡ Appointment table already has data")
 	}
 
+		// เพิ่ม mock data สำหรับ InitialSymptomps ถ้ายังว่าง
+	DB.Model(&entity.InitialSymptomps{}).Count(&count)
+	if count == 0 {
+		mockData := GetMockInitialSymptomps()
+		for _, d := range mockData {
+			DB.Create(&d)
+		}
+		log.Println("✅ Added mock Appointment data")
+	} else {
+		log.Println("⚡ Appointment table already has data")
+	}
+
 }
 
 

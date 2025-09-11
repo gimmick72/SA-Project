@@ -105,7 +105,7 @@ const InitialPage: React.FC = () => {
     const key = "saving-symptom";
     try {
       setSubmitting(true);
-  
+
       // แสดงกำลังบันทึก (ผูกกับ contextHolder ได้)
       messageApi.open({
         key,
@@ -113,18 +113,21 @@ const InitialPage: React.FC = () => {
         content: "กำลังบันทึกข้อมูลอาการ...",
         duration: 0,
       });
-  
+
       await PatientSymptomsAPI.createSymtom(id!, values);
-  
+
       // ปิด/ทำลาย loading เดิมก่อน
       messageApi.destroy(key);
-  
+
       // ✅ แสดง "บันทึกสำเร็จ" ด้วย global message (ไม่ผูกกับเพจนี้)
       message.success({
         content: "บันทึกข้อมูลเรียบร้อย",
         duration: 1.5,
       });
-  
+
+      // 🔔 แจ้งให้หน้า HomePage รีเฟรชข้อมูล
+      window.dispatchEvent(new Event("visit:changed"));
+
       // 👉 เปลี่ยนหน้า “ทันที” หลังเฟรมถัดไป (ไม่หน่วงให้ผู้ใช้รู้สึก)
       requestAnimationFrame(() => {
         navigate("/admin/patient");
@@ -148,7 +151,7 @@ const InitialPage: React.FC = () => {
   return (
     <div className="wrapper">
       {contextHolder}
-     
+
       <Spin fullscreen spinning={submitting} />
 
       <div className="header">

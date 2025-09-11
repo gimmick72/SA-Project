@@ -41,6 +41,10 @@ const AddPatientPage: React.FC = () => {
 
       await PatientAPI.createPatient(patient);
       messageApi.success("บันทึกข้อมูลสำเร็จ");
+
+      // 🔔 แจ้งให้หน้า HomePage รีเฟรชข้อมูล
+      window.dispatchEvent(new Event("patient:updated"));
+
       // form.resetFields();
       setTimeout(() => {
         navigate("/admin/patient");

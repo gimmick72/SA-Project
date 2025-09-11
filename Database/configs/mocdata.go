@@ -3,6 +3,7 @@ package configs
 import (
 	"Database/entity"
 	"time"
+
 )
 
 // -------------------- DentistManagement --------------------
@@ -125,7 +126,10 @@ func GetMockSupplies() []entity.Supply {
 }
 
 // -------------------- Appointment  --------------------
+func ptrInt(v int) *int { return &v }
+
 func GetMockAppointments() []entity.Appointment {
+
 	return []entity.Appointment{
 		{Date: time.Date(2025, 9, 10, 10, 0, 0, 0, time.UTC), RoomID: "1", Time: "10:00", PatientID: "P001", PatientName: "สมชาย ใจดี", Type: "appointment", DurationMin: ptrInt(60)},
 		{Date: time.Date(2025, 9, 10, 10, 0, 0, 0, time.UTC), RoomID: "2", Time: "10:00", PatientID: "P002", PatientName: "วิภา สายสุข", Type: "walkin", DurationMin: ptrInt(60)},
@@ -140,6 +144,137 @@ func GetMockAppointments() []entity.Appointment {
 	}
 }
 
-func ptrInt(v int) *int {
-	return &v
+
+
+func GetMockStatuses() []entity.Status {
+	return []entity.Status{
+		{ StatusName: "รอคิว"},
+		{StatusName: "กำลังตรวจ"},
+		{StatusName: "ชำระเงิน"},
+		{StatusName: "เสร็จสิ้น"},
+	}
+}
+
+
+func GetMockInitialSymptomps() []entity.InitialSymptomps {
+	// แนะนำให้ seed ตามลำดับ: GetMockStatuses() -> GetMockServices() -> SeedPatient() -> GetMockInitialSymptomps()
+	// โดยตัวอย่างนี้อ้างอิง:
+	//   StatusID: 1=รอคิว, 2=กำลังตรวจ, 3=ชำระเงิน, 4=เสร็จสิ้น
+	//   ServiceID: 1=ขูดหินปูน, 2=ฟันผุ(อุด), 3=ฟอกสีฟัน, 4=ฟันปลอม/ครอบฟัน (ปรับตามของคุณได้)
+	//   PatientID: 1..6 (ปรับให้ตรงกับข้อมูลผู้ป่วยที่ seed ไว้จริง)
+
+	base := time.Date(2025, 9, 12, 9, 0, 0, 0, time.Local)
+
+	return []entity.InitialSymptomps{
+		{
+			Symptomps:     "ปวดฟันซี่ 36 เสียวเมื่อโดนเย็น",
+			BloodPressure: "120/80",
+			Visit:         base.Add(15 * time.Minute), // 09:15
+			HeartRate:     "76",
+			Weight:        65.0,
+			Height:        170.0,
+			ServiceID:     1,  // ขูดหินปูน (ตัวอย่าง)
+			PatientID:     1,  // ผู้ป่วย ID=1
+			StatusID:      1,  // รอคิว
+		},
+		{
+			Symptomps:     "เหงือกบวม เลือดออกง่าย ต้องการขูดหินปูน",
+			BloodPressure: "118/76",
+			Visit:         base.Add(45 * time.Minute), // 09:45
+			HeartRate:     "74",
+			Weight:        55.0,
+			Height:        160.0,
+			ServiceID:     1,
+			PatientID:     2,
+			StatusID:      2, // กำลังตรวจ
+		},
+		{
+			Symptomps:     "ฟันผุด้านบดเคี้ยว เจ็บเวลาเคี้ยว",
+			BloodPressure: "125/82",
+			Visit:         base.Add(90 * time.Minute), // 10:30
+			HeartRate:     "81",
+			Weight:        70.5,
+			Height:        175.0,
+			ServiceID:     2,  // อุดฟัน
+			PatientID:     3,
+			StatusID:      3, // ชำระเงิน
+		},
+		{
+			Symptomps:     "ทำครอบฟันต่อจากรักษาราก",
+			BloodPressure: "116/74",
+			Visit:         base.Add(120 * time.Minute), // 11:00
+			HeartRate:     "72",
+			Weight:        58.3,
+			Height:        162.0,
+			ServiceID:     4,  // ครอบฟัน/ประดิษฐ์
+			PatientID:     4,
+			StatusID:      4, // เสร็จสิ้น
+		},
+		{
+			Symptomps:     "เสียวฟันเวลาโดนลมเย็น ฟันล่างขวา",
+			BloodPressure: "122/80",
+			Visit:         base.Add(180 * time.Minute), // 12:00
+			HeartRate:     "77",
+			Weight:        68.0,
+			Height:        173.0,
+			ServiceID:     2, // อุดฟัน
+			PatientID:     5,
+			StatusID:      1, // รอคิว
+		},
+		{
+			Symptomps:     "ทำความสะอาดประจำปี",
+			BloodPressure: "117/75",
+			Visit:         base.Add(210 * time.Minute), // 12:30
+			HeartRate:     "73",
+			Weight:        52.4,
+			Height:        158.0,
+			ServiceID:     1, // ขูดหินปูน
+			PatientID:     6,
+			StatusID:      2, // กำลังตรวจ
+		},
+		{
+			Symptomps:     "ฟอกสีฟัน เตรียมถ่ายภาพก่อนเริ่ม",
+			BloodPressure: "119/77",
+			Visit:         base.Add(240 * time.Minute), // 13:00
+			HeartRate:     "75",
+			Weight:        60.0,
+			Height:        165.0,
+			ServiceID:     3, // ฟอกสีฟัน
+			PatientID:     1,
+			StatusID:      1, // รอคิว
+		},
+		{
+			Symptomps:     "ฟันปลอมหลวม ปวดบริเวณเหงือก",
+			BloodPressure: "121/79",
+			Visit:         base.Add(270 * time.Minute), // 13:30
+			HeartRate:     "78",
+			Weight:        62.0,
+			Height:        166.0,
+			ServiceID:     4, // ประดิษฐ์/ครอบฟัน/ฟันปลอม
+			PatientID:     2,
+			StatusID:      3, // ชำระเงิน
+		},
+		{
+			Symptomps:     "นัดอุดฟันซี่ 26 ระยะติดตามผล",
+			BloodPressure: "115/73",
+			Visit:         base.Add(300 * time.Minute), // 14:00
+			HeartRate:     "71",
+			Weight:        57.0,
+			Height:        161.0,
+			ServiceID:     2, // อุดฟัน
+			PatientID:     3,
+			StatusID:      4, // เสร็จสิ้น
+		},
+		{
+			Symptomps:     "ขูดหินปูน + เคลือบฟลูออไรด์",
+			BloodPressure: "119/78",
+			Visit:         base.Add(330 * time.Minute), // 14:30
+			HeartRate:     "74",
+			Weight:        66.0,
+			Height:        171.0,
+			ServiceID:     1, // ขูดหินปูน
+			PatientID:     4,
+			StatusID:      2, // กำลังตรวจ
+		},
+	}
 }
