@@ -1,0 +1,51 @@
+* [33m1918ee8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mNew-Gim[m[33m)[m cant post
+* [33m35d811c[m 20.53 commit don't post api method
+* [33m4bc2c53[m update react ver 19
+* [33mf3492bf[m api connect
+* [33m6a0dd6f[m feat: add patient management components and API integration
+* [33m9c5794b[m 1st commit
+* [33m53f35b4[m chore: downgrade React and ReactDOM to version 18.3.1
+* [33m98f9853[m[33m ([m[1;32mKhanathip[m[33m)[m Update: crate UI Payment System and Staff Work Time Management System, create Login and Register System
+* [33m80762e9[m Update UI: Payment System and Staff Work Time Management
+* [33meae5257[m ok
+*   [33m3a77fcb[m Merge pull request #9 from gimmick72/gim-test
+[32m|[m[33m\[m  
+[32m|[m *   [33md738558[m Merge branch 'main' of https://github.com/gimmick72/SA-Project into gim-test
+[32m|[m [34m|[m[35m\[m  
+[32m|[m * [35m|[m [33m807b437[m update path
+[32m|[m * [35m|[m   [33mbd5c37d[m Merge branch 'gim-test' of https://github.com/gimmick72/SA-Project into gim-test
+[32m|[m [36m|[m[1;31m\[m [35m\[m  
+[32m|[m [36m|[m * [35m|[m [33mc9c275e[m Delete frontend/src/routes/AdminRoutes.tsx
+[32m|[m * [1;31m|[m [35m|[m [33m329cc24[m Merge branch 'gim-test' of https://github.com/gimmick72/SA-Project into gim-test
+[32m|[m [1;32m|[m[1;31m\[m[1;31m|[m [35m|[m 
+[32m|[m [1;32m|[m * [35m|[m [33m4ad1652[m Delete admin Route change to StaffRoute
+[32m|[m * [1;33m|[m [35m|[m [33m0be98bf[m change path
+[32m|[m * [1;33m|[m [35m|[m [33m0c073c6[m Delete AdminRoutes.tsx
+[32m|[m [1;33m|[m[1;33m/[m [35m/[m  
+[32m|[m * [35m|[m   [33m73638f1[m Merge branch 'gim-test' of https://github.com/gimmick72/SA-Project into gim-test
+[32m|[m [1;34m|[m[1;35m\[m [35m\[m  
+[32m|[m [1;34m|[m * [35m|[m [33m2d158f7[m update sidebar
+[32m|[m * [1;35m|[m [35m|[m [33m5f20398[m update page and sidebar
+* [1;35m|[m [1;35m|[m [35m|[m [33m10ecb2e[m ok
+[35m|[m [1;35m|[m[35m_[m[1;35m|[m[35m/[m  
+[35m|[m[35m/[m[1;35m|[m [1;35m|[m   
+* [1;35m|[m [1;35m|[m   [33m9e5c17e[m Merge pull request #6 from gimmick72/123
+[1;36m|[m[31m\[m [1;35m\[m [1;35m\[m  
+[1;36m|[m * [1;35m\[m [1;35m\[m   [33m3967315[m Merge branch 'main' into 123
+[1;36m|[m [32m|[m[1;36m\[m [1;35m\[m [1;35m\[m  
+[1;36m|[m [32m|[m[1;36m/[m [1;35m/[m [1;35m/[m  
+[1;36m|[m[1;36m/[m[32m|[m [1;35m|[m [1;35m|[m   
+* [32m|[m [1;35m|[m [1;35m|[m [33m8dc0dd1[m add sch and service
+* [32m|[m [1;35m|[m [1;35m|[m   [33m32804a0[m merge sch and service and database
+[34m|[m[35m\[m [32m\[m [1;35m\[m [1;35m\[m  
+[34m|[m * [32m\[m [1;35m\[m [1;35m\[m   [33m29a1f74[m[33m ([m[1;31morigin/schedulepage[m[33m)[m Merge branch 'main' of https://github.com/gimmick72/SA-Project into schedulepage
+[34m|[m [36m|[m[34m\[m [32m\[m [1;35m\[m [1;35m\[m  
+[34m|[m [36m|[m[34m/[m [32m/[m [1;35m/[m [1;35m/[m  
+[34m|[m[34m/[m[36m|[m [32m|[m [1;35m|[m [1;35m|[m   
+* [36m|[m [32m|[m [1;35m|[m [1;35m|[m   [33ma89f121[m Merge pull request #3 from gimmick72/gim-test
+[1;32m|[m[1;35m\[m [36m\[m [32m\[m [1;35m\[m [1;35m\[m  
+[1;32m|[m [1;35m|[m [36m|[m[1;35m_[m[32m|[m[1;35m_[m[1;35m|[m[1;35m/[m  
+[1;32m|[m [1;35m|[m[1;35m/[m[36m|[m [32m|[m [1;35m|[m   
+[1;32m|[m * [36m|[m [32m|[m [1;35m|[m [33ma4379a6[m update
+[1;32m|[m [1;35m|[m [36m|[m[1;35m_[m[32m|[m[1;35m/[m  
+[1;32m|[m [1;35m|[m[1;35m/[m[36m|[m [32m|[m   
