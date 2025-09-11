@@ -11,7 +11,7 @@ const PatientListPage = () => {
 
   return (
     <div className="page">
-      <Outlet />
+
 
       {/* แถบเครื่องมือ */}
       <div className="toolbar">
@@ -32,6 +32,7 @@ const PatientListPage = () => {
         {/* ส่ง searchTerm ไปที่ Table */}
         <PatienTable searchTerm={searchTerm} />
       </div>
+            <Outlet />
     </div>
   );
 };
