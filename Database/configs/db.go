@@ -43,6 +43,7 @@ func SetupDatbase() {
 
 		// เวชภัณฑ์
 		&entity.Supply{},
+		&entity.RecordSupply{},
 
 		// ตารางคิว
 		&entity.Appointment{},

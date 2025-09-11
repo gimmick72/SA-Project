@@ -1,10 +1,11 @@
 import React from "react";
 import { HomeOutlined } from "@ant-design/icons";
+import HomePage from "./home_info";
 
 const HomeInfoPage = () => {
   return (
     <div style={{
-      maxWidth: '1200px',
+      maxWidth: '100%',
       margin: '0 auto',
       background: '#ffffff',
       borderRadius: '12px',
@@ -18,7 +19,7 @@ const HomeInfoPage = () => {
           แดชบอร์ดหลัก
         </h2>
       </div>
-      <p>ยินดีต้อนรับสู่ระบบจัดการคลินิกทันตกรรม!</p>
+      <HomePage/>
     </div>
   );
 };

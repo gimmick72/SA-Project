@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Tabs, Card } from "antd";
 import { UserOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import StaffRegistration from "./components/StaffRegistration";
+import StaffDataPage from "./staffData/staffDataPage";
 
 const { TabPane } = Tabs;
 
@@ -17,15 +18,10 @@ const StaffInfoPage = () => {
           จัดการเจ้าหน้าที่
         </span>
       ),
-      children: (
-        <Card>
-          <h2>รายการเจ้าหน้าที่</h2>
-          <p>ทิพ หรอ</p>
-        </Card>
-      )
+      children: <StaffDataPage/>
     },
     {
-      key: "2", 
+      key: "2",
       label: (
         <span>
           <PlusOutlined />
@@ -52,7 +48,7 @@ const StaffInfoPage = () => {
           ระบบจัดการเจ้าหน้าที่
         </h2>
       </div>
-      
+
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}

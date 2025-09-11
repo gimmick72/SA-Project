@@ -1,43 +1,40 @@
 package configs
 
 import (
-	"time"
 	"Database/entity"
+	"time"
 )
 
 // -------------------- DentistManagement --------------------
 func GetMockDentists() []entity.DentistManagement {
 	return []entity.DentistManagement{
-		{Room: "A101", TimeIn: time.Date(2025, 9, 1, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 1, 13, 0, 0, 0, time.Local), Dentist: "หมอสมชาย"},
-		{Room: "B102", TimeIn: time.Date(2025, 9, 2, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 2, 13, 0, 0, 0, time.Local), Dentist: "หมอวิภา"},
-		{Room: "C103", TimeIn: time.Date(2025, 9, 3, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 3, 13, 0, 0, 0, time.Local), Dentist: "หมออนันต์"},
-		{Room: "D104", TimeIn: time.Date(2025, 9, 4, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 4, 13, 0, 0, 0, time.Local), Dentist: "หมอศิริพร"},
-		{Room: "E105", TimeIn: time.Date(2025, 9, 5, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 5, 13, 0, 0, 0, time.Local), Dentist: "หมอธีระ"},
-		{Room: "F106", TimeIn: time.Date(2025, 9, 6, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 6, 13, 0, 0, 0, time.Local), Dentist: "หมอสุรินทร์"},
-		{Room: "G107", TimeIn: time.Date(2025, 9, 7, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 7, 13, 0, 0, 0, time.Local), Dentist: "หมอวรรณา"},
-		{Room: "H108", TimeIn: time.Date(2025, 9, 8, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 8, 13, 0, 0, 0, time.Local), Dentist: "หมอปริญญา"},
-		{Room: "I109", TimeIn: time.Date(2025, 9, 9, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 9, 13, 0, 0, 0, time.Local), Dentist: "หมอประพันธ์"},
-		{Room: "J110", TimeIn: time.Date(2025, 9, 10, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 10, 13, 0, 0, 0, time.Local), Dentist: "หมอธนกร"},
+		{Room: "B001", TimeIn: time.Date(2025, 9, 1, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 1, 13, 0, 0, 0, time.Local), Dentist: "หมอสมชาย"},
+		{Room: "B002", TimeIn: time.Date(2025, 9, 2, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 2, 13, 0, 0, 0, time.Local), Dentist: "หมอวิภา"},
+		{Room: "B003", TimeIn: time.Date(2025, 9, 3, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 3, 13, 0, 0, 0, time.Local), Dentist: "หมออนันต์"},
+		{Room: "B004", TimeIn: time.Date(2025, 9, 4, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 4, 13, 0, 0, 0, time.Local), Dentist: "หมอศิริพร"},
+		{Room: "B004", TimeIn: time.Date(2025, 9, 5, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 5, 13, 0, 0, 0, time.Local), Dentist: "หมอธีระ"},
+		{Room: "B001", TimeIn: time.Date(2025, 9, 6, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 6, 13, 0, 0, 0, time.Local), Dentist: "หมอสุรินทร์"},
+		{Room: "B002", TimeIn: time.Date(2025, 9, 7, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 7, 13, 0, 0, 0, time.Local), Dentist: "หมอวรรณา"},
+		{Room: "B003", TimeIn: time.Date(2025, 9, 8, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 8, 13, 0, 0, 0, time.Local), Dentist: "หมอปริญญา"},
+		{Room: "B004", TimeIn: time.Date(2025, 9, 9, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 9, 13, 0, 0, 0, time.Local), Dentist: "หมอประพันธ์"},
+		{Room: "B001", TimeIn: time.Date(2025, 9, 10, 9, 0, 0, 0, time.Local), TimeOut: time.Date(2025, 9, 10, 13, 0, 0, 0, time.Local), Dentist: "หมอธนกร"},
 	}
 }
-
 
 // -------------------- Category --------------------
 func GetMockCategories() []entity.Category {
 	return []entity.Category{
-		{NameCategory: "ทันตกรรมทั่วไป"},          
-		{NameCategory: "ทันตกรรมประดิษฐ์"},       
-		{NameCategory: "ทันตกรรมจัดฟัน"},        
-		{NameCategory: "ทันตกรรมปริทันต์"},     
-		{NameCategory: "ทันตกรรมเพื่อความงาม"},  
-		{NameCategory: "ทันตกรรมสำหรับเด็ก"},     
-		{NameCategory: "ทันตกรรมผ่าตัดช่องปาก"}, 
-		{NameCategory: "ทันตกรรมรากฟันเทียม"},   
-		{NameCategory: "ทันตกรรมเฉพาะทางอื่น ๆ"},  
+		{NameCategory: "ทันตกรรมทั่วไป"},
+		{NameCategory: "ทันตกรรมประดิษฐ์"},
+		{NameCategory: "ทันตกรรมจัดฟัน"},
+		{NameCategory: "ทันตกรรมปริทันต์"},
+		{NameCategory: "ทันตกรรมเพื่อความงาม"},
+		{NameCategory: "ทันตกรรมสำหรับเด็ก"},
+		{NameCategory: "ทันตกรรมผ่าตัดช่องปาก"},
+		{NameCategory: "ทันตกรรมรากฟันเทียม"},
+		{NameCategory: "ทันตกรรมเฉพาะทางอื่น ๆ"},
 	}
 }
-
-
 
 // ------------------- Promotion --------------------
 func GetMockServices() []entity.Service {
@@ -80,8 +77,6 @@ func GetMockServices() []entity.Service {
 	}
 }
 
-
-
 // -------------------- Promotion --------------------
 func GetMockPromotions() []entity.Promotion {
 	return []entity.Promotion{
@@ -112,8 +107,6 @@ func GetMockPromotions() []entity.Promotion {
 	}
 }
 
-
-
 // -------------------- Supply --------------------
 func GetMockSupplies() []entity.Supply {
 	now := time.Now()
@@ -130,10 +123,6 @@ func GetMockSupplies() []entity.Supply {
 		{Code: "S010", Name: "น้ำยาฆ่าเชื้อ", Category: "อุปกรณ์", Quantity: 60, Unit: "ขวด", ImportDate: now.AddDate(0, -1, -7), ExpiryDate: now.AddDate(1, 6, 0)},
 	}
 }
-
-
-
-
 
 // -------------------- Appointment  --------------------
 func GetMockAppointments() []entity.Appointment {
@@ -152,8 +141,5 @@ func GetMockAppointments() []entity.Appointment {
 }
 
 func ptrInt(v int) *int {
-    return &v
+	return &v
 }
-
-
-
