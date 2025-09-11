@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"time"
-
 )
 
 var DB *gorm.DB
@@ -27,6 +26,10 @@ func SetupDatbase() {
 
 	//Migrate the schema
 	DB.AutoMigrate(
+
+		// dashboard
+		&entity.Status{},
+
 		//Patient
 		&patientEntity.Patient{},
 		&patientEntity.Address{},
@@ -50,7 +53,6 @@ func SetupDatbase() {
 
 		// ตาราง DentistManagement
 		&entity.DentistManagement{},
-		
 
 		// ตาราง Service และ Category และ promotion
 		&entity.Category{},
@@ -58,9 +60,9 @@ func SetupDatbase() {
 		&entity.Promotion{},
 
 		// ตารารางระบบ Personal and Treatment
-		&entity.PersonalData{},	
-        &entity.Department{},
-        &entity.Patient{},
+		&entity.PersonalData{},
+		&entity.Department{},
+		&entity.Patient{},
 		&entity.Address{},
 		&entity.ContactPerson{},
 		&entity.InitialSymptomps{},
@@ -69,14 +71,13 @@ func SetupDatbase() {
 		&entity.CaseData{},
 	)
 
-	// จำลองข้อมูล ระบบ -> ตารางแพทย์, บริการ, อุปกรณ์, คิวห้อง 
+	// จำลองข้อมูล ระบบ -> ตารางแพทย์, บริการ, อุปกรณ์, คิวห้อง
 	MockData()
 	// seed ข้อมูลเริ่มต้น ระบบ Personal and Treatment
 	SeedPatient()
 	SeedCase()
 	SeedStaff()
 }
-
 
 // จำลองข้อมูล
 func MockData() {
@@ -155,9 +156,21 @@ func MockData() {
 		log.Println("✅ Added mock Appointment data")
 	} else {
 		log.Println("⚡ Appointment table already has data")
+
+		// เพิ่ม mock data สำหรับ status intitial ถ้ายังว่าง
+		DB.Model(&entity.Status{}).Count(&count)
+		if count == 0 {
+			mockData := GetMockStatus()
+			for _, d := range mockData {
+				DB.Create(&d)
+			}
+			log.Println("✅ Added mock Appointment data")
+		} else {
+			log.Println("⚡ Appointment table already has data")
+		}
 	}
 
-		// เพิ่ม mock data สำหรับ InitialSymptomps ถ้ายังว่าง
+	// เพิ่ม mock data สำหรับ InitialSymptomps ถ้ายังว่าง
 	DB.Model(&entity.InitialSymptomps{}).Count(&count)
 	if count == 0 {
 		mockData := GetMockInitialSymptomps()
@@ -171,9 +184,6 @@ func MockData() {
 
 }
 
-
-
-
 // ------------------- SEED STAFF (PersonalData + Department) -------------------
 func SeedStaff() {
 	// ถ้ามีข้อมูลแล้วข้าม
@@ -186,12 +196,12 @@ func SeedStaff() {
 
 	staffList := []struct {
 		Title, FirstName, LastName, Gender, Email, EmpNationalID, Tel string
-		HouseNumber, Subdistrict, District, VillageNumber              string
-		Age                                                            int
-		Position, EmpType,  License                          string
-		CompRate                                                       float32
-		Specialization                                                 string
-		StartDate                                                      time.Time
+		HouseNumber, Subdistrict, District, VillageNumber             string
+		Age                                                           int
+		Position, EmpType, License                                    string
+		CompRate                                                      float32
+		Specialization                                                string
+		StartDate                                                     time.Time
 	}{
 		{"ทพ.", "Somsak", "Thongdee", "ชาย", "somsak@clinic.com", "1234567890123", "0812345678",
 			"123 Moo 1", "Nongprue", "Muang", "Nakhon Ratchasima", 45,
@@ -316,7 +326,7 @@ func SeedPatient() {
 
 // ------------------- SEED CASE -------------------
 func SeedCase() {
-	
+
 	var count int64
 	DB.Model(&entity.CaseData{}).Count(&count)
 	if count > 0 {
@@ -333,15 +343,15 @@ func SeedCase() {
 
 	// สร้างเคสใหม่
 	case1 := entity.CaseData{
-		SignDate:      time.Now(),
+		SignDate:         time.Now(),
 		Appointment_date: time.Date(2072, 8, 20, 0, 0, 0, 0, time.UTC),
-		Note:         "ตรวจสุขภาพฟันประจำปี",
-		TotalPrice:    3500,
-		PatientID:    patient.ID,
-		DepartmentID: 1, // สมมติว่ามี Department ID = 1
+		Note:             "ตรวจสุขภาพฟันประจำปี",
+		TotalPrice:       3500,
+		PatientID:        patient.ID,
+		DepartmentID:     1, // สมมติว่ามี Department ID = 1
 
 		Treatment: []entity.Treatment{
-			{	
+			{
 				TreatmentName: "ขูดหินปูน",
 				Price:         1500,
 				Quadrants: []entity.Quadrant{

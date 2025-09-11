@@ -146,9 +146,9 @@ func GetMockAppointments() []entity.Appointment {
 
 
 
-func GetMockStatuses() []entity.Status {
+func GetMockStatus() []entity.Status {
 	return []entity.Status{
-		{ StatusName: "รอคิว"},
+		{StatusName: "รอคิว"},
 		{StatusName: "กำลังตรวจ"},
 		{StatusName: "ชำระเงิน"},
 		{StatusName: "เสร็จสิ้น"},
