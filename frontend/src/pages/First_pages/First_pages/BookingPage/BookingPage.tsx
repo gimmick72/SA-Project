@@ -21,6 +21,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import { CalendarOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons";
 import SiteHeader from "./siteHeader";
+import { useNavigate } from "react-router-dom";
 
 // types จาก services
 import type {
@@ -34,7 +35,6 @@ import type {
 import {
   createBooking,
   getCapacityByDate,
-  // ⬇️ ใช้ getService (mock ได้)
   getService,
 } from "../../../../services/booking/bookingApi";
 
@@ -50,7 +50,7 @@ const timeSlotLabel: Record<TimeSlot, string> = {
 const BookingPage: React.FC = () => {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
-
+  const navigate = useNavigate();
   const [slot, setSlot] = useState<TimeSlot | undefined>(undefined);
   const [date, setDate] = useState<Dayjs | null>(null);
 
@@ -161,8 +161,11 @@ const BookingPage: React.FC = () => {
       const fresh = await getCapacityByDate(date);
       setCap(fresh);
 
-      message.success("จองคิวสำเร็จ! เราจะติดต่อยืนยันกลับอีกครั้ง");
+      message.success("จองคิวสำเร็จ! ");
       form.resetFields();
+      // setTimeout(() => {
+      //   navigate("/my-booking");
+      // }, 2500);
       setSlot(undefined);
     } catch (e: any) {
       message.error(e?.response?.data?.error ?? "จองคิวไม่สำเร็จ");

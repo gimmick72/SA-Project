@@ -69,5 +69,4 @@ export interface IBookingLite {
   date: string;          // ISO
   hhmm: string;
   segment: SegKey;
-  status: "reserved" | "checked_in" | "done" | "cancelled";
 }
