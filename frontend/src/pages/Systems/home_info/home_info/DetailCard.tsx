@@ -12,7 +12,6 @@ const DetailCard: React.FC<Props> = ({ active }) => (
       <>
         <Paragraph style={{ marginBottom: 6 }}><Text strong>เวลา:</Text> {active.timeStart}–{active.timeEnd}</Paragraph>
         <Paragraph style={{ marginBottom: 6 }}><Text strong>ชื่อ:</Text> {active.firstName} {active.lastName}</Paragraph>
-        <Paragraph style={{ marginBottom: 6 }}><Text strong>ประเภท:</Text> <Tag color={typeColor(active.type)}>{active.type}</Tag></Paragraph>
         <Paragraph style={{ marginBottom: 6 }}><Text strong>บริการ:</Text> <Tag color={serviceColor(active.service)}>{active.service}</Tag></Paragraph>
         <Paragraph style={{ marginBottom: 0 }}><Text strong>แพทย์/ห้อง:</Text> {active.doctor} • {active.room}</Paragraph>
       </>

@@ -7,7 +7,7 @@ const HomePage = lazy(() => import("../Home_page/First_pages/HomePage/HomePage")
 const OurDentists = lazy(() => import("../Home_page/First_pages/OurDentistsPage/OurDentistsPage"));
 const Services = lazy(() => import("../Home_page/First_pages/Services/ServicesPage"));
 const ContactPage = lazy(() => import("../Home_page/First_pages/ContactUs/ContactUs"));
-const Booking = lazy(() => import("../Home_page/First_pages/booking_page"));
+const BookingPage = lazy(() => import("../Home_page/First_pages/booking_page/BookingPage"));
 
 const HomePageRoutes: React.FC = () => {
   return (
@@ -17,7 +17,7 @@ const HomePageRoutes: React.FC = () => {
         <Route path="/dentists" element={<OurDentists />} />
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<ContactPage />} />
-        <Route path="/booking" element={<Booking />} />
+        {/* <Route path="/bookingPage" element={<BookingPage />} /> */}
       </Routes>
     </div>
   );

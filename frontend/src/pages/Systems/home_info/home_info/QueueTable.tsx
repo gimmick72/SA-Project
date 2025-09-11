@@ -20,11 +20,9 @@ const QueueTable: React.FC<Props> = ({ data, onSelect, activeId, onSearch, onAdd
       render: (_v, r) => (
         <>
           <div>{r.firstName} {r.lastName}</div>
-          <div style={{ fontSize: 12, color: "#8c8c8c" }}>{r.timeStart}–{r.timeEnd} • ห้อง {r.room}</div>
         </>
       ),
     },
-    { title: "ประเภท", dataIndex: "type", width: 110, render: (t) => <Tag color={typeColor(t)}>{t}</Tag> },
     { title: "บริการ", dataIndex: "service", width: 120, render: (v) => <Tag color={serviceColor(v)}>{v}</Tag>, responsive: ["md"] },
     { title: "สถานะ", dataIndex: "status", width: 120, render: (s) => <Tag color={statusColor[s]}>{s}</Tag> },
   ];

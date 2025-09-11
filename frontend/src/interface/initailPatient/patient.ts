@@ -18,7 +18,7 @@ export interface Patient {
   firstname?: string;
   lastname?: string;
   nickname?: string;
-  congenitadisease?: string;
+  congenita_disease?: string;
   blood_type?: string;
   gender?: "male" | "female" | "";
 

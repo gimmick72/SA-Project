@@ -7,11 +7,11 @@ import Loadable from "../components/third-patry/Loadable";
 
 // HomePage
 const HomePage = Loadable(lazy(() => import("../pages/Home_page/index")));
-const BookingPage = Loadable(lazy(() => import("../pages/Home_page/First_pages/Booking")));
+const BookingPage = Loadable(lazy(() => import("../pages/Home_page/First_pages/booking_page/BookingPage")));
 const OurDentist = Loadable(lazy(() => import("../pages/Home_page/First_pages/OurDentistsPage/OurDentistsPage")));
-const ContactUs = Loadable(lazy(() => import("../pages/Home_page/contactUs/index")));
-const PriceGuide = Loadable(lazy(() => import("../pages/Home_page/priceGuide/index")));
-const ServicePage = Loadable(lazy(() => import("../pages/Home_page/services")));
+const ContactUs = Loadable(lazy(() => import("../pages/Home_page/First_pages/ContactUs/ContactUs")));
+const PriceGuide = Loadable(lazy(() => import("../pages/Home_page/First_pages/PriceGuide/PriceGuidePage")));
+const ServicePage = Loadable(lazy(() => import("../pages/Home_page/First_pages/Services/ServicesPage")));
 
 const IndexRoutes: RouteObject[] = [
   {
@@ -27,7 +27,7 @@ const IndexRoutes: RouteObject[] = [
         element: <HomePage />,
       },
       {
-        path: "booking",
+        path: "bookingPage",
         element: <BookingPage />,
       },
       {

@@ -29,6 +29,7 @@ func main() {
 		routers.CaseDataRouter(router) // ระบบการรักษา
 		// routers.CaseData_2_Router(router) // ระบบการรักษา
 		routers.StaffRouter(router) // ระบบบุคลากร
+		routers.QueueRouter(router) // ระบบจองคิว
 
 	}
 	// Run the server go run main.go

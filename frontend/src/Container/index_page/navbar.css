@@ -13,6 +13,7 @@
   right: 0;
   z-index: 999;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 55;
 }
 
 .navbar-logo-section {

@@ -24,7 +24,8 @@ const menuItems = [
 
 const HomePage: React.FC = () => {
   return (
-    <Layout style={{ minHeight: "100vh", fontFamily: "sans-serif", backgroundColor: "#F5F2F9" }}>
+    <Layout style={{ minHeight: "100vh", fontFamily: "sans-serif", backgroundColor: "#F5F2F9", marginTop: '-15px'
+     }}>
       
       {/* Content */}
       <Content
@@ -32,23 +33,24 @@ const HomePage: React.FC = () => {
           padding: "60px 20px",
           height: "calc(100vh - 64px)", // 64px is default AntD Header height
           overflowY: "auto",
+          marginTop: 80,
         }}
       >
         <SlideInTop>
-          <div id="home" style={{ marginTop: "0px" }}>
+          <div id="home" style={{ marginTop: "0px",}}>
           <PromoPage />
         </div>
         </SlideInTop>
-        <div id="dentists" style={{ marginTop: "80px" }}>
+        <div id="dentists" style={{ marginTop: "80px",}}>
           <OurDentistsPage />
         </div>
-        <div id="services" style={{ marginTop: "80px" }}>
+        <div id="services" style={{ marginTop: "80px",}}>
           <ServicesPage />
         </div>
-        <div id="priceguide">
+        <div id="priceguide" style={{ marginTop: "80px",}}>
           <PriceGuidePage />
         </div>
-        <div id="contact" style={{ marginTop: "80px" }}>
+        <div id="contact" style={{ marginTop: "80px"}}>
           <ContactPage />
         </div>
 
