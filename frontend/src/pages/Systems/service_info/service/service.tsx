@@ -564,7 +564,7 @@ const Servicecomponent = () => {
                         width: "100%",
                         height: "100%",
                         backgroundColor: "rgba(0,0,0,0)",
-                        zIndex: 999999,
+                        zIndex: 9999,
                         pointerEvents: "auto",
                     }}
                 >
