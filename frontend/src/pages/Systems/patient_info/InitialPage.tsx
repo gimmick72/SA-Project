@@ -39,6 +39,7 @@ const InitialPage: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [Status, setStatus] = useState<string[]>([]);
   const [serviceOptions, setServiceOptions] = useState<
     { label: string; value: number }[]
   >([]);
@@ -91,8 +92,8 @@ const InitialPage: React.FC = () => {
         (Array.isArray(res) && res) || (Array.isArray(res?.data) && res.data) || [];
       setServiceOptions(
         rows.map((s: any) => ({
-          value: Number(s.ID ?? s.id),
-          label: s.NameService ?? s.name ?? "",
+          value: Number(s.id ?? s.ID),
+          label: s.name_service ?? s.NameService ?? "",
         }))
       );
     } catch (e) {
@@ -124,6 +125,7 @@ const InitialPage: React.FC = () => {
         content: "บันทึกข้อมูลเรียบร้อย",
         duration: 1.5,
       });
+      console.log("[payload]", values);
 
       // 🔔 แจ้งให้หน้า HomePage รีเฟรชข้อมูล
       window.dispatchEvent(new Event("visit:changed"));

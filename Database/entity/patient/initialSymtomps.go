@@ -22,4 +22,12 @@ type InitialSymptomps struct {
  
 	 // FK ไปหา Service
 	 ServiceID *uint `json:"serviceID,omitempty"`
+
+	StatusID uint   `json:"statusID"`
+	Status   Status `json:"status" gorm:"foreignKey:StatusID;references:ID"`
+}
+
+type Status struct{
+	gorm.Model
+	StatusName string
 }

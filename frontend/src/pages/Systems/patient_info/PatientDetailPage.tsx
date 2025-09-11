@@ -21,7 +21,7 @@ import dayjs, { Dayjs } from "dayjs";
 import th from "dayjs/locale/th";
 import { PatientAPI } from "../../../services/patient/patientApi";
 import { Patient } from "../../../interface/initailPatient/patient";
-
+type Raw = any;
 dayjs.locale(th);
 
 /* ---------- helpers ---------- */
@@ -35,6 +35,13 @@ function toDateInputValue(v?: string | Date) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+const PREFIX_OPTIONS = [
+  { value: 'MR', label: 'นาย' },
+  { value: 'MRS', label: 'นาง' },
+  { value: 'MS', label: 'นางสาว' },
+  { value: 'MASTER', label: 'เด็กชาย' },
+  { value: 'MISS', label: 'เด็กหญิง' },
+];
 const mapPatientToForm = (p: any) =>
   !p
     ? {}
@@ -165,11 +172,11 @@ const PatientDetail: React.FC = () => {
       firstname: values.firstname,
       lastname: values.lastname,
       nickname: values.nickname,
-      congenitaldisease: values.underlyingDisease,
+      congenitadisease: values.underlyingDisease,
       blood_type: values.bloodtype,
       gender: values.gender,
-      birthday: values.birthdate
-        ? (values.birthdate as Dayjs).startOf("day").toDate().toISOString()
+      birthday: values.birthday
+        ? (values.birthday as Dayjs).startOf("day").toDate().toISOString()
         : undefined,
       phone_number: values.phone_number,
       age: values.age ? Number(values.age) : undefined,

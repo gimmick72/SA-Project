@@ -1,18 +1,18 @@
+
 package controllers
 
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
-	// "gorm.io/gorm"
 
 	"Database/configs"
 	serviceEntity "Database/entity"
 	patientEntity "Database/entity/patient"
 )
 
-// POST/initailPatient.go
 func CreateSymptom(c *gin.Context) {
 	var symptom patientEntity.InitialSymptomps
 
@@ -21,7 +21,7 @@ func CreateSymptom(c *gin.Context) {
 		return
 	}
 
-	// อ่าน id จากพาธ
+	// อ่าน patient id จาก path
 	pidStr := c.Param("id")
 	pid, err := strconv.ParseUint(pidStr, 10, 64)
 	if err != nil || pid == 0 {
@@ -30,26 +30,74 @@ func CreateSymptom(c *gin.Context) {
 	}
 	symptom.PatientID = uint(pid)
 
-	// เช็คว่ามี patient นี้จริงไหม (กัน FK ล้ม)
+	// เช็ค Patient มีจริง
 	if tx := configs.DB.First(&patientEntity.Patient{}, symptom.PatientID); tx.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "patient not found"})
 		return
 	}
 
-	// บันทึก
-	if err := configs.DB.Create(&symptom).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// ✅ จัดการสถานะ
+	// ถ้าไม่ได้ส่ง statusID มา หรือเป็น 0 -> ใช้สถานะ "รอคิว" เป็นค่าเริ่มต้น
+	if symptom.StatusID == 0 {
+		var st patientEntity.Status
+		// หา status ชื่อ "รอคิว" (เผื่อชื่ออังกฤษด้วย)
+		if err := configs.DB.
+			Where("LOWER(status_name) IN ?", []string{"รอคิว", "waiting", "wait", "queued"}).
+			First(&st).Error; err == nil {
+			symptom.StatusID = st.ID
+		}
+	}
+
+	// ต้องมี StatusID ที่ valid เสมอ
+	if symptom.StatusID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "statusID is required"})
 		return
 	}
 
-	// preload กลับ
-	if err := configs.DB.Preload("Patient").First(&symptom, symptom.ID).Error; err != nil {
+	// ตรวจสอบว่า status นี้มีจริง
+	{
+		var st patientEntity.Status
+		if tx := configs.DB.First(&st, symptom.StatusID); tx.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid statusID"})
+			return
+		}
+	}
+
+	// (ทางเลือก) ป้องกัน serviceID ไม่ตรงสคีมา
+	// ถ้ามี serviceID ให้เช็คว่ามีจริง
+	if symptom.ServiceID != nil {
+		var svc serviceEntity.Service
+		if tx := configs.DB.First(&svc, *symptom.ServiceID); tx.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid serviceID"})
+			return
+		}
+	}
+
+	// บันทึก
+	if err := configs.DB.Create(&symptom).Error; err != nil {
+		// จัดข้อความ error ให้อ่านง่ายขึ้นหน่อย
+		msg := err.Error()
+		if strings.Contains(strings.ToLower(msg), "foreign key") {
+			msg = "foreign key constraint failed (check patientID/statusID/serviceID)"
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": msg})
+		return
+	}
+
+	// ✅ preload ความสัมพันธ์ที่ต้องการส่งกลับ
+	if err := configs.DB.
+		Preload("Patient").
+		Preload("Status").
+		Preload("Service").
+		First(&symptom, symptom.ID).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusCreated, symptom)
 }
+
+
 
 // Get Service
 func GetServicetoSymtompOption(c *gin.Context) {

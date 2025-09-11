@@ -1,5 +1,4 @@
-//Okay but ยังไม่ได้จตรวจสอบดีๆ
-
+// src/pages/Systems/patient_info/AddPatientPage.tsx
 import "../patient_info/design/pateint.css";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,46 +8,113 @@ import type {
   ContactPerson,
   Address,
 } from "../../../interface/initailPatient/patient";
-import {message,Form,Input,Radio,Select,DatePicker,InputNumber,Col,Row,Space,Card,
+import {
+  message,
+  Form,
+  Input,
+  Radio,
+  Select,
+  DatePicker,
+  InputNumber,
+  Col,
+  Row,
+  Space,
 } from "antd";
-import dayjs from "dayjs";
-import type { DateOnly } from "./utils/calDate";
+import dayjs, { Dayjs } from "dayjs";
 
 const { Option } = Select;
+
+const PREFIX_OPTIONS = [
+  { value: "MR", label: "นาย" },
+  { value: "MRS", label: "นาง" },
+  { value: "MS", label: "นางสาว" },
+  { value: "MASTER", label: "เด็กชาย" },
+  { value: "MISS", label: "เด็กหญิง" },
+];
+
+type DrugAllergyType = "hasAllergy" | "noAllergy";
 
 const AddPatientPage: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [submitting, setSubmitting] = useState(false);
-  const [form] = Form.useForm<Patient>();
+  const [form] = Form.useForm<
+    Patient & {
+      drugAllergyType?: DrugAllergyType;
+      birthday?: Dayjs | null;
+    }
+  >();
   const navigate = useNavigate();
 
   const handleSubmit = async (
-    patient: Patient & { drugAllergyType?: "hasAllergy" | "noAllergy" }
+    values: Patient & {
+      drugAllergyType?: DrugAllergyType;
+      birthday?: Dayjs | null;
+    }
   ) => {
     try {
       setSubmitting(true);
 
-      // const DataOnly = patient.birthday
-      //   ? dayjs(patient.birthday).startOf("day").format("YYYY-MM-DDTHH:mm:ssZ")
-      //   : "";
+      // --- Normalize fields before POST ---
+      const isoBirthday =
+        values.birthday ? dayjs(values.birthday as any).toISOString() : null;
 
-      if (patient.drugAllergyType === "noAllergy") {
-        patient.drug_allergy = "none";
-      }
-      delete (patient as any).drugAllergyType;
+      const drug_allergy_type: DrugAllergyType =
+        values.drugAllergyType === "hasAllergy" ? "hasAllergy" : "noAllergy";
 
-      console.log("[handleSubmit] values:", patient);
+      const drug_allergy =
+        drug_allergy_type === "noAllergy"
+          ? "none"
+          : (values.drug_allergy || "").trim();
 
-      await PatientAPI.createPatient(patient);
+      const citizenID = (values.citizenID || "").replace(/\D/g, "");
+      const phone_number = (values.phone_number || "").replace(/\D/g, "");
+
+      // Merge nested objects safely (contactperson/address might be undefined)
+      const contactperson: ContactPerson | undefined = values.contactperson
+        ? {
+            relationship: values.contactperson.relationship || "",
+            emergency_phone: (values.contactperson.emergency_phone || "")
+              .toString()
+              .replace(/\D/g, ""),
+          }
+        : undefined;
+
+      const address: Address | undefined = values.address
+        ? {
+            house_number: values.address.house_number || "",
+            moo: values.address.moo || "",
+            subdistrict: values.address.subdistrict || "",
+            district: values.address.district || "",
+            province: values.address.province || "",
+            postcode: (values.address.postcode || "")
+              .toString()
+              .replace(/\D/g, ""),
+          }
+        : undefined;
+
+      // Build payload that matches Go json tags
+      const payload = {
+        ...values,
+        citizenID,
+        phone_number,
+        birthday: isoBirthday, // time.Time expects ISO string from JSON
+        drug_allergy_type,
+        drug_allergy,
+        contactperson,
+        address,
+      } as any;
+
+      delete payload.drugAllergyType; // frontend-only helper
+
+      console.log("[handleSubmit] payload:", payload);
+
+      await PatientAPI.createPatient(payload);
       messageApi.success("บันทึกข้อมูลสำเร็จ");
 
-      // 🔔 แจ้งให้หน้า HomePage รีเฟรชข้อมูล
       window.dispatchEvent(new Event("patient:updated"));
-
-      // form.resetFields();
       setTimeout(() => {
         navigate("/admin/patient");
-      }, 2500);
+      }, 800);
     } catch (error: any) {
       console.error("Error submitting form:", error);
       messageApi.error(
@@ -68,16 +134,17 @@ const AddPatientPage: React.FC = () => {
         <div className="wrapper">
           {contextHolder}
           <h2 style={{ fontWeight: 600 }}>ข้อมูลประจำตัว</h2>
+
           <Form
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
             onValuesChange={(changed) => {
               if ("birthday" in changed) {
-                const d = changed.birthday as any;
+                const d = changed.birthday as Dayjs | null;
                 form.setFieldsValue({
                   age: d ? dayjs().diff(d, "year") : undefined,
-                });
+                } as any);
               }
             }}
             initialValues={{
@@ -89,7 +156,7 @@ const AddPatientPage: React.FC = () => {
               congenitadisease: "",
               blood_type: "",
               gender: "",
-              birthday: null,
+              birthday: null, // important for DatePicker controlled value
               phone_number: "",
               age: 0,
               drug_allergy: "",
@@ -99,7 +166,7 @@ const AddPatientPage: React.FC = () => {
                 emergency_phone: "",
               },
               address: {
-                house_number: "", 
+                house_number: "",
                 moo: "",
                 subdistrict: "",
                 district: "",
@@ -108,7 +175,7 @@ const AddPatientPage: React.FC = () => {
               },
             }}
           >
-            {/* แถวชื่อ-สกุล-เลขบัตร */}
+            {/* ชื่อ-สกุล-เลขบัตร */}
             <Row gutter={[16, 8]}>
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
                 <Form.Item
@@ -123,9 +190,8 @@ const AddPatientPage: React.FC = () => {
                     placeholder="เลขบัตรประชาชน"
                     maxLength={13}
                     onChange={(e) => {
-                      // รับเฉพาะตัวเลข
                       const value = e.target.value.replace(/\D/g, "");
-                      form.setFieldsValue({ citizenID: value });
+                      form.setFieldsValue({ citizenID: value } as any);
                     }}
                   />
                 </Form.Item>
@@ -137,13 +203,12 @@ const AddPatientPage: React.FC = () => {
                   label="คำนำหน้า"
                   rules={[{ required: true, message: "กรุณาเลือกคำนำหน้า" }]}
                 >
-                  <Select placeholder="เลือกคำนำหน้า">
-                  <Option value="เด็กหญิง">เด็กชาย</Option>
-                  <Option value="เด็กหญิง">เด็กหญิง</Option>
-                    <Option value="นาย">นาย</Option>
-                    <Option value="นางสาว">นางสาว</Option>
-                    <Option value="นาง">นาง</Option>
-                  </Select>
+                  <Select
+                    options={PREFIX_OPTIONS}
+                    fieldNames={{ label: "label", value: "value" }}
+                    optionLabelProp="label"
+                    placeholder="เลือกคำนำหน้า"
+                  />
                 </Form.Item>
               </Col>
 
@@ -174,13 +239,10 @@ const AddPatientPage: React.FC = () => {
               </Col>
             </Row>
 
-            {/* แถว เพศ / วันเกิด / อายุ / โรคประจำตัว / หมู่เลือด / โทรศัพท์ */}
+            {/* เพศ / วันเกิด / อายุ / โรคประจำตัว / หมู่เลือด / โทรศัพท์ */}
             <Row gutter={[16, 8]}>
               <Col xs={24} sm={12} md={8} lg={6} xl={4}>
-                <div
-                  id="gender_label"
-                  style={{ marginBottom: 4, fontWeight: 500 }}
-                >
+                <div id="gender_label" style={{ marginBottom: 4, fontWeight: 500 }}>
                   เพศ
                 </div>
                 <Form.Item
@@ -201,7 +263,6 @@ const AddPatientPage: React.FC = () => {
                   rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
                 >
                   <DatePicker
-                    //data อาจจะต้องแก้ ดูก่อน
                     format="YYYY-MM-DD"
                     style={{ width: "100%" }}
                     disabledDate={(current) =>
@@ -262,22 +323,21 @@ const AddPatientPage: React.FC = () => {
                     maxLength={10}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
-                      form.setFieldsValue({ phone_number: value });
+                      form.setFieldsValue({ phone_number: value } as any);
                     }}
                   />
                 </Form.Item>
               </Col>
             </Row>
 
-            {/* แถบแพ้ยา */}
+            {/* แพ้ยา */}
             <Form.Item label="แพ้ยา" colon={false} style={{ marginBottom: 8 }}>
               <Space align="center" wrap>
-                {/* เลือกแพ้/ไม่แพ้ */}
                 <Form.Item name="drugAllergyType" noStyle>
                   <Radio.Group
                     onChange={({ target }) => {
                       if (target.value === "noAllergy") {
-                        form.setFieldsValue({ drug_allergy: "" });
+                        form.setFieldsValue({ drug_allergy: "" } as any);
                       }
                     }}
                   >
@@ -288,7 +348,6 @@ const AddPatientPage: React.FC = () => {
                   </Radio.Group>
                 </Form.Item>
 
-                {/* ช่องกรอกชื่อยาอยู่ชิดต่อท้าย Radio */}
                 <Form.Item
                   noStyle
                   shouldUpdate={(prev, cur) =>
@@ -320,7 +379,7 @@ const AddPatientPage: React.FC = () => {
                         <Input
                           placeholder="ชื่อยาที่แพ้ (เช่น เพนิซิลลิน)"
                           disabled={disabled}
-                          style={{ width: 260 }} // ปรับความกว้างตามใจ
+                          style={{ width: 260 }}
                         />
                       </Form.Item>
                     );
@@ -346,18 +405,22 @@ const AddPatientPage: React.FC = () => {
                 <Form.Item
                   name={["contactperson", "emergency_phone"]}
                   label="หมายเลขโทรศัพท์"
+                  rules={[
+                    {
+                      pattern: /^[0-9]{10}$/,
+                      message: "หมายเลขโทรศัพท์ต้องมี 10 หลัก",
+                    },
+                  ]}
                 >
                   <Input
                     placeholder="หมายเลขโทรศัพท์"
                     maxLength={10}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
+                      const current = form.getFieldValue("contactperson") || {};
                       form.setFieldsValue({
-                        contactperson: {
-                          ...form.getFieldValue("contactperson"),
-                          emergency_phone: value, // merge ไม่ทับ field อื่น
-                        },
-                      });
+                        contactperson: { ...current, emergency_phone: value },
+                      } as any);
                     }}
                   />
                 </Form.Item>
@@ -404,10 +467,7 @@ const AddPatientPage: React.FC = () => {
                   name={["address", "postcode"]}
                   label="รหัสไปรษณีย์"
                   rules={[
-                    {
-                      pattern: /^[0-9]{5}$/,
-                      message: "รหัสไปรษณีย์ต้องมี 5 หลัก",
-                    },
+                    { pattern: /^[0-9]{5}$/, message: "รหัสไปรษณีย์ต้องมี 5 หลัก" },
                   ]}
                 >
                   <Input
@@ -415,12 +475,10 @@ const AddPatientPage: React.FC = () => {
                     maxLength={5}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
+                      const current = form.getFieldValue("address") || {};
                       form.setFieldsValue({
-                        address: {
-                          ...form.getFieldValue("address"),
-                          postcode: value, 
-                        },
-                      });
+                        address: { ...current, postcode: value },
+                      } as any);
                     }}
                   />
                 </Form.Item>
@@ -429,13 +487,8 @@ const AddPatientPage: React.FC = () => {
 
             {/* ปุ่ม */}
             <div className="buttons">
-              <button
-                type="submit"
-                className="save-button"
-                disabled={submitting}
-              >
+              <button type="submit" className="save-button" disabled={submitting}>
                 {submitting ? "กำลังบันทึก..." : "บันทึก"}
-
               </button>
               <button
                 type="button"
@@ -453,3 +506,5 @@ const AddPatientPage: React.FC = () => {
 };
 
 export default AddPatientPage;
+
+
