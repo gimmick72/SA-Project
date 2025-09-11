@@ -1,5 +1,3 @@
-//Okay but ยังไม่ได้จตรวจสอบดีๆ
-
 import "../patient_info/design/pateint.css";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,18 +7,7 @@ import type {
   ContactPerson,
   Address,
 } from "../../../interface/initailPatient/patient";
-import {
-  message,
-  Form,
-  Input,
-  Radio,
-  Select,
-  DatePicker,
-  InputNumber,
-  Col,
-  Row,
-  Space,
-  Card,
+import {message,Form,Input,Radio,Select,DatePicker,InputNumber,Col,Row,Space,Card,
 } from "antd";
 import dayjs from "dayjs";
 import type { DateOnly } from "./utils/calDate";

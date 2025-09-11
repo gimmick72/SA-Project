@@ -2,33 +2,24 @@
 import axios from "axios";
 import dayjs, { Dayjs } from "dayjs";
 
-/* ===================== Types ===================== */
-export type TimeSlot = "morning" | "afternoon" | "evening";
+// ---- ใช้ type กลางจาก interfaces ----
+import type {
+  TimeSlot,
+  CapacitySummary,
+  CreateBooking as CreateBookingPayload,
+  SummaryBooking,
+  ServiceItem as _ServiceItem,
+} from "../../interface/bookingQueue";
 
-export interface IServiceItem { id: number; name: string; }
-
-export interface ICapacitySummary {
-  morning: number;
-  afternoon: number;
-  evening: number;
-}
-
-export interface ICreateBookingPayload {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  serviceId: number;
-  date: Dayjs | string;     // Dayjs object หรือ YYYY-MM-DD
-  timeSlot: TimeSlot;
-}
+// re-export ให้หน้าอื่น import จาก services ได้เหมือนเดิม
+export type { TimeSlot } from "../../interface/bookingQueue";
+export type IServiceItem = _ServiceItem;
 
 /* ===================== Utils ===================== */
-// ส่งวันเป็นสตริงตามปฏิทินผู้ใช้ แล้วให้ backend normalize เองเป็น UTC midnight
 const toDateStr = (d: Dayjs | string) =>
   dayjs(d).startOf("day").format("YYYY-MM-DD");
 
 /* ===================== Services (MOCK) ===================== */
-// ใช้ mock 100% ให้ dropdown มีข้อมูลแน่นอน
 const MOCK_SERVICES: IServiceItem[] = [
   { id: 1, name: "ตรวจสุขภาพช่องปาก" },
   { id: 2, name: "ขูดหินปูน" },
@@ -37,14 +28,11 @@ const MOCK_SERVICES: IServiceItem[] = [
   { id: 5, name: "เอ็กซเรย์ช่องปาก" },
 ];
 
-// เรียกตัวนี้ในหน้า Booking
 export async function getService(): Promise<IServiceItem[]> {
-  // delay เล็กน้อยให้เหมือนเรียก API
   await new Promise((r) => setTimeout(r, 200));
   return MOCK_SERVICES;
 }
 
-// ถ้าในอนาคตมี backend จริง ๆ อยากใช้แทน mock ก็ใช้ตัวนี้ได้
 export async function listServices(): Promise<IServiceItem[]> {
   try {
     const { data } = await axios.get("/api/services");
@@ -55,7 +43,7 @@ export async function listServices(): Promise<IServiceItem[]> {
 }
 
 /* ===================== Booking APIs ===================== */
-export async function getCapacityByDate(d: Dayjs | string): Promise<ICapacitySummary> {
+export async function getCapacityByDate(d: Dayjs | string): Promise<CapacitySummary> {
   const date = toDateStr(d);
   const { data } = await axios.get("/api/queue/capacity", { params: { date } });
   return {
@@ -65,9 +53,20 @@ export async function getCapacityByDate(d: Dayjs | string): Promise<ICapacitySum
   };
 }
 
-export async function createBooking(p: ICreateBookingPayload) {
-  const payload = { ...p, date: toDateStr(p.date) };
-  const { data } = await axios.post("/api/bookings", payload);
+// ⬇️ รับ CreateBooking จาก interfaces (มี dateText / phone_number)
+export async function createBooking(p: CreateBookingPayload) {
+  const body = {
+    firstName: (p.firstName ?? "").trim(),
+    lastName:  (p.lastName ?? "").trim(),
+    phone_number: String(p.phone_number ?? "").replace(/\D/g, ""),        // ให้เป็นตัวเลขล้วน
+    service_id: Number((p as any).service_id ?? p.serviceId),             // << map ไปเป็น service_id
+    dateText: dayjs(p.dateText).format("YYYY-MM-DD"),
+    timeSlot: p.timeSlot,                                                 // "morning" | "afternoon" | "evening"
+  };
+
+  const { data } = await axios.post("/api/bookings", body, {
+    headers: { "Content-Type": "application/json" },
+  });
   return data;
 }
 
@@ -92,19 +91,20 @@ export async function listSlotsByDate(
 
 export async function listBookingsByDate(
   d: Dayjs | string
-): Promise<
-  Array<{
-    id: number;
-    firstName: string;
-    lastName: string;
-    phone: string;
-    status: string;
-    date: string;
-    hhmm: string;
-    segment: TimeSlot;
-  }>
-> {
+): Promise<SummaryBooking[]> {
   const date = toDateStr(d);
   const { data } = await axios.get("/api/bookings", { params: { date } });
-  return data?.data ?? [];
+  return (data?.data ?? []) as SummaryBooking[];
+}
+
+export async function searchBookingsByPhone(
+  phone: string,
+  date?: string | Dayjs
+): Promise<SummaryBooking[]> {
+  const params: Record<string, string> = {};
+  if (phone) params.phone = phone.trim();
+  if (date) params.date = typeof date === "string" ? date : dayjs(date).format("YYYY-MM-DD");
+
+  const { data } = await axios.get("/api/bookings/search-by-phone", { params });
+  return (data?.data ?? []) as SummaryBooking[];
 }

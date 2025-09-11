@@ -18,7 +18,9 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 
-import type { InitialSymtoms } from "../../../interface/initailPatient/initailSym";
+// 🔁 แก้ชื่อให้ตรงกับ interface ใหม่
+import type { InitialSymptoms } from "../../../interface/initailPatient/initailSym";
+
 import {
   PatientAPI,
   ServiceToSymtomsAPI,
@@ -29,28 +31,23 @@ import { useSyncDateTime } from "../../../hooks/syncDateTime";
 
 const { Title } = Typography;
 
-// ✅ sleep ฟังก์ชันทำงานจริง
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+// ✅ ค่ามาตรฐาน
+const DEFAULT_STATUS = "รอคิว";
 
 const InitialPage: React.FC = () => {
-  const [symptomsForm] = Form.useForm<InitialSymtoms>();
+  const [symptomsForm] = Form.useForm<InitialSymptoms>();
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [serviceOptions, setServiceOptions] = useState<
-    { label: string; value: number }[]
-  >([]);
+  const [serviceOptions, setServiceOptions] = useState<{ label: string; value: number }[]>([]);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // ✅ รวม date+time → visit (local RFC3339) อัตโนมัติ
+  // รวม date+time → visit (local RFC3339)
   useSyncDateTime(symptomsForm, "visitDateOnly", "visitTimeOnly", "visit");
 
   useEffect(() => {
     if (!id) return;
-
     const run = async () => {
       try {
         setLoading(true);
@@ -59,9 +56,7 @@ const InitialPage: React.FC = () => {
         setLoading(false);
       }
     };
-
     run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchPatient = async () => {
@@ -69,7 +64,6 @@ const InitialPage: React.FC = () => {
       const resp = await PatientAPI.getByID(Number(id));
       const data = resp?.data ?? resp ?? {};
 
-      // แตก visit เดิมให้ช่องวันที่/เวลาแยกแสดง
       const v = data.visit ?? data.visitDate ?? data.Visit ?? data.visit_date;
       const { dateOnly, timeOnly } = splitToDateAndTime(v);
 
@@ -77,6 +71,7 @@ const InitialPage: React.FC = () => {
         ...data,
         visitDateOnly: dateOnly,
         visitTimeOnly: timeOnly,
+        status: data?.status ?? DEFAULT_STATUS, // ✅ ไม่มีค่าเดิม ให้ default เป็น "รอคิว"
       });
     } catch (e) {
       console.error(e);
@@ -86,9 +81,8 @@ const InitialPage: React.FC = () => {
 
   const fetchService = async () => {
     try {
-      const res = await ServiceToSymtomsAPI.getService(); // GET /api/services
-      const rows =
-        (Array.isArray(res) && res) || (Array.isArray(res?.data) && res.data) || [];
+      const res = await ServiceToSymtomsAPI.getService();
+      const rows = (Array.isArray(res) && res) || (Array.isArray(res?.data) && res.data) || [];
       setServiceOptions(
         rows.map((s: any) => ({
           value: Number(s.ID ?? s.id),
@@ -105,27 +99,16 @@ const InitialPage: React.FC = () => {
     const key = "saving-symptom";
     try {
       setSubmitting(true);
-  
-      // แสดงกำลังบันทึก (ผูกกับ contextHolder ได้)
-      messageApi.open({
-        key,
-        type: "loading",
-        content: "กำลังบันทึกข้อมูลอาการ...",
-        duration: 0,
-      });
-  
-      await PatientSymptomsAPI.createSymtom(id!, values);
-  
-      // ปิด/ทำลาย loading เดิมก่อน
+      messageApi.open({ key, type: "loading", content: "กำลังบันทึกข้อมูลอาการ...", duration: 0 });
+
+      // ✅ บังคับสถานะเป็น "รอคิว" ตอนส่งเสมอ
+      const payload: InitialSymptoms = { ...values, status: DEFAULT_STATUS };
+
+      await PatientSymptomsAPI.createSymtom(id!, payload);
+
       messageApi.destroy(key);
-  
-      // ✅ แสดง "บันทึกสำเร็จ" ด้วย global message (ไม่ผูกกับเพจนี้)
-      message.success({
-        content: "บันทึกข้อมูลเรียบร้อย",
-        duration: 1.5,
-      });
-  
-      // 👉 เปลี่ยนหน้า “ทันที” หลังเฟรมถัดไป (ไม่หน่วงให้ผู้ใช้รู้สึก)
+      message.success({ content: "บันทึกข้อมูลเรียบร้อย", duration: 1.5 });
+
       requestAnimationFrame(() => {
         navigate("/admin/patient");
         // หรือ navigate(`/admin/patient/patient-history/${id}`);
@@ -133,13 +116,7 @@ const InitialPage: React.FC = () => {
     } catch (e: any) {
       console.error(e);
       const msg = e?.response?.data?.error || e?.message || "บันทึกไม่สำเร็จ";
-      // ใช้ instance เดิมก็ได้เพราะเรายังอยู่หน้านี้
-      messageApi.open({
-        key,
-        type: "error",
-        content: msg,
-        duration: 2,
-      });
+      messageApi.open({ key, type: "error", content: msg, duration: 2 });
     } finally {
       setSubmitting(false);
     }
@@ -148,7 +125,6 @@ const InitialPage: React.FC = () => {
   return (
     <div className="wrapper">
       {contextHolder}
-     
       <Spin fullscreen spinning={submitting} />
 
       <div className="header">
@@ -161,10 +137,13 @@ const InitialPage: React.FC = () => {
             form={symptomsForm}
             layout="vertical"
             onFinish={onFinish}
-            initialValues={{}}
+            initialValues={{ status: DEFAULT_STATUS }} // ✅ default "รอคิว"
             disabled={submitting}
           >
-            {/* ----------------------- */}
+             <Form.Item name="visit" hidden>
+              <Input type="hidden" />
+            </Form.Item>
+         
             {/* แถวที่ 1: ข้อมูลคนไข้ */}
             <Row gutter={[24, 12]}>
               <Col md={4}>

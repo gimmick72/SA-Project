@@ -5,6 +5,7 @@ import (
 
 	"Database/configs"
 	"Database/controllers"
+	bookingController "Database/controllers/booking"
 )
 
 const PORT = "8080"
@@ -15,6 +16,9 @@ func main() {
 
 	r := gin.Default()
 	r.Use(CORSMiddleware())
+
+	
+
 
 	//api OK
 	router := r.Group("/api")
@@ -27,18 +31,25 @@ func main() {
 		router.DELETE("/patients/:id", controllers.DeletePatient) // (เพิ่ม) ลบ
 
 		router.POST("/patients/:id/symptoms", controllers.CreateSymptom) //AddSymptom
-		router.GET("/services", controllers.GetService)   //ดึง service มาเลือกตอนเพิ่มอาการ
+		router.GET("/services", controllers.GetService)                  //ดึง service มาเลือกตอนเพิ่มอาการ
 		router.GET("/case-data/:id", controllers.GetCaseHistory)         //ดึง case data
 
 		// Queue settings / capacity
-		router.POST("/queue/slots", controllers.UpsertSlots) // admin
-		router.GET("/queue/slots", controllers.ListSlots)    // admin/view
-		router.GET("/queue/capacity", controllers.GetCapacitySummary)
+		router.POST("/queue/slots", bookingController.CreateSlots)   // admin
+		router.GET("/queue/slots", bookingController.GetSlotsByDate) // admin/view
+		router.GET("/queue/capacity", bookingController.GetCapacitySummaryByDate)
+		router.DELETE("/queue/slots/:id", bookingController.DeleteQueueSlot)
+		router.PATCH("/queue/slots/:id", bookingController.UpdateQueueSlot)
 
 		// Booking
-		router.POST("/bookings", controllers.CreateBooking)
-		router.POST("/bookings/:id/cancel", controllers.CancelBooking)
-		router.GET("/bookings", controllers.ListBookingsByDate)
+		router.POST("/bookings", bookingController.CreateBooking)
+		router.POST("/bookings/:id/cancel", bookingController.CancelBookingByID)
+		router.GET("/bookings", bookingController.GetBookingsByDate)
+
+		// New search routes
+		router.GET("/bookings/search-by-phone", bookingController.SearchBookingsByPhone)
+		// router.GET("/bookings/search-by-date", bookingController.SearchBookingsByDate)
+		// router.GET("/bookings/search-combined", bookingController.SearchBookingsByPhoneAndDate)
 
 		// Supplies
 		router.GET("/supplies", controllers.ListSupplies)
