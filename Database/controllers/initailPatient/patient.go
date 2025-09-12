@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"Database/configs"
-	"Database/entity"
+	entity "Database/entity"
 )
 
 // POST /api/patients
@@ -81,6 +81,9 @@ func GetPatientByID(c *gin.Context) {
 		Preload("ContactPerson").
 		Preload("InitialSymptomps").
 		Preload("Histories").
+		Preload("CaseData").
+        // Preload("CaseData.Department").
+        // Preload("CaseData.Treatments").
 		First(&patient, id).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ไม่พบข้อมูลคนไข้"})
 		return
@@ -103,20 +106,20 @@ func UpdatePatient(c *gin.Context) {
 	if tx := configs.DB.Model(&entity.Patient{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
-			"citizenID":        payload.CitizenID,
-			"prefix":            payload.Prefix,
-			"firstname":        payload.FirstName,
-			"lastname":         payload.LastName,
-			"nick_name":         payload.NickName,
-			"congenita_disease": payload.CongenitaDisease,
-			"blood_type":        payload.BloodType,
-			"gender":            payload.Gender,
-			"birthday":         payload.Birthday, // ต้องส่ง "YYYY-MM-DD" จาก FE ตาม time_format
-			"phone_number":      payload.PhoneNumber,
-			"age":               payload.Age,
-			"drug_allergy":      payload.DrugAllergy,
-		}); tx.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": tx.Error.Error()})
+			"citizen_id":         payload.CitizenID,
+			"prefix":             payload.Prefix,
+			"first_name":         payload.FirstName,
+			"last_name":          payload.LastName,
+			"nick_name":          payload.NickName,
+			"congenital_disease": payload.CongenitalDisease, 
+			"blood_type":         payload.BloodType,
+			"gender":             payload.Gender,
+			"birthday":           payload.Birthday,
+			"phone_number":       payload.PhoneNumber,
+			"age":                payload.Age,
+			"drug_allergy":       payload.DrugAllergy,
+		}).Error; tx != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": tx.Error()})
 		return
 	}
 
@@ -175,9 +178,9 @@ func UpdatePatient(c *gin.Context) {
 func DeletePatient(c *gin.Context) {
 	id := c.Param("id")
 	if err := configs.DB.Unscoped().Where("id = ?", id).Delete(&entity.Patient{}).Error; err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"message": "ลบข้อมูลคนไข้เรียบร้อย"})
 }
 

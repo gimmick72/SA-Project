@@ -31,6 +31,7 @@ func main() {
 		routers.StaffRouter(router) // ระบบบุคลากร
 		routers.QueueRouter(router) // ระบบจองคิว
 		routers.DashboardStaffRouter(router) //หน้า dashboard
+		routers.BookingRouter(router) //หน้า booking
 
 	}
 	// Run the server go run main.go

@@ -9,5 +9,6 @@ export interface InitialSymtoms{
     height: number;     // Backend expects float64, not Float64Array
     serviceID: number;  // Required by backend
     patientID: number;  // Required by backend
+
 }
 

@@ -14,9 +14,9 @@ func QueueRouter(router *gin.RouterGroup) {
 	router.PATCH("/queue/slots/:id", bookingController.UpdateQueueSlot)
 
 	// Booking
-	router.POST("/bookings", bookingController.CreateBooking)
-	router.POST("/bookings/:id/cancel", bookingController.CancelBookingByID)
-	router.GET("/bookings", bookingController.GetBookingsByDate)
+	// router.POST("/bookings", bookingController.CreateBooking)
+	// router.POST("/bookings/:id/cancel", bookingController.CancelBookingByID)
+	// router.GET("/bookings", bookingController.GetBookingsByDate)
 
 	// New search routes
 	router.GET("/bookings/search", bookingController.SearchBookings)

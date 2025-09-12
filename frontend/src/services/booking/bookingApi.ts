@@ -19,26 +19,23 @@ export type IServiceItem = _ServiceItem;
 const toDateStr = (d: Dayjs | string) =>
   dayjs(d).startOf("day").format("YYYY-MM-DD");
 
-/* ===================== Services (MOCK) ===================== */
-const MOCK_SERVICES: IServiceItem[] = [
-  { id: 1, name: "ตรวจสุขภาพช่องปาก" },
-  { id: 2, name: "ขูดหินปูน" },
-  { id: 3, name: "อุดฟัน" },
-  { id: 4, name: "ถอนฟัน" },
-  { id: 5, name: "เอ็กซเรย์ช่องปาก" },
-];
-
+/* ===================== Services (REAL API) ===================== */
+// ทั้งสองฟังก์ชันนี้จะยิง /api/services และคืน array ของบริการจากตารางจริง
 export async function getService(): Promise<IServiceItem[]> {
-  await new Promise((r) => setTimeout(r, 200));
-  return MOCK_SERVICES;
+  try {
+    const { data } = await axios.get("/api/services");
+    return (data?.data ?? data ?? []) as IServiceItem[];
+  } catch {
+    return [];
+  }
 }
 
 export async function listServices(): Promise<IServiceItem[]> {
   try {
     const { data } = await axios.get("/api/services");
-    return data?.data ?? data ?? [];
+    return (data?.data ?? data ?? []) as IServiceItem[];
   } catch {
-    return MOCK_SERVICES;
+    return [];
   }
 }
 
@@ -57,11 +54,11 @@ export async function getCapacityByDate(d: Dayjs | string): Promise<CapacitySumm
 export async function createBooking(p: CreateBookingPayload) {
   const body = {
     firstName: (p.firstName ?? "").trim(),
-    lastName: (p.lastName ?? "").trim(),
-    phone_number: String(p.phone_number ?? "").replace(/\D/g, ""),        // ให้เป็นตัวเลขล้วน
-    service_id: Number((p as any).service_id ?? p.serviceId),             // << map ไปเป็น service_id
+    lastName:  (p.lastName ?? "").trim(),
+    phone_number: String(p.phone_number ?? "").replace(/\D/g, ""),
+    service_id: Number((p as any).service_id ?? (p as any).serviceId),
     dateText: dayjs(p.dateText).format("YYYY-MM-DD"),
-    timeSlot: p.timeSlot,                                                 // "morning" | "afternoon" | "evening"
+    timeSlot: p.timeSlot,
   };
 
   const { data } = await axios.post("/api/bookings", body, {
@@ -97,14 +94,14 @@ export async function listBookingsByDate(
   return (data?.data ?? []) as SummaryBooking[];
 }
 
-export async function searchBookingsByPhone(
-  phone: string,
-  date?: string | Dayjs
+export async function searchBookings(
+  phone?: string,
+  dateStr?: string
 ): Promise<SummaryBooking[]> {
-  const params: Record<string, string> = {};
-  if (phone) params.phone = phone.trim();
-  if (date) params.date = typeof date === "string" ? date : dayjs(date).format("YYYY-MM-DD");
+  const params = new URLSearchParams();
+  if (phone && phone.trim()) params.set("phone", phone.trim());
+  if (dateStr && dateStr.trim()) params.set("date", dateStr.trim());
 
-  const { data } = await axios.get("/api/bookings/search-by-phone", { params });
-  return (data?.data ?? []) as SummaryBooking[];
+  const { data } = await axios.get(`/api/bookings/search?${params.toString()}`);
+  return data?.data ?? [];
 }

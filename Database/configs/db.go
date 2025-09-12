@@ -44,7 +44,7 @@ func SetupDatbase() {
 		&entity.Supply{},
 		&entity.RecordSupply{},
 
-		// ตารางคิว
+		// //Queue and Room
 		&entity.Appointment{},
 
 		// ตาราง DentistManagement
@@ -58,6 +58,7 @@ func SetupDatbase() {
 		// ตารารางระบบ Personal and Treatment
 		&entity.PersonalData{},
 		&entity.Department{},
+
 		// &entity.Patient{},
 		&entity.Address{},
 		&entity.ContactPerson{},
@@ -65,6 +66,10 @@ func SetupDatbase() {
 		&entity.Treatment{},
 		&entity.Quadrant{},
 		&entity.CaseData{},
+
+		//BookingQueue
+		&entity.QueueSlot{},
+		&entity.Booking{},
 	)
 
 	// จำลองข้อมูล ระบบ -> ตารางแพทย์, บริการ, อุปกรณ์, คิวห้อง
@@ -156,6 +161,34 @@ func MockData() {
 		log.Println("⚡ Appointment table already has data")
 	}
 
+	
+	// เพิ่ม mock data สำหรับ Booking  ถ้ายังว่าง
+	DB.Model(&entity.Booking{}).Count(&count)
+	if count == 0 {
+		mockData := GetMockbooking()
+		for _, d := range mockData {
+			DB.Create(&d)
+		}
+		log.Println("✅ Added mock Appointment data")
+	} else {
+		log.Println("⚡ Appointment table already has data")
+	}
+
+	
+	// เพิ่ม mock data สำหรับ Booking  ถ้ายังว่าง
+	DB.Model(&entity.QueueSlot{}).Count(&count)
+	if count == 0 {
+		mockData := GetMockQueueSlots()
+		for _, d := range mockData {
+			DB.Create(&d)
+		}
+		log.Println("✅ Added mock Appointment data")
+	} else {
+		log.Println("⚡ Appointment table already has data")
+	}
+
+
+	// GetMockQueueSlots()
 }
 
 // ------------------- SEED STAFF (PersonalData + Department) -------------------
@@ -245,7 +278,7 @@ func SeedPatient() {
 			FirstName:        "เทส",
 			LastName:         "ระบบ",
 			NickName:         "ชาย",
-			CongenitaDisease: "ไม่มี",
+			CongenitalDisease: "ไม่มี",
 			BloodType:        "O",
 			Gender:           "ชาย",
 			Birthday:         time.Date(1990, 5, 12, 0, 0, 0, 0, time.UTC),
@@ -282,7 +315,7 @@ func SeedPatient() {
 			FirstName:        "สุดา",
 			LastName:         "พิมพ์ดี",
 			NickName:         "ดาว",
-			CongenitaDisease: "หอบหืด",
+			CongenitalDisease: "หอบหืด",
 			BloodType:        "A",
 			Gender:           "หญิง",
 			Birthday:         time.Date(1985, 8, 20, 0, 0, 0, 0, time.UTC),

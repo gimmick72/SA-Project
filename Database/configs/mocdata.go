@@ -4,6 +4,7 @@ import (
 	"Database/entity"
 	"time"
 	"log"
+	"fmt"
 )
 
 // -------------------- DentistManagement --------------------
@@ -344,4 +345,110 @@ func SeedContactPerson() {
     }
 
     log.Println("✅ Seeded contact persons successfully!")
+}
+
+
+
+
+
+
+
+
+// booking
+func GetMockbooking() []entity.Booking {
+	mockBookings := []entity.Booking{
+		{
+			ID:          1,
+			FirstName:   "สมชาย",
+			LastName:    "ใจดี",
+			PhoneNumber: "0812345678",
+			ServiceID:   101,
+			SlotID:      1,
+			Date:        time.Date(2025, 9, 12, 0, 0, 0, 0, time.Local),
+			HHMM:        "0900",
+			Segment:     "morning",
+			Status:      "confirmed",
+		},
+		{
+			ID:          2,
+			FirstName:   "สุมาลี",
+			LastName:    "สุขใจ",
+			PhoneNumber: "0898765432",
+			ServiceID:   102,
+			SlotID:      2,
+			Date:        time.Date(2025, 9, 12, 0, 0, 0, 0, time.Local),
+			HHMM:        "1000",
+			Segment:     "morning",
+			Status:      "confirmed",
+		},
+		{
+			ID:          3,
+			FirstName:   "ประวิทย์",
+			LastName:    "เก่งงาน",
+			PhoneNumber: "0823456789",
+			ServiceID:   103,
+			SlotID:      3,
+			Date:        time.Date(2025, 9, 12, 0, 0, 0, 0, time.Local),
+			HHMM:        "1400",
+			Segment:     "afternoon",
+			Status:      "cancelled",
+		},
+	}
+
+	// ถ้าต้องการ debug
+	for _, b := range mockBookings {
+		fmt.Printf("%+v\n", b)
+	}
+
+	return mockBookings
+}
+
+
+
+// mockdata  QueueSlot
+func GetMockQueueSlots() []entity.QueueSlot {
+	mockSlots := []entity.QueueSlot{
+		{
+			Date:     time.Date(2025, 9, 12, 0, 0, 0, 0, time.Local),
+			HHMM:     "0900",
+			Segment:  "morning",
+			Capacity: 5,
+			Used:     2,
+		},
+		{
+			Date:     time.Date(2025, 9, 12, 0, 0, 0, 0, time.Local),
+			HHMM:     "1000",
+			Segment:  "morning",
+			Capacity: 5,
+			Used:     1,
+		},
+		{
+			Date:     time.Date(2025, 9, 12, 0, 0, 0, 0, time.Local),
+			HHMM:     "1400",
+			Segment:  "afternoon",
+			Capacity: 4,
+			Used:     0,
+		},
+		{
+			Date:     time.Date(2025, 9, 13, 0, 0, 0, 0, time.Local),
+			HHMM:     "0900",
+			Segment:  "morning",
+			Capacity: 5,
+			Used:     3,
+		},
+		{
+			Date:     time.Date(2025, 9, 13, 0, 0, 0, 0, time.Local),
+			HHMM:     "1500",
+			Segment:  "afternoon",
+			Capacity: 4,
+			Used:     2,
+		},
+	}
+
+	// แสดง debug
+	for _, s := range mockSlots {
+		fmt.Printf("%+v\n", s)
+	}
+
+	return mockSlots
 }
