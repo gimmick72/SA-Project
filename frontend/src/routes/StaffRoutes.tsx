@@ -4,6 +4,7 @@ import type { RouteObject } from "react-router-dom";
 import Loadable from "../components/third-patry/Loadable";
 import FullLayout from "../layout/FullLayout";
 import StaffDetail from "../pages/Systems/staff_info/staffData/StaffDetail";
+import RequireManager from "../pages/Systems/staff_info/components/RequireManager";
 
 const HomeInfoPage = Loadable(lazy(() => import("../pages/Systems/home_info/index")));
 const PatientInfoPage = Loadable(lazy(() => import("../pages/Systems/patient_info/index")));
@@ -75,7 +76,10 @@ const AdminRoutes: RouteObject[] = [
       },
       {
         path: "PersonalData/:Employee_ID",
-        element: <StaffDetail />
+        element:
+                <RequireManager> 
+                <StaffDetail />
+                </RequireManager> 
       },
       {
         path: "queue",

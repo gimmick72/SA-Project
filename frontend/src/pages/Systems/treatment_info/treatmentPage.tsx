@@ -270,8 +270,8 @@ const TreatmentPage: React.FC = () => {
                         filteredCases.map((r) => {
                             const patient = patientsList.find((p) => p.ID === r.patientId) || r.patient;
                             const title = patient?.Prefix || patient?.prefix || "";
-                            const patientName = patient ? `${patient.FirstName || patient.firstName || ""} ${patient.LastName || patient.lastName || ""}` : "-";
-                            const nationalId = patient?.CitizenID || "";
+                            const patientName = patient ? `${patient.firstname || patient.firstName || ""} ${patient.Lastname || patient.lastname || ""}` : "-";
+                            const nationalId = patient?.citizenID || "";
                             const appointment = r.appointment_date ? dayjs(r.appointment_date).format("DD/MM/YYYY") : "ไม่มี";
                             const totalPrice = (r.treatments || []).reduce((s, t) => s + (Number(t.Price || (t as any).price || 0)), 0);
                             return (
@@ -330,7 +330,7 @@ const TreatmentPage: React.FC = () => {
 
                                     <Col xs={24} sm={12} md={8}><Text strong>อาการ</Text><div>{form.getFieldValue("symptomps") || "-"}</div></Col>
                                     <Col xs={24} sm={12} md={8}><Text strong>ประวัติแพ้ยา</Text><div>{form.getFieldValue("allergyHistory") || "-"}</div></Col>
-                                    <Col xs={24} sm={12} md={8}><Text strong>เบอร์โทรศัพท์</Text><div>{form.getFieldValue("phone") || "-"}</div></Col>
+                                    <Col xs={24} sm={12} md={8}><Text strong>เบอร์โทรศัพท์</Text><div>{form.getFieldValue("phonenumber") || "-"}</div></Col>
                                 </Row>
                             </Card>
                         )}

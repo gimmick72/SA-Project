@@ -1,7 +1,8 @@
 //frontend/src/services/https/CaseAPI.tsx
 import axios from "axios";
 const API_BASE = "http://localhost:8080/api";
-import type { CaseData, Treatment, Patient, CaseRow } from "../../interface/Case";
+import type { CaseData, Treatment, Patients, CaseRow } from "../../interface/Case";
+import type {Patient} from "../../interface/patient";
 import dayjs from "dayjs";   // ✅ ต้องใส่ตรงนี้
 
 const normalizeDateString = (s?: any): string | undefined => {
@@ -70,10 +71,10 @@ export const CaseAPI = {
   getCaseFormValuesByID: async (
     id: number,
     row: CaseRow,
-    patientsList: Patient[]
+    patientsList: Patients[]
   ): Promise<{
     formValues: any;
-    patient: Patient | null;
+    patient: Patients | null;
   }> => {
     const data = await CaseAPI.getCaseByID(id);
 
@@ -84,9 +85,9 @@ export const CaseAPI = {
       null;
 
     const init =
-      data.Patient?.InitialSymptomps &&
-        data.Patient.InitialSymptomps.length
-        ? data.Patient.InitialSymptomps[0]
+      data.Patient?.initialsymptomps &&
+        data.Patient.initialsymptomps.length
+        ? data.Patient.initialsymptomps[0]
         : null;
 
     // เตรียมค่าไว้ใส่ใน Form
@@ -95,15 +96,15 @@ export const CaseAPI = {
       dentist_Name: data.Department?.PersonalData
         ? `${data.Department.PersonalData.FirstName} ${data.Department.PersonalData.LastName}`
         : "",
-      NationalID: patient?.CitizenID || patient?.NationalID || undefined,
+      NationalID: patient?.citizenID || patient?.nationalID || undefined,
       fullName: patient
-        ? `${patient.Prefix || ""} ${patient.FirstName || ""} ${patient.LastName || ""
+        ? `${patient.prefix || ""} ${patient.firstname || ""} ${patient.lastname || ""
         }`
         : "",
-      age: patient?.Age,
-      preExistingConditions: patient?.CongenitaDisease ?? "",
-      phone: patient?.PhoneNumber,
-      allergyHistory: patient?.DrugAllergy ?? "",
+      age: patient?.age,
+      preExistingConditions: patient?.congenita_disease ?? "ดึงผิด",
+      phonenumber: patient?.phonenumber ?? "ดึงผิด",
+      allergyHistory: patient?.drugallergy ?? "ดึงผิด",
       note: row.note,
       appointment_date: row.appointment_date ? dayjs(row.appointment_date) : null,
       treatments: (row.treatments || []).map((t) => ({
@@ -111,12 +112,12 @@ export const CaseAPI = {
         price: t.Price || 0,
       })),
       SignDate: data.SignDate ? dayjs(data.SignDate) : null,
-      symptomps: init?.Symptomps ?? "",
-      bloodPressure: init?.BloodPressure ?? "",
-      heartRate: init?.HeartRate ?? "",
-      weight: init?.Weight ?? "",
-      height: init?.Height ?? "",
-      bloodType: patient?.BloodType ?? "",
+      symptomps: init?.symptomps ?? "",
+      bloodPressure: init?.bloodpressure ?? "ดึงผิด",
+      heartRate: init?.heartrate?? "",
+      weight: init?.weight ?? "",
+      height: init?.height ?? "",
+      bloodType: patient?.blood_type ?? "",
     };
     return { formValues, patient };
   },
@@ -175,7 +176,7 @@ export const CaseAPI = {
 
   buildCasePayload: (
     values: any,
-    selectedPatient: Patient | null,
+    selectedPatient: Patients | null,
     // dynamicSelectedTeeth: Record<number, string[]>
   ): Partial<CaseData> | null => {
     const patientIdToUse =
@@ -217,7 +218,7 @@ export const CaseAPI = {
   // ✅ save (update or create)
   saveCase: async (
     values: any,
-    selectedPatient: Patient | null,
+    selectedPatient: Patients | null,
     editingCase: CaseRow | null,
     prevCases: CaseRow[]
   ): Promise<CaseRow[]> => {
@@ -273,22 +274,27 @@ export const CaseAPI = {
     }
 
     const init =
-      found.InitialSymptomps && found.InitialSymptomps.length
-        ? found.InitialSymptomps[0]
+      found.initialsymptomps && found.initialsymptomps.length
+        ? found.initialsymptomps[0]
+        : null;
+
+    const Init =
+      found.initialsymptomps && found.initialsymptomps.length
+        ? found.initialsymptomps[0]
         : null;
 
     const formValues: any = {
-      fullName: `${found.Prefix ?? ""} ${found.FirstName ?? ""} ${found.LastName ?? ""}`.trim(),
-      age: found.Age ?? "",
-      preExistingConditions: found.CongenitaDisease ?? "",
-      phone: found.PhoneNumber ?? "",
-      allergyHistory: found.DrugAllergy ?? "",
-      symptomps: init?.Symptomps ?? "",
-      bloodPressure: init?.BloodPressure ?? "",
-      heartRate: init?.HeartRate ?? "",
-      weight: init?.Weight ?? "",
-      height: init?.Height ?? "",
-      bloodType: found.BloodType ?? "",
+      fullName: `${found.prefix ?? ""} ${found.firstname ?? ""} ${found.lastname ?? ""}`.trim(),
+      age: found.age ?? "",
+      preExistingConditions: found.congenita_disease ?? "ดึงผิด",
+      phonenumber: found.phonenumber ?? "ดึงผิด",
+      allergyHistory: found.drugallergy ?? "ดึงผิด",
+      symptomps: init?.symptomps ?? "",
+      bloodPressure: init?.bloodpressure ?? "ดึงผิด",
+      heartRate: init?.heartrate ?? "",
+      weight: init?.weight ?? "",
+      height: init?.height ?? "",
+      bloodType: found.blood_type ?? "",
     };
 
     return { patient: found, formValues };

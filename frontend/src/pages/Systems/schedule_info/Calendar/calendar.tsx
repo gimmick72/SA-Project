@@ -23,7 +23,7 @@ interface EventType {
   room: string;
   start: Date;
   end: Date;
-  dentist: string;
+  dentist: string ;
 }
 
 // type EventData = {
@@ -45,7 +45,6 @@ const MyCalendar: React.FC = () => {
   const [showEventModal, setShowEventModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const [dentist, setDentist] = useState<string>("สมชาย");
 
 
   // โหลดข้อมูลจาก DB เมื่อคอมโพเนนต์ mount
