@@ -12,6 +12,7 @@ import { Patient, RoomScheduleData as RoomDataFromTypes } from "./types";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/th";
 import { assignPatientApi, fetchRoomsByDate } from "../../../services/queue/schedule";
+import { useNavigate } from "react-router-dom";
 
 dayjs.locale("th");
 
@@ -26,6 +27,9 @@ async function fetchPatients(): Promise<Patient[]> {
 }
 
 const QueuePage: React.FC = () => {
+
+  const navigate = useNavigate();
+
   const [date, setDate] = useState<Dayjs>(dayjs());
 
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -125,19 +129,19 @@ const QueuePage: React.FC = () => {
   );
 
   return (
-  <div
-    style={{
-      display: "flex",
-      padding: '1rem',
-      height: "40%",
-      flexDirection: "column",
-      overflowY: "auto",
-      overflowX: "auto",
-      border: "none 2px #000000",
-      
-    }}
-  >
-    <DndProvider backend={HTML5Backend}>
+    <div
+      style={{
+        display: "flex",
+        padding: '1rem',
+        height: "40%",
+        flexDirection: "column",
+        overflowY: "auto",
+        overflowX: "auto",
+        border: "none 2px #000000",
+
+      }}
+    >
+      <DndProvider backend={HTML5Backend}>
         {/* Toolbar: วันที่อยู่บนสุด */}
         <Card style={{ marginBottom: 1 }} size="small" >
           <Space size="small" wrap>
@@ -153,20 +157,38 @@ const QueuePage: React.FC = () => {
           </Space>
         </Card>
 
+
         {/* Panels: ใต้วันที่ = ซ้าย (คิวทั้งหมด) | ขวา (ตารางห้อง) */}
         <Row gutter={10} style={{ height: "40%", minHeight: 0, border: "none 2px #000000" }}>
           {/* ซ้าย: คิวทั้งหมด */}
-          <Col xs={24} md={6} style={{ height: "40%", minHeight: 0,border: "none 2px #000000" }}>
+          <Col xs={24} md={6} style={{ height: "40%", minHeight: 0, border: "none 2px #000000" }}>
+
+            <Button style={{
+              backgroundColor: "#CBFEFF",
+              color: "black",
+              border: "black",
+              borderRadius: 12,
+              fontWeight: 600,
+              width: "100%",
+              marginBottom: 10,
+              marginTop: 10
+            }}
+              type="primary"
+              onClick={() => navigate("/admin/queue/manage-queue")
+              }>
+              จัดการการจองคิว
+            </Button>
+
             <Spin spinning={loadingPatients}>
               <div
                 style={{
                   height: "50%",
                   minHeight: 0,
                   overflow: "hidden",
-                  border: "none 2px #000000" 
+                  border: "none 2px #000000"
                 }}
               >
-                <QueueSidebar patients={patients} maxHeight="100%"  />
+                <QueueSidebar patients={patients} maxHeight="100%" />
               </div>
             </Spin>
           </Col>
@@ -190,14 +212,14 @@ const QueuePage: React.FC = () => {
                     <Empty description="ยังไม่มีข้อมูลห้องในวันนี้" />
                   </div>
                 ) : (
-                 
+
                   <Row gutter={[16, 16]}>
                     {rooms.map((room) => (
                       <Col key={room.roomId} xs={24} sm={12} lg={6}>
                         <RoomSchedule
                           room={room}
                           onAssignPatient={handleAssignPatient}
-                          currentDate={date} viewMode={"week"}                        />
+                          currentDate={date} viewMode={"week"} />
                       </Col>
                     ))}
                   </Row>
@@ -206,10 +228,10 @@ const QueuePage: React.FC = () => {
             </div>
           </Col>
         </Row>
-      
-    </DndProvider>
-  </div>
-);
+
+      </DndProvider>
+    </div>
+  );
 
 };
 

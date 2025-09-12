@@ -21,6 +21,8 @@ const InitialSymptoms = Loadable(lazy(() => import("../pages/Systems/patient_inf
 const HistoryPage = Loadable(lazy(() => import("../pages/Systems/patient_info/HistoryPage")));
 const AddPatientPage = Loadable(lazy(() => import("../pages/Systems/patient_info/AddPatientPage")));
 
+const ManageQueue = Loadable(lazy(() => import("../pages/Systems/queue_info/manageQueue")))
+
 
 // Patient routes removed - using simplified patient info page
 
@@ -79,6 +81,10 @@ const AdminRoutes: RouteObject[] = [
         path: "queue",
         element: <QueueInfoPage />,
       },
+              {
+                path: "queue/manage-queue",
+                element: <ManageQueue/>
+              },
       {
         path: "payment/*",
         element: <PaymentRoutes />,
