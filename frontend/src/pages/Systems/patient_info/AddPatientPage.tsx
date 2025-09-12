@@ -132,7 +132,7 @@ const AddPatientPage: React.FC = () => {
                   rules={[{ required: true, message: "กรุณาเลือกคำนำหน้า" }]}
                 >
                   <Select placeholder="เลือกคำนำหน้า">
-                  <Option value="เด็กหญิง">เด็กชาย</Option>
+                  <Option value="เด็กชาย">เด็กชาย</Option>
                   <Option value="เด็กหญิง">เด็กหญิง</Option>
                     <Option value="นาย">นาย</Option>
                     <Option value="นางสาว">นางสาว</Option>
