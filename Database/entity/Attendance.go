@@ -24,13 +24,13 @@ type Attendance struct {
 
 // AttendanceRequest for creating attendance records
 type AttendanceRequest struct {
-	StaffID     uint       `json:"staff_id" binding:"required"`
-	Date        time.Time  `json:"date" binding:"required"`
+	StaffID     uint   `json:"staff_id" binding:"required"`
+	Date        string `json:"date" binding:"required"` // Accept date as string (YYYY-MM-DD)
 	CheckInTime *time.Time `json:"check_in_time"`
 	CheckOutTime *time.Time `json:"check_out_time"`
-	Status      string     `json:"status" binding:"oneof=present late absent half_day"`
-	Notes       string     `json:"notes"`
-	Location    string     `json:"location"`
+	Status      string `json:"status" binding:"oneof=present late absent half_day scheduled"`
+	Notes       string `json:"notes"`
+	Location    string `json:"location"`
 }
 
 // AttendanceResponse for API responses

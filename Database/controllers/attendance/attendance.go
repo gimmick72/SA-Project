@@ -20,10 +20,17 @@ func CreateAttendance(c *gin.Context) {
 		return
 	}
 
+	// Parse date string to time.Time
+	parsedDate, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD", "details": err.Error()})
+		return
+	}
+
 	// Create attendance record
 	attendance := entity.Attendance{
 		StaffID:      req.StaffID,
-		Date:         req.Date,
+		Date:         parsedDate,
 		CheckInTime:  req.CheckInTime,
 		CheckOutTime: req.CheckOutTime,
 		Status:       req.Status,
@@ -202,9 +209,16 @@ func UpdateAttendance(c *gin.Context) {
 		return
 	}
 
+	// Parse date string to time.Time
+	parsedDate, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD", "details": err.Error()})
+		return
+	}
+
 	// Update fields
 	attendance.StaffID = req.StaffID
-	attendance.Date = req.Date
+	attendance.Date = parsedDate
 	attendance.CheckInTime = req.CheckInTime
 	attendance.CheckOutTime = req.CheckOutTime
 	attendance.Status = req.Status

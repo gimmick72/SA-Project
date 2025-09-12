@@ -117,7 +117,7 @@ func GetMockSupplies() []entity.Supply {
 		{Code: "S004", Name: "น้ำยาบ้วนปาก", Category: "ทันตกรรม", Quantity: 80, Unit: "ขวด", ImportDate: now.AddDate(0, -3, 0), ExpiryDate: now.AddDate(1, 6, 0)},
 		{Code: "S005", Name: "ผ้าก๊อซ", Category: "อุปกรณ์", Quantity: 500, Unit: "แผ่น", ImportDate: now.AddDate(0, -1, -10), ExpiryDate: now.AddDate(2, 0, 0)},
 		{Code: "S006", Name: "ถุงมือยาง", Category: "อุปกรณ์", Quantity: 300, Unit: "คู่", ImportDate: now.AddDate(0, -2, -3), ExpiryDate: now.AddDate(1, 6, 0)},
-		{Code: "S007", Name: "หน้ากากอนามัย", Category: "อุปกรณ์", Quantity: 1000, Unit: "ชิ้น", ImportDate: now.AddDate(0, -1, -15), ExpiryDate: now.AddDate(1, 0, 0)},
+		{Code: "S007", Name: "หน้ากากอนามัย", Category: "อุปกรณ์", Quantity: 1000, Unit: "ชิ้น", ImportDate: now.AddDate(0, -1, -15), ExpiryDate: now.AddDate(1, 6, 0)},
 		{Code: "S008", Name: "ยาแก้ปวด", Category: "ยา", Quantity: 150, Unit: "เม็ด", ImportDate: now.AddDate(0, -1, 0), ExpiryDate: now.AddDate(2, 0, 0)},
 		{Code: "S009", Name: "ยาชา", Category: "ยา", Quantity: 50, Unit: "หลอด", ImportDate: now.AddDate(0, -2, 0), ExpiryDate: now.AddDate(1, 0, 0)},
 		{Code: "S010", Name: "น้ำยาฆ่าเชื้อ", Category: "อุปกรณ์", Quantity: 60, Unit: "ขวด", ImportDate: now.AddDate(0, -1, -7), ExpiryDate: now.AddDate(1, 6, 0)},

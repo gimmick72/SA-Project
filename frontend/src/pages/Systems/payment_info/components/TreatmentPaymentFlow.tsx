@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, Select, InputNumber, Steps, Typography, Space, Divider, message, Row, Col, Table, Tag } from 'antd';
-import { DollarOutlined, MobileOutlined, FileTextOutlined, CheckCircleOutlined, PrinterOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DollarOutlined, MobileOutlined, FileTextOutlined, CheckCircleOutlined, HistoryOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import PromptPayQR from '../third-party/PromptPayQR';
 import { paymentAPI, Payment } from '../../../../services/api';
 import './TreatmentPaymentFlow.css';
@@ -18,7 +19,6 @@ interface TreatmentItem {
 
 interface TreatmentData {
   patientName: string;
-  patientId: string;
   treatments: TreatmentItem[];
   dentistName: string;
   amount: number;
@@ -33,6 +33,7 @@ const TreatmentPaymentFlow: React.FC = () => {
   const [treatmentData, setTreatmentData] = useState<Partial<TreatmentData>>({ treatments: [] });
   const [loading, setLoading] = useState(false);
   const [selectedTreatments, setSelectedTreatments] = useState<TreatmentItem[]>([]);
+  const navigate = useNavigate();
 
   const treatmentTypes = [
     { name: 'ทำความสะอาดฟัน', price: 800 },
@@ -74,8 +75,8 @@ const TreatmentPaymentFlow: React.FC = () => {
       icon: <CheckCircleOutlined />
     },
     {
-      title: 'ใบเสร็จ',
-      icon: <PrinterOutlined />
+      title: 'เสร็จสิ้น',
+      icon: <CheckCircleOutlined />
     }
   ];
 
@@ -144,31 +145,56 @@ const TreatmentPaymentFlow: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Create payment using real API
+      // Check authentication token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn('No authentication token found, but proceeding with payment creation');
+        // For now, continue without token - the backend should handle this gracefully
+      }
+
+      // Use default patient ID since we removed the input field
+      const patientId = 1; // Default patient ID
+
       const paymentData = {
         amount: treatmentData.amount || 0,
-        payment_method: treatmentData.paymentMethod || 'cash',
-        status: 'completed',
+        payment_method: treatmentData.paymentMethod === 'online' ? 'promptpay' : treatmentData.paymentMethod || 'cash',
         description: `Treatment for ${treatmentData.patientName} - ${treatmentData.treatments?.map(t => t.type).join(', ')}`,
-        patient_id: 1, // Default patient ID for now
-        staff_id: 1, // Default staff ID for now
-        service_id: 1, // Default service ID for now
+        patient_id: patientId,
+        patient_name: treatmentData.patientName, // Add patient name to payment data
+        staff_id: 1, // Default staff ID - should be from logged in user
+        service_id: 5, // Use existing service ID from backend
       };
 
+      console.log('Creating payment with data:', paymentData);
       const response = await paymentAPI.createPayment(paymentData);
+      console.log('Payment created successfully:', response);
       
       message.success('บันทึกข้อมูลการรักษาและการชำระเงินเรียบร้อยแล้ว');
       setCurrentStep(currentStep + 1);
-    } catch (error) {
-      message.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    } catch (error: any) {
       console.error('Error creating payment:', error);
+      console.error('Payment data sent:', {
+        amount: treatmentData.amount || 0,
+        payment_method: treatmentData.paymentMethod || 'cash',
+        description: `Treatment for ${treatmentData.patientName} - ${treatmentData.treatments?.map(t => t.type).join(', ')}`,
+        patient_id: 1, // Default patient ID
+        patient_name: treatmentData.patientName, // Add patient name to error log
+        staff_id: 1,
+        service_id: 1,
+      });
+      console.error('Error response:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล';
+      message.error(`ไม่สามารถบันทึกการชำระเงินได้: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePrintReceipt = () => {
-    message.success('กำลังพิมพ์ใบเสร็จ...');
+  const handleGoToHistory = () => {
+    message.success('กำลังไปยังหน้าประวัติการชำระเงิน...');
+    // Navigate to payment history page
+    navigate('/admin/payment/history');
     // Reset form
     form.resetFields();
     setTreatmentData({});
@@ -189,15 +215,6 @@ const TreatmentPaymentFlow: React.FC = () => {
                   rules={[{ required: true, message: 'กรุณากรอกชื่อผู้ป่วย' }]}
                 >
                   <Input placeholder="กรอกชื่อผู้ป่วย" />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label="รหัสผู้ป่วย"
-                  name="patientId"
-                  rules={[{ required: true, message: 'กรุณากรอกรหัสผู้ป่วย' }]}
-                >
-                  <Input placeholder="กรอกรหัสผู้ป่วย" />
                 </Form.Item>
               </Col>
             </Row>
@@ -463,10 +480,6 @@ const TreatmentPaymentFlow: React.FC = () => {
                   <Text strong>ผู้ป่วย: </Text>
                   <Text>{treatmentData.patientName}</Text>
                 </Col>
-                <Col span={12}>
-                  <Text strong>รหัสผู้ป่วย: </Text>
-                  <Text>{treatmentData.patientId}</Text>
-                </Col>
               </Row>
               <Divider />
               <Text strong>ทันตแพทย์ผู้รักษา: </Text>
@@ -561,9 +574,6 @@ const TreatmentPaymentFlow: React.FC = () => {
                 <Col span={12}>
                   <Text strong>ผู้ป่วย: </Text><Text>{treatmentData.patientName}</Text>
                 </Col>
-                <Col span={12}>
-                  <Text strong>รหัสผู้ป่วย: </Text><Text>{treatmentData.patientId}</Text>
-                </Col>
               </Row>
               <br />
               <Text strong>ทันตแพทย์ผู้รักษา: </Text><Text>{treatmentData.dentistName}</Text>
@@ -656,8 +666,8 @@ const TreatmentPaymentFlow: React.FC = () => {
           
           {currentStep === 4 && (
             <Space>
-              <Button type="primary" icon={<PrinterOutlined />} onClick={handlePrintReceipt}>
-                พิมพ์ใบเสร็จ
+              <Button type="primary" icon={<HistoryOutlined />} onClick={handleGoToHistory}>
+                ไปที่หน้าประวัติชำระเงิน
               </Button>
               <Button onClick={() => {
                 form.resetFields();

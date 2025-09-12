@@ -48,13 +48,55 @@ export interface User {
   last_name: string;
   phone_number?: string;
   date_of_birth?: string;
-  is_active: boolean;
-  last_login?: string;
-  department?: string;
-  position?: string;
-  citizen_id?: string;
-  created_at: string;
-  updated_at?: string;
+}
+
+// Schedule/Appointment Types
+export interface ScheduleEvent {
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
+  room: string;
+  dentist: string;
+  patient_id?: string;
+  patient_name?: string;
+  type: 'appointment' | 'walkin';
+  case_code?: string;
+  note?: string;
+  duration_min?: number;
+}
+
+export interface TimeSlot {
+  time: string;
+  patient: {
+    id: string;
+    name: string;
+    type: string;
+    caseCode?: string;
+    note?: string;
+    durationMin?: number;
+  } | null;
+}
+
+export interface RoomSchedule {
+  roomId: string;
+  roomName: string;
+  assignedDoctor?: string;
+  timeSlots: TimeSlot[];
+}
+
+export interface AssignScheduleRequest {
+  date: string;
+  roomId: string;
+  time: string;
+  patientId?: string;
+  fromRoomId?: string;
+  fromTime?: string;
+  patientName?: string;
+  type?: 'appointment' | 'walkin';
+  caseCode?: string;
+  note?: string;
+  durationMin?: number;
 }
 
 export interface Payment {
@@ -288,6 +330,54 @@ export const adminAPI = {
     const response = await api.get<ApiResponse<User[]>>('/admin/admins');
     return response.data;
   },
+};
+
+// Schedule API
+export const scheduleAPI = {
+  getSchedule: async (date: string) => {
+    const response = await api.get<RoomSchedule[]>(`/schedule?mode=day&date=${date}`);
+    return response.data;
+  },
+
+  assignSchedule: async (assignData: AssignScheduleRequest) => {
+    const response = await api.post<ApiResponse<{ ok: boolean }>>('/schedule/assign', assignData);
+    return response.data;
+  },
+
+  // Convert backend room schedule to calendar events
+  convertToEvents: (roomSchedules: RoomSchedule[], date: string): ScheduleEvent[] => {
+    const events: ScheduleEvent[] = [];
+    
+    roomSchedules.forEach(room => {
+      room.timeSlots.forEach(slot => {
+        if (slot.patient) {
+          const [hours, minutes] = slot.time.split(':').map(Number);
+          const startDate = new Date(date);
+          startDate.setHours(hours, minutes, 0, 0);
+          
+          const endDate = new Date(startDate);
+          endDate.setMinutes(endDate.getMinutes() + (slot.patient.durationMin || 60));
+
+          events.push({
+            id: parseInt(`${room.roomId}${slot.time.replace(':', '')}`),
+            title: `${slot.patient.name} - ${room.roomName}`,
+            start: startDate,
+            end: endDate,
+            room: room.roomName,
+            dentist: room.assignedDoctor || 'ไม่ระบุ',
+            patient_id: slot.patient.id,
+            patient_name: slot.patient.name,
+            type: slot.patient.type as 'appointment' | 'walkin',
+            case_code: slot.patient.caseCode,
+            note: slot.patient.note,
+            duration_min: slot.patient.durationMin
+          });
+        }
+      });
+    });
+    
+    return events;
+  }
 };
 
 export default api;

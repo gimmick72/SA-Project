@@ -210,16 +210,6 @@ const PromptPayQR: React.FC<PromptPayQRProps> = ({
         </ul>
       </div>
 
-      {/* Refresh QR Code Button */}
-      <div className="refresh-button-container">
-        <Button 
-          onClick={generateQRCode} 
-          loading={loading}
-          icon={<QrcodeOutlined />}
-        >
-          สร้าง QR Code ใหม่
-        </Button>
-      </div>
     </Card>
   );
 };

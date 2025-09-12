@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import {
   Card, Row, Col, Table, Typography, Button, Input, Tag, Empty, Pagination, // ⬅️ เพิ่ม Pagination
 } from "antd";
+import type { ColumnsType } from "antd/es/table";
 
 const { Paragraph, Text } = Typography;
 
@@ -57,7 +58,7 @@ const HomeMed: React.FC = () => {
     [filtered, activeId]
   );
 
-  const columns = [
+  const columns: ColumnsType<QItem> = [
     {
       title: "No.",
       width: 70,

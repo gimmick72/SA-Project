@@ -26,15 +26,12 @@ interface Schedule {
   startTime: string;
   endTime: string;
   status: 'scheduled' | 'confirmed' | 'cancelled';
-  notes?: string;
-  createdAt: string;
 }
 
 interface StaffMember {
   id: string;
   name: string;
   position: string;
-  department: string;
 }
 
 const StaffScheduleManager: React.FC = () => {
@@ -53,44 +50,14 @@ const StaffScheduleManager: React.FC = () => {
           uniqueStaff.set(attendance.staff.id, {
             id: attendance.staff.id.toString(),
             name: `${attendance.staff.first_name} ${attendance.staff.last_name}`,
-            position: attendance.staff.position_info?.name || 'Staff',
-            department: attendance.staff.department_info?.name || 'General'
+            position: attendance.staff.position_info?.name || 'Staff'
           });
         }
       });
       setStaffMembers(Array.from(uniqueStaff.values()));
-      
-      // Mock schedule data for demonstration
-      setSchedules([
-        {
-          id: '1',
-          staffId: '1',
-          staffName: 'ดร.สมชาย ใจดี',
-          position: 'ทันตแพทย์',
-          date: '2024-01-15',
-          startTime: '09:00',
-          endTime: '17:00',
-          status: 'confirmed',
-          notes: 'ตารางงานปกติ',
-          createdAt: '2024-01-10T10:00:00Z'
-        },
-        {
-          id: '2',
-          staffId: '2',
-          staffName: 'พยาบาล สุดา สวยงาม',
-          position: 'พยาบาลทันตกรรม',
-          date: '2024-01-15',
-          startTime: '08:00',
-          endTime: '16:00',
-          status: 'scheduled',
-          notes: 'เวรเช้า',
-          createdAt: '2024-01-10T10:00:00Z'
-        }
-      ]);
     } catch (error) {
       console.error('Error loading staff members:', error);
       message.error('ไม่สามารถโหลดข้อมูลพนักงานได้');
-      setStaffMembers([]);
     } finally {
       setLoading(false);
     }
@@ -136,12 +103,6 @@ const StaffScheduleManager: React.FC = () => {
         const config = statusConfig[status as keyof typeof statusConfig];
         return <Tag color={config.color}>{config.text}</Tag>;
       },
-    },
-    {
-      title: 'หมายเหตุ',
-      dataIndex: 'notes',
-      key: 'notes',
-      render: (notes: string) => <Text type="secondary">{notes}</Text>,
     }
   ];
 

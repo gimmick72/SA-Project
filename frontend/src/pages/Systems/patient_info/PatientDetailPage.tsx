@@ -165,7 +165,7 @@ const PatientDetail: React.FC = () => {
       firstname: values.firstname,
       lastname: values.lastname,
       nickname: values.nickname,
-      congenitaldisease: values.underlyingDisease,
+      congenita_disease: values.underlyingDisease,
       blood_type: values.bloodtype,
       gender: values.gender,
       birthday: values.birthdate

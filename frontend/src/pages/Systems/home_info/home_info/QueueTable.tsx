@@ -24,7 +24,7 @@ const QueueTable: React.FC<Props> = ({ data, onSelect, activeId, onSearch, onAdd
       ),
     },
     { title: "บริการ", dataIndex: "service", width: 120, render: (v) => <Tag color={serviceColor(v)}>{v}</Tag>, responsive: ["md"] },
-    { title: "สถานะ", dataIndex: "status", width: 120, render: (s) => <Tag color={statusColor[s]}>{s}</Tag> },
+    { title: "สถานะ", dataIndex: "status", width: 120, render: (s: Person["status"]) => <Tag color={statusColor[s]}>{s}</Tag> },
   ];
 
   return (

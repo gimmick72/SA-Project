@@ -3,7 +3,7 @@ import { Modal, Button } from 'antd';
 import 'antd/dist/reset.css';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
-import { dentists } from './../../../Home_page/ourDentists/dentistsData';
+import { dentists } from './../../../Home_page/First_pages/OurDentistsPage/dentistsData';
 
 type EventType = {
   id: number;
