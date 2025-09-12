@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, Select, InputNumber, Steps, Typography, Space, Divider, message, Row, Col, Table, Tag } from 'antd';
 import { DollarOutlined, MobileOutlined, FileTextOutlined, CheckCircleOutlined, PrinterOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import PromptPayQR from '../third-party/PromptPayQR';
+import { paymentAPI, Payment } from '../../../../services/api';
 import './TreatmentPaymentFlow.css';
 
 const { Title, Text } = Typography;

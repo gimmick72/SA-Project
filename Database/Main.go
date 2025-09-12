@@ -31,6 +31,11 @@ func main() {
 		routers.StaffRouter(router) // ระบบบุคลากร
 		routers.QueueRouter(router) // ระบบจองคิว
 
+		// New API routes
+		routers.PaymentRouter(router) // ระบบการชำระเงิน
+		routers.AttendanceRouter(router) // ระบบการเข้างาน
+		routers.AuthRouter(router) // ระบบการยืนยันตัวตน
+
 	}
 	// Run the server go run main.go
 	r.Run("localhost:" + PORT)

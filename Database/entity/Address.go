@@ -1,8 +1,8 @@
-//Database/entity/Address.go		
+// Database/entity/Address.go
 package entity
+
 import (
 	"gorm.io/gorm"
-	
 )
 
 type Address struct {
@@ -11,11 +11,9 @@ type Address struct {
 	Moo         string
 	Subdistrict string
 	District    string
-	Provice     string
-	Postcod     string
+	Province    string
+	Postcode    string
 
 	PatientID uint
 	Patient   *Patient `gorm:"foreignKey:PatientID;references:ID"`
 }
-
-
