@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Card, Input, Button, Row, Col, Typography, message, Drawer, Spin } from 'antd'; // Import Spin
 import { SearchOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import AddStaffForm from './staffAdd';
+// import AddStaffForm from './staffAdd';
 import { StaffAPI } from '../../../../services/Staff/StaffAPI';
-import type { NewStaffData, Staff } from '../../../../interface/Staff';
+import type { Staff } from '../../../../interface/Staff';
 const { Title } = Typography;
 
 
@@ -17,7 +17,7 @@ const StaffDataPaeg: React.FC = () => {
   const [searchText, setSearchText] = useState<string>('');
   const [staffData, setStaffData] = useState<Staff[]>([]); // Initialize with an empty array
   const [filteredStaff, setFilteredStaff] = useState<Staff[]>([]);
-  const [isAddDrawerVisible, setIsAddDrawerVisible] = useState(false);
+  // const [isAddDrawerVisible, setIsAddDrawerVisible] = useState(false);
   const [loading, setLoading] = useState<boolean>(true); // Add a new loading state
   const navigate = useNavigate();
 
@@ -61,23 +61,7 @@ const StaffDataPaeg: React.FC = () => {
         setFilteredStaff([exactMatch]); // เจอ Employee_ID → แสดงเฉพาะคนเดียว
         return;
       }
-      // else {
-      //   console.log("string search")
-      //   if (trimmedText.length === 13) {
-      //     console.log("length = 13")
-      //     const idCardMatches = staffData.filter(staff =>
-      //       (staff.idCard).includes(trimmedText)
-      //     );
-      //     if (idCardMatches.length > 0) {
-      //       console.log("Found by idCard");
-      //       setFilteredStaff(idCardMatches);
-      //       return;
-      //     }
-      //   }
-      // }
-
     }
-
     // ถ้าไม่ใช่ Employee_ID หรือไม่เจอ → ค้นหาด้วย string อื่น ๆ
     const newFilteredStaff = staffData.filter((staff) => {
       const firstName = staff.firstName || "";
@@ -104,33 +88,33 @@ const StaffDataPaeg: React.FC = () => {
     applySearchFilter();
   }, [searchText, staffData]);
 
-  const handleAddFormSubmit = async (newStaff: NewStaffData) => {
-    try {
-      setLoading(true);
-      await StaffAPI.addStaff(newStaff);  // เรียก service เพิ่มข้อมูล
+  // const handleAddFormSubmit = async (newStaff: NewStaffData) => {
+  //   try {
+  //     setLoading(true);
+  //     await StaffAPI.addStaff(newStaff);  // เรียก service เพิ่มข้อมูล
 
-      // โหลดข้อมูลล่าสุดทั้งหมดจาก backend
-      const allStaff = await StaffAPI.getAllStaff();
-      setStaffData(allStaff);
-      setFilteredStaff(allStaff);
+  //     // โหลดข้อมูลล่าสุดทั้งหมดจาก backend
+  //     const allStaff = await StaffAPI.getAllStaff();
+  //     setStaffData(allStaff);
+  //     setFilteredStaff(allStaff);
 
-      message.success('เพิ่มข้อมูลบุคลากรใหม่เรียบร้อย!');
-      setIsAddDrawerVisible(false);
-    } catch (err) {
-      console.error(err);
-      message.error('เกิดข้อผิดพลาดในการเพิ่มบุคลากร');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     message.success('เพิ่มข้อมูลบุคลากรใหม่เรียบร้อย!');
+  //     // setIsAddDrawerVisible(false);
+  //   } catch (err) {
+  //     console.error(err);
+  //     message.error('เกิดข้อผิดพลาดในการเพิ่มบุคลากร');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const handleAddStaffClick = () => {
-    setIsAddDrawerVisible(true);
-  };
+  // const handleAddStaffClick = () => {
+  //   setIsAddDrawerVisible(true);
+  // };
 
-  const handleAddFormCancel = () => {
-    setIsAddDrawerVisible(false);
-  };
+  // const handleAddFormCancel = () => {
+  //   setIsAddDrawerVisible(false);
+  // };
 
   return (
     <div style={{ padding: '16px', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -161,7 +145,7 @@ const StaffDataPaeg: React.FC = () => {
             }}
           />
         </Col>
-        <Col>
+        {/* <Col>
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -175,7 +159,7 @@ const StaffDataPaeg: React.FC = () => {
           >
             เพิ่มรายชื่อ
           </Button>
-        </Col>
+        </Col> */}
       </Row>
 
 
@@ -263,15 +247,15 @@ const StaffDataPaeg: React.FC = () => {
           </Title>
         }
         placement="top"
-        open={isAddDrawerVisible}
-        onClose={handleAddFormCancel}
+        // open={isAddDrawerVisible}
+        // onClose={handleAddFormCancel}
         height="85vh"
 
       >
-        <AddStaffForm
+        {/* <AddStaffForm
           onFormSubmit={handleAddFormSubmit}
-          onFormCancel={handleAddFormCancel}
-        />
+          // onFormCancel={handleAddFormCancel}
+        /> */}
       </Drawer>
     </div>
   );

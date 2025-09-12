@@ -3,8 +3,9 @@ import { Tabs, Card } from "antd";
 import { UserOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import StaffRegistration from "./components/StaffRegistration";
 import StaffDataPage from "./staffData/staffDataPage";
+import RequireManager from "./components/RequireManager";
 
-const { TabPane } = Tabs;
+// const { TabPane } = Tabs;
 
 const StaffInfoPage = () => {
   const [activeTab, setActiveTab] = useState("1");
@@ -33,8 +34,9 @@ const StaffInfoPage = () => {
   ];
 
   return (
+    <RequireManager requiredPosition="ผู้จัดการ">
     <div style={{
-      maxWidth: '1200px',
+      maxWidth: '100%',
       margin: '0 auto',
       background: '#ffffff',
       borderRadius: '12px',
@@ -61,6 +63,7 @@ const StaffInfoPage = () => {
         size="large"
       />
     </div>
+    </RequireManager>
   );
 };
 

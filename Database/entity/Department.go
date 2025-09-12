@@ -14,6 +14,7 @@ type Department struct {
 	CompRate       float32
 	Specialization string
 	StartDate      time.Time
+	Password      string
 
 	PersonalDataID uint
 	PersonalData   PersonalData `gorm:"foreignKey:PersonalDataID;references:ID"`

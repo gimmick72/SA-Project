@@ -17,7 +17,7 @@ const StaffDetails: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   // const id = Number(Employee_ID); // แปลงเป็น number 
-
+  
   useEffect(() => {
     const fetchStaff = async () => {
       if (!Employee_ID) return;
@@ -101,7 +101,7 @@ const StaffDetails: React.FC = () => {
       if (!staff) return; // กัน null
       await StaffAPI.deleteStaff(staff.Employee_ID); // เรียก API
       message.success('ลบข้อมูลเรียบร้อย');
-      navigate('/staff'); // กลับไปหน้า list หรือ refresh
+      navigate('/admin/staff'); // กลับไปหน้า list หรือ refresh
     } catch (err) {
       console.error(err);
       message.error('เกิดข้อผิดพลาดในการลบข้อมูล');
@@ -316,7 +316,14 @@ const StaffDetails: React.FC = () => {
               <Col xs={24} sm={12}>
 
                 <Form.Item name="position" label="ตำแหน่งงาน" rules={[{ required: true, message: 'กรุณาเลือกตำแหน่ง' }]}>
-                  <Input placeholder="เลือกตำแหน่งงาน" />
+                  <Select placeholder="ตำแหน่งงาน">
+                                <Option value="ทันตแพทย์">ทันตแพทย์</Option>
+                                <Option value="ผู้ช่วยทันตแพทย์">ผู้ช่วยทันตแพทย์</Option>
+                                <Option value="เจ้าหน้าที่การเงิน">เจ้าหน้าที่การเงิน</Option>
+                                <Option value="เจ้าหน้าที่ต้อนรับ">เจ้าหน้าที่ต้อนรับ</Option>
+                                <Option value="พนักงานทำความสะอาด">พนักงานทำความสะอาด</Option>
+                                <Option value="ผู้จัดการ">ผู้จัดการ</Option>
+                              </Select>
                 </Form.Item>
               </Col>
               <Form.Item name="employeeType" label="ประเภทพนักงาน" rules={[{ required: true, message: 'กรุณาเลือกประเภทพนักงาน' }]}>
@@ -361,6 +368,16 @@ const StaffDetails: React.FC = () => {
                   />
                 </Form.Item>
               </Col>
+              <Col xs={24} sm={12}>
+                        <Form.Item name="Password"
+                          label="รหัสผ่าน"
+                          rules={[
+                            { required: true, message: 'กรุณากรอกรหัสผ่าน' },
+                            { min: 6, message: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร' }
+                          ]}>
+                          <Input placeholder="กรุณากรอกรหัสผ่าน" />
+                        </Form.Item>
+                      </Col>
 
 
             </Row>

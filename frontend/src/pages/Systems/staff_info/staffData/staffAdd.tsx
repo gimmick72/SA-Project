@@ -80,42 +80,42 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={6}>
-                        <Form.Item
-                          name="idCard"
-                          label="เลขบัตรประชาชน"
-                          rules={[
-                            { required: true, message: 'กรุณากรอกเลขบัตรประชาชน' },
-                            { pattern: /^\d{1,13}$/, message: 'กรอกได้เฉพาะตัวเลขและไม่เกิน 13 หลัก' },
-                          ]}
-                        >
-                          <Input
-                            placeholder="ใส่เลขบัตรประชาชน"
-                            maxLength={13} // จำกัด input
-        
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} sm={12} md={6}>
-                        <Form.Item
-                          name="phone"
-                          label="เบอร์โทรศัพท์"
-                          rules={[
-                            { required: true, message: 'กรุณาใส่เบอร์โทรศัพท์' },
-                            { pattern: /^\d+$/, message: 'กรอกได้เฉพาะตัวเลขเท่านั้น' },
-                            { min: 10, max: 10, message: 'เบอร์โทรศัพท์ต้องมี 10 หลัก' },
-                          ]}
-                        >
-                          <Input
-                            placeholder="ใส่เบอร์โทรศัพท์"
-                            maxLength={10}
-                            inputMode="numeric"
-                            onChange={(e) => {
-                              const onlyNumbers = e.target.value.replace(/\D/g, ""); // ลบทุกตัวที่ไม่ใช่เลข
-                              e.target.value = onlyNumbers;
-                            }}
-                          />
-                        </Form.Item>
-                      </Col>
+          <Form.Item
+            name="idCard"
+            label="เลขบัตรประชาชน"
+            rules={[
+              { required: true, message: 'กรุณากรอกเลขบัตรประชาชน' },
+              { pattern: /^\d{1,13}$/, message: 'กรอกได้เฉพาะตัวเลขและไม่เกิน 13 หลัก' },
+            ]}
+          >
+            <Input
+              placeholder="ใส่เลขบัตรประชาชน"
+              maxLength={13} // จำกัด input
+
+            />
+          </Form.Item>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Form.Item
+            name="phone"
+            label="เบอร์โทรศัพท์"
+            rules={[
+              { required: true, message: 'กรุณาใส่เบอร์โทรศัพท์' },
+              { pattern: /^\d+$/, message: 'กรอกได้เฉพาะตัวเลขเท่านั้น' },
+              { min: 10, max: 10, message: 'เบอร์โทรศัพท์ต้องมี 10 หลัก' },
+            ]}
+          >
+            <Input
+              placeholder="ใส่เบอร์โทรศัพท์"
+              maxLength={10}
+              inputMode="numeric"
+              onChange={(e) => {
+                const onlyNumbers = e.target.value.replace(/\D/g, ""); // ลบทุกตัวที่ไม่ใช่เลข
+                e.target.value = onlyNumbers;
+              }}
+            />
+          </Form.Item>
+        </Col>
       </Row>
       <Col xs={24} sm={12} md={24}>
         {/* ====== อีเมล / ที่อยู่ ====== */}
@@ -131,7 +131,14 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
       <Row gutter={24}>
         <Col xs={24} sm={12}>
           <Form.Item name="position" label="ตำแหน่งงาน" rules={[{ required: true, message: 'กรุณาเลือกตำแหน่ง' }]}>
-            <Input placeholder="ตำแหน่งงาน" />
+            <Select placeholder="ตำแหน่งงาน">
+              <Option value="ทันตแพทย์">ทันตแพทย์</Option>
+              <Option value="ผู้ช่วยทันตแพทย์">ผู้ช่วยทันตแพทย์</Option>
+              <Option value="เจ้าหน้าที่การเงิน">เจ้าหน้าที่การเงิน</Option>
+              <Option value="เจ้าหน้าที่ต้อนรับ">เจ้าหน้าที่ต้อนรับ</Option>
+              <Option value="ผู้จัดการ">ผู้จัดการ</Option>
+              {/* <Option value="ผู้อำนวยการ">ผู้อำนวยการ</Option> */}
+            </Select>
           </Form.Item>
         </Col>
         <Col xs={24} sm={12}>
@@ -182,6 +189,17 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
           </Form.Item>
 
         </Col>
+        <Col xs={24} sm={12}>
+          <Form.Item name="Password"
+            label="ตั้งรหัสผ่าน"
+            rules={[
+              { required: true, message: 'กรุณากรอกรหัสผ่าน' },
+              { min: 6, message: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร' }
+            ]}>
+            <Input placeholder="กรุณากรอกรหัสผ่าน" />
+          </Form.Item>
+        </Col>
+
       </Row>
 
       {/* ====== ปุ่ม Submit / Cancel ====== */}
@@ -193,7 +211,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
               width: 120,
               height: 40,
               borderRadius: '25px',
-            }} onClick={() => { form.resetFields(); onFormCancel(); }}>ยกเลิก
+            }} onClick={() => { form.resetFields(); onFormCancel(); }}>รีเซ็ต
             </Button>
 
             <Button type="primary" htmlType="submit" style={{
