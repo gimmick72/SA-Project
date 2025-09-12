@@ -10,7 +10,7 @@ import (
 type Attendance struct {
 	gorm.Model
 	StaffID     uint         `json:"staff_id" gorm:"not null"`
-	Staff       PersonalData `json:"staff,omitempty" gorm:"foreignKey:StaffID;references:ID"`
+	Staff       PersonalData `json:"staff,omitempty" gorm:"foreignKey:StaffID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Date        time.Time    `json:"date" gorm:"not null"`
 	CheckInTime *time.Time   `json:"check_in_time"`
 	CheckOutTime *time.Time  `json:"check_out_time"`
@@ -35,19 +35,20 @@ type AttendanceRequest struct {
 
 // AttendanceResponse for API responses
 type AttendanceResponse struct {
-	ID           uint      `json:"id"`
-	StaffID      uint      `json:"staff_id"`
-	StaffName    string    `json:"staff_name"`
-	Date         time.Time `json:"date"`
-	CheckInTime  *time.Time `json:"check_in_time"`
-	CheckOutTime *time.Time `json:"check_out_time"`
-	WorkHours    float64   `json:"work_hours"`
-	Status       string    `json:"status"`
-	Notes        string    `json:"notes"`
-	Location     string    `json:"location"`
-	IsLate       bool      `json:"is_late"`
-	LateMinutes  int       `json:"late_minutes"`
-	CreatedAt    time.Time `json:"created_at"`
+	ID           uint         `json:"id"`
+	StaffID      uint         `json:"staff_id"`
+	Staff        *PersonalData `json:"staff,omitempty"`
+	StaffName    string       `json:"staff_name"`
+	Date         time.Time    `json:"date"`
+	CheckInTime  *time.Time   `json:"check_in_time"`
+	CheckOutTime *time.Time   `json:"check_out_time"`
+	WorkHours    float64      `json:"work_hours"`
+	Status       string       `json:"status"`
+	Notes        string       `json:"notes"`
+	Location     string       `json:"location"`
+	IsLate       bool         `json:"is_late"`
+	LateMinutes  int          `json:"late_minutes"`
+	CreatedAt    time.Time    `json:"created_at"`
 }
 
 // CheckInRequest for staff check-in

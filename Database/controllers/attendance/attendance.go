@@ -47,13 +47,14 @@ func CreateAttendance(c *gin.Context) {
 		return
 	}
 
-	// Load staff relation
-	configs.DB.Preload("Staff").First(&attendance, attendance.ID)
+	// Load staff relation with Department
+	configs.DB.Preload("Staff.Department").First(&attendance, attendance.ID)
 
 	// Create response
 	response := entity.AttendanceResponse{
 		ID:           attendance.ID,
 		StaffID:      attendance.StaffID,
+		Staff:        &attendance.Staff,
 		Date:         attendance.Date,
 		CheckInTime:  attendance.CheckInTime,
 		CheckOutTime: attendance.CheckOutTime,
@@ -112,7 +113,7 @@ func GetAttendances(c *gin.Context) {
 
 	query.Count(&total)
 
-	if err := query.Preload("Staff").Offset(offset).Limit(pageSize).
+	if err := query.Preload("Staff.Department").Offset(offset).Limit(pageSize).
 		Order("date DESC, created_at DESC").Find(&attendances).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve attendances", "details": err.Error()})
 		return
@@ -123,6 +124,7 @@ func GetAttendances(c *gin.Context) {
 		response := entity.AttendanceResponse{
 			ID:           attendance.ID,
 			StaffID:      attendance.StaffID,
+			Staff:        &attendance.Staff,
 			Date:         attendance.Date,
 			CheckInTime:  attendance.CheckInTime,
 			CheckOutTime: attendance.CheckOutTime,
@@ -158,7 +160,7 @@ func GetAttendance(c *gin.Context) {
 	id := c.Param("id")
 
 	var attendance entity.Attendance
-	if err := configs.DB.Preload("Staff").First(&attendance, id).Error; err != nil {
+	if err := configs.DB.Preload("Staff.Department").First(&attendance, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Attendance record not found"})
 			return
@@ -170,6 +172,7 @@ func GetAttendance(c *gin.Context) {
 	response := entity.AttendanceResponse{
 		ID:           attendance.ID,
 		StaffID:      attendance.StaffID,
+		Staff:        &attendance.Staff,
 		Date:         attendance.Date,
 		CheckInTime:  attendance.CheckInTime,
 		CheckOutTime: attendance.CheckOutTime,

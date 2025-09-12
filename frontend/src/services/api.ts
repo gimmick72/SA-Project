@@ -248,16 +248,33 @@ export const paymentAPI = {
   },
 };
 
+// Staff API integration for attendance
+export const staffAttendanceAPI = {
+  // Get staff list for attendance management
+  getStaffList: async () => {
+    const response = await api.get('/staff');
+    return response.data;
+  },
+};
+
 // Attendance API
 export const attendanceAPI = {
+  // Get attendances with optional filters
   getAttendances: async (params?: {
     page?: number;
     page_size?: number;
-    staff_id?: number;
-    date?: string;
+    staff_id?: string;
     status?: string;
+    date_from?: string;
+    date_to?: string;
   }) => {
-    const response = await api.get<ApiResponse<Attendance[]>>('/attendance', { params });
+    const response = await api.get('/attendance', { params });
+    return response.data;
+  },
+
+  // Get staff list from staff_info API for attendance
+  getStaffForAttendance: async () => {
+    const response = await api.get('/staff');
     return response.data;
   },
 
