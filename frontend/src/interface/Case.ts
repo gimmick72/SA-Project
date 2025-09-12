@@ -22,7 +22,7 @@ export interface InitialSymptomps {
   Height?: number;
 }
 
-export interface Patient {
+export interface Patients {
   ID?: number;
   CitizenID?: string;
   Prefix?: string;
@@ -85,4 +85,5 @@ export type CaseRow = {
     patient?: any; // can tighten type if you have Patient interface
     SignDate?: string;
     totalPrice?: number;   // ✅ new field
+    
 };

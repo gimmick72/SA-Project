@@ -1,5 +1,4 @@
-
-
+//Database/interface/patient.ts
 export interface Patient {
   id: number;
   citizenID: string;

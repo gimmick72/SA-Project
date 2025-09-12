@@ -34,7 +34,7 @@ const StaffInfoPage = () => {
   ];
 
   return (
-    <RequireManager requiredPosition="ผู้จัดการ">
+    
     <div style={{
       maxWidth: '100%',
       margin: '0 auto',
@@ -63,7 +63,7 @@ const StaffInfoPage = () => {
         size="large"
       />
     </div>
-    </RequireManager>
+   
   );
 };
 
