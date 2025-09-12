@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Tabs } from 'antd';
+import { Tabs, Typography } from 'antd';
 import { ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
 import StaffWorkTimeManagement from './StaffWorkTimeManagement';
 import AttendanceManagement from './components/AttendanceManagement';
+
+const { Title } = Typography;
 
 const { TabPane } = Tabs;
 
@@ -10,17 +12,21 @@ const AttendanceInfoIndex: React.FC = () => {
   const [activeTab, setActiveTab] = useState('management');
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="admin-page-container">
+      <Title level={2} className="admin-page-title">
+        ระบบจัดการเวลาเข้างาน
+      </Title>
       <Tabs 
         activeKey={activeTab} 
         onChange={setActiveTab}
         type="card"
+        className="admin-tabs"
       >
         <TabPane 
           tab={
             <span>
               <ClockCircleOutlined />
-              Attendance Management
+              การจัดการเวลาเข้างาน
             </span>
           } 
           key="management"
@@ -31,7 +37,7 @@ const AttendanceInfoIndex: React.FC = () => {
           tab={
             <span>
               <UserOutlined />
-              Staff Work Time Management
+              การจัดการเวลาทำงานพนักงาน
             </span>
           } 
           key="worktime"

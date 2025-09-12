@@ -192,13 +192,13 @@ const AttendanceManagement: React.FC = () => {
 
   const columns = [
     {
-      title: 'Staff ID',
+      title: 'รหัสพนักงาน',
       dataIndex: 'staff_id',
       key: 'staff_id',
-      render: (id: number) => `Staff ${id}`,
+      render: (id: number) => `พนักงาน ${id}`,
     },
     {
-      title: 'Date',
+      title: 'วันที่',
       dataIndex: 'date',
       key: 'date',
       render: (date: string) => dayjs(date).format('DD/MM/YYYY'),
@@ -206,49 +206,52 @@ const AttendanceManagement: React.FC = () => {
         dayjs(a.date).unix() - dayjs(b.date).unix(),
     },
     {
-      title: 'Check In',
+      title: 'เวลาเข้างาน',
       dataIndex: 'check_in_time',
       key: 'check_in_time',
       render: (time: string) => time ? dayjs(time).format('HH:mm') : '-',
     },
     {
-      title: 'Check Out',
+      title: 'เวลาออกงาน',
       dataIndex: 'check_out_time',
       key: 'check_out_time',
       render: (time: string) => time ? dayjs(time).format('HH:mm') : '-',
     },
     {
-      title: 'Work Hours',
+      title: 'ชั่วโมงทำงาน',
       dataIndex: 'work_hours',
       key: 'work_hours',
-      render: (hours: number) => `${hours.toFixed(1)}h`,
+      render: (hours: number) => `${hours.toFixed(1)} ชม.`,
       sorter: (a: Attendance, b: Attendance) => a.work_hours - b.work_hours,
     },
     {
-      title: 'Status',
+      title: 'สถานะ',
       dataIndex: 'status',
       key: 'status',
       render: (status: string, record: Attendance) => (
         <Space>
           <Tag color={getStatusColor(status)}>
-            {status.toUpperCase()}
+            {status === 'present' ? 'มาทำงาน' : 
+             status === 'late' ? 'มาสาย' :
+             status === 'absent' ? 'ขาดงาน' :
+             status === 'half_day' ? 'ครึ่งวัน' : status.toUpperCase()}
           </Tag>
           {record.is_late && (
             <Tag color="orange">
-              Late {record.late_minutes}min
+              สาย {record.late_minutes} นาที
             </Tag>
           )}
         </Space>
       ),
     },
     {
-      title: 'Location',
+      title: 'สถานที่',
       dataIndex: 'location',
       key: 'location',
       render: (text: string) => text || '-',
     },
     {
-      title: 'Actions',
+      title: 'การดำเนินการ',
       key: 'actions',
       render: (_: any, record: Attendance) => (
         <Space>
@@ -301,36 +304,38 @@ const AttendanceManagement: React.FC = () => {
   return (
     <div>
       {/* Quick Actions */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
+      <Row gutter={16} className="admin-mb-24">
         <Col span={12}>
-          <Card>
+          <Card className="admin-content-card">
             <Space direction="vertical" style={{ width: '100%' }}>
-              <Title level={5}>Quick Check-in/out</Title>
+              <Title level={5} className="admin-card-title">เช็คเข้า-ออกงานด่วน</Title>
               <Space>
                 <Button
                   type="primary"
                   icon={<CheckCircleOutlined />}
                   onClick={handleCheckIn}
+                  className="admin-primary-button"
                 >
-                  Check In
+                  เช็คเข้างาน
                 </Button>
                 <Button
                   icon={<ExclamationCircleOutlined />}
                   onClick={handleCheckOut}
+                  className="admin-secondary-button"
                 >
-                  Check Out
+                  เช็คออกงาน
                 </Button>
               </Space>
             </Space>
           </Card>
         </Col>
         <Col span={12}>
-          <Card>
-            <Title level={5}>Today's Status</Title>
+          <Card className="admin-content-card">
+            <Title level={5} className="admin-card-title">สถานะวันนี้</Title>
             <Space>
-              <Tag color="success">Present: {stats?.present_count || 0}</Tag>
-              <Tag color="warning">Late: {stats?.late_count || 0}</Tag>
-              <Tag color="error">Absent: {stats?.absent_count || 0}</Tag>
+              <Tag color="success">มาทำงาน: {stats?.present_count || 0}</Tag>
+              <Tag color="warning">มาสาย: {stats?.late_count || 0}</Tag>
+              <Tag color="error">ขาดงาน: {stats?.absent_count || 0}</Tag>
             </Space>
           </Card>
         </Col>
@@ -338,45 +343,49 @@ const AttendanceManagement: React.FC = () => {
 
       {/* Statistics Cards */}
       {stats && (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Row gutter={16} className="admin-mb-24">
           <Col span={6}>
-            <Card>
+            <Card className="admin-stats-card">
               <Statistic
-                title="Total Staff"
+                title="จำนวนพนักงานทั้งหมด"
                 value={stats.total_staff}
                 prefix={<UserOutlined />}
+                className="admin-statistic"
               />
             </Card>
           </Col>
           <Col span={6}>
-            <Card>
+            <Card className="admin-stats-card">
               <Statistic
-                title="Present Today"
+                title="มาทำงานวันนี้"
                 value={stats.present_count}
                 valueStyle={{ color: '#3f8600' }}
                 prefix={<CheckCircleOutlined />}
+                className="admin-statistic"
               />
             </Card>
           </Col>
           <Col span={6}>
-            <Card>
+            <Card className="admin-stats-card">
               <Statistic
-                title="Average Hours"
+                title="ชั่วโมงเฉลี่ย"
                 value={stats.average_hours}
                 precision={1}
-                suffix="h"
+                suffix=" ชม."
                 prefix={<ClockCircleOutlined />}
+                className="admin-statistic"
               />
             </Card>
           </Col>
           <Col span={6}>
-            <Card>
+            <Card className="admin-stats-card">
               <Statistic
-                title="Total Hours"
+                title="ชั่วโมงรวม"
                 value={stats.total_hours}
                 precision={1}
-                suffix="h"
+                suffix=" ชม."
                 valueStyle={{ color: '#1890ff' }}
+                className="admin-statistic"
               />
             </Card>
           </Col>
@@ -384,15 +393,16 @@ const AttendanceManagement: React.FC = () => {
       )}
 
       {/* Main Table */}
-      <Card>
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-          <Title level={4}>Attendance Management</Title>
+      <Card className="admin-table-card">
+        <div className="admin-mb-16" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Title level={4} className="admin-table-title">การจัดการเวลาเข้างาน</Title>
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => openModal()}
+            className="admin-primary-button"
           >
-            Add Attendance
+            เพิ่มข้อมูลเวลาเข้างาน
           </Button>
         </div>
 
@@ -401,6 +411,7 @@ const AttendanceManagement: React.FC = () => {
           dataSource={attendances}
           rowKey="id"
           loading={loading}
+          className="admin-table"
           pagination={{
             ...pagination,
             showSizeChanger: true,

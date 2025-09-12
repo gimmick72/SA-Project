@@ -5,10 +5,10 @@ import DetailCard from "./DetailCard";
 import AddWalkinDrawer from "./AddWalkinDrawer";
 import PaymentTab from "./PaymentTab";
 import { Person } from "./types";
-import { MOCK_APPOINTMENTS, MOCK_WALKINS } from "./mock";
+// Removed mock data imports - using real API data
 
 const HomePage: React.FC = () => {
-  const [list, setList] = useState<Person[]>([...MOCK_APPOINTMENTS, ...MOCK_WALKINS]);
+  const [list, setList] = useState<Person[]>([]);
   const [search, setSearch] = useState("");
   const [activeId, setActiveId] = useState<number | null>(list[0]?.id ?? null);
   const [openAdd, setOpenAdd] = useState(false);

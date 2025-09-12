@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'patient' | 'staff';
+  requiredRole?: 'patient' | 'admin';
   redirectTo?: string;
 }
 
@@ -16,7 +16,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   
   // Mock authentication - check localStorage
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userRole = localStorage.getItem('userRole') as 'patient' | 'staff' || 'staff';
+  const userRole = localStorage.getItem('userRole') as 'patient' | 'admin' || 'admin';
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
@@ -26,7 +26,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // If role is required and user doesn't have the required role
   if (requiredRole && userRole !== requiredRole) {
     // Redirect based on user's actual role
-    const defaultRedirect = userRole === 'staff' ? '/admin' : '/home';
+    const defaultRedirect = userRole === 'admin' ? '/admin' : '/home';
     return <Navigate to={defaultRedirect} replace />;
   }
 

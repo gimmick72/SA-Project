@@ -144,13 +144,24 @@ const TreatmentPaymentFlow: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Mock API call to save treatment and payment
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create payment using real API
+      const paymentData = {
+        amount: treatmentData.amount || 0,
+        payment_method: treatmentData.paymentMethod || 'cash',
+        status: 'completed',
+        description: `Treatment for ${treatmentData.patientName} - ${treatmentData.treatments?.map(t => t.type).join(', ')}`,
+        patient_id: 1, // Default patient ID for now
+        staff_id: 1, // Default staff ID for now
+        service_id: 1, // Default service ID for now
+      };
+
+      const response = await paymentAPI.createPayment(paymentData);
       
       message.success('บันทึกข้อมูลการรักษาและการชำระเงินเรียบร้อยแล้ว');
       setCurrentStep(currentStep + 1);
     } catch (error) {
       message.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      console.error('Error creating payment:', error);
     } finally {
       setLoading(false);
     }

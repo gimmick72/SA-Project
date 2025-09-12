@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Typography, Alert, Space, Select } from 'antd';
-import { UserOutlined, LockOutlined, TeamOutlined, PhoneOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
+import { UserAddOutlined, UserOutlined, MailOutlined, LockOutlined, IdcardOutlined, PhoneOutlined } from '@ant-design/icons';
+import { authAPI } from '../../../../services/api';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -17,18 +18,18 @@ const StaffRegistration: React.FC = () => {
     setSuccess('');
 
     try {
-      // Mock registration - simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock validation - just check if email already exists
-      const existingUsers = ['admin@clinic.com', 'patient@example.com'];
+      // Real API registration
+      const response = await authAPI.register({
+        email: values.email,
+        password: values.password,
+        role: 'admin',
+        first_name: values.firstName,
+        last_name: values.lastName,
+        phone_number: values.phoneNumber,
+        department: values.department,
+        position: values.position
+      });
       
-      if (existingUsers.includes(values.email)) {
-        setError('อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น');
-        return;
-      }
-
-      // Mock successful registration
       setSuccess(`สร้างบัญชีเจ้าหน้าที่สำเร็จ: ${values.firstName} ${values.lastName}`);
       form.resetFields();
 

@@ -19,26 +19,30 @@ export type IServiceItem = _ServiceItem;
 const toDateStr = (d: Dayjs | string) =>
   dayjs(d).startOf("day").format("YYYY-MM-DD");
 
-/* ===================== Services (MOCK) ===================== */
-const MOCK_SERVICES: IServiceItem[] = [
+/* ===================== Services (Real API) ===================== */
+const DEFAULT_SERVICES: IServiceItem[] = [
   { id: 1, name: "ตรวจสุขภาพช่องปาก" },
   { id: 2, name: "ขูดหินปูน" },
   { id: 3, name: "อุดฟัน" },
   { id: 4, name: "ถอนฟัน" },
-  { id: 5, name: "เอ็กซเรย์ช่องปาก" },
+  { id: 5, name: "รักษารากฟัน" },
 ];
 
 export async function getService(): Promise<IServiceItem[]> {
-  await new Promise((r) => setTimeout(r, 200));
-  return MOCK_SERVICES;
+  try {
+    const { data } = await axios.get("/api/services");
+    return data?.data ?? data ?? DEFAULT_SERVICES;
+  } catch {
+    return DEFAULT_SERVICES;
+  }
 }
 
 export async function listServices(): Promise<IServiceItem[]> {
   try {
     const { data } = await axios.get("/api/services");
-    return data?.data ?? data ?? [];
+    return data?.data ?? data ?? DEFAULT_SERVICES;
   } catch {
-    return MOCK_SERVICES;
+    return DEFAULT_SERVICES;
   }
 }
 
