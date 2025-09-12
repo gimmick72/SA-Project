@@ -72,24 +72,12 @@ const SharedNavbar: React.FC<SharedNavbarProps> = ({ variant = 'index', classNam
     );
   }
 
-  // Index variant
+  // Index variant - show login link for public pages
   return (
-    <div className={`navbar-user-section ${className}`}>
-      <Avatar 
-        size={32} 
-        icon={<UserOutlined />}
-        className="navbar-user-avatar"
-      />
-      <span className="navbar-user-info">
-        {userEmail}
-      </span>
-      {userRole === 'staff' && (
-        <Link to="/admin" className="navbar-admin-link">
-          จัดการระบบ
-        </Link>
-      )}
-      <LogoutButton />
-    </div>
+    <Link to="/auth/login" className={`navbar-login-link ${className}`}>
+      <UserOutlined className="navbar-login-icon" />
+      {" "}เข้าสู่ระบบ
+    </Link>
   );
 };
 

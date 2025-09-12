@@ -5,6 +5,7 @@ import (
 	"time"
 	"log"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // -------------------- DentistManagement --------------------
@@ -119,7 +120,7 @@ func GetMockSupplies() []entity.Supply {
 		{Code: "S004", Name: "น้ำยาบ้วนปาก", Category: "ทันตกรรม", Quantity: 80, Unit: "ขวด", ImportDate: now.AddDate(0, -3, 0), ExpiryDate: now.AddDate(1, 6, 0)},
 		{Code: "S005", Name: "ผ้าก๊อซ", Category: "อุปกรณ์", Quantity: 500, Unit: "แผ่น", ImportDate: now.AddDate(0, -1, -10), ExpiryDate: now.AddDate(2, 0, 0)},
 		{Code: "S006", Name: "ถุงมือยาง", Category: "อุปกรณ์", Quantity: 300, Unit: "คู่", ImportDate: now.AddDate(0, -2, -3), ExpiryDate: now.AddDate(1, 6, 0)},
-		{Code: "S007", Name: "หน้ากากอนามัย", Category: "อุปกรณ์", Quantity: 1000, Unit: "ชิ้น", ImportDate: now.AddDate(0, -1, -15), ExpiryDate: now.AddDate(1, 0, 0)},
+		{Code: "S007", Name: "หน้ากากอนามัย", Category: "อุปกรณ์", Quantity: 1000, Unit: "ชิ้น", ImportDate: now.AddDate(0, -1, -15), ExpiryDate: now.AddDate(1, 6, 0)},
 		{Code: "S008", Name: "ยาแก้ปวด", Category: "ยา", Quantity: 150, Unit: "เม็ด", ImportDate: now.AddDate(0, -1, 0), ExpiryDate: now.AddDate(2, 0, 0)},
 		{Code: "S009", Name: "ยาชา", Category: "ยา", Quantity: 50, Unit: "หลอด", ImportDate: now.AddDate(0, -2, 0), ExpiryDate: now.AddDate(1, 0, 0)},
 		{Code: "S010", Name: "น้ำยาฆ่าเชื้อ", Category: "อุปกรณ์", Quantity: 60, Unit: "ขวด", ImportDate: now.AddDate(0, -1, -7), ExpiryDate: now.AddDate(1, 6, 0)},
@@ -451,4 +452,84 @@ func GetMockQueueSlots() []entity.QueueSlot {
 	}
 
 	return mockSlots
+}
+
+// -------------------- Users (Staff) --------------------
+func GetMockUsers() []entity.User {
+	// Hash passwords for mock users
+	adminPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
+	staffPassword, _ := bcrypt.GenerateFromPassword([]byte("staff123"), bcrypt.DefaultCost)
+	managerPassword, _ := bcrypt.GenerateFromPassword([]byte("manager123"), bcrypt.DefaultCost)
+	
+	return []entity.User{
+		{
+			Email:       "admin@clinic.com",
+			Password:    string(adminPassword),
+			Role:        "admin",
+			FirstName:   "ผู้ดูแล",
+			LastName:    "ระบบ",
+			PhoneNumber: "0812345678",
+			DateOfBirth: "1985-01-15",
+			IsActive:    true,
+			Department:  "IT",
+			Position:    "System Administrator",
+		},
+		{
+			Email:       "staff@clinic.com",
+			Password:    string(staffPassword),
+			Role:        "admin",
+			FirstName:   "สมชาย",
+			LastName:    "ใจดี",
+			PhoneNumber: "0823456789",
+			DateOfBirth: "1990-03-20",
+			IsActive:    true,
+			Department:  "Reception",
+			Position:    "Staff",
+		},
+		{
+			Email:       "manager@clinic.com",
+			Password:    string(managerPassword),
+			Role:        "admin",
+			FirstName:   "วิภา",
+			LastName:    "สุขใจ",
+			PhoneNumber: "0834567890",
+			DateOfBirth: "1988-07-10",
+			IsActive:    true,
+			Department:  "Management",
+			Position:    "Manager",
+		},
+		{
+			Email:       "dentist@clinic.com",
+			Password:    string(staffPassword),
+			Role:        "admin",
+			FirstName:   "ดร.อนันต์",
+			LastName:    "รักเรียน",
+			PhoneNumber: "0845678901",
+			DateOfBirth: "1982-12-05",
+			IsActive:    true,
+			Department:  "Medical",
+			Position:    "Dentist",
+		},
+	}
+}
+
+// SeedUsers - Function to seed users into database
+func SeedUsers() {
+	var count int64
+	DB.Model(&entity.User{}).Count(&count)
+	if count > 0 {
+		log.Println("ℹ️ Users already seeded, skipping...")
+		return
+	}
+
+	users := GetMockUsers()
+	for _, user := range users {
+		if err := DB.Create(&user).Error; err != nil {
+			log.Printf("❌ Failed to seed user %s: %v", user.Email, err)
+		} else {
+			log.Printf("✅ Seeded user: %s (%s)", user.Email, user.GetFullName())
+		}
+	}
+
+	log.Println("✅ Seeded users successfully!")
 }

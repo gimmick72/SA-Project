@@ -1,87 +1,75 @@
 import React, { useState, useEffect } from "react";
 import { Card, Input, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { getTodayInitialSymptomps, InitialSymtoms } from "../../../../services/Dashboard/dashboardStaff";
+import { Person } from "../types";
 
-interface PaymentPatient {
-  id: number;
-  firstName: string;
-  lastName: string;
-  service: string;
-  cost: number;
-  status: string;
+interface PaymentTabProps {
+  rows: Person[];
+  onPaid: (id: number) => void;
+  onVoid: (id: number) => void;
 }
 
-const Payment: React.FC = () => {
-  const [data, setData] = useState<PaymentPatient[]>([]);
-  const [filteredData, setFilteredData] = useState<PaymentPatient[]>([]);
-
-  const fetchData = async () => {
-    try {
-      const res = await getTodayInitialSymptomps();
-      const items: PaymentPatient[] = res.symptomps
-        .filter(s => s.Status?.Name === "รอชำระเงิน") // เฉพาะที่ต้องชำระเงิน
-        .map(s => ({
-          id: s.ID,
-          firstName: s.Patient?.FirstName || "",
-          lastName: s.Patient?.LastName || "",
-          service: s.Service?.Name || "",
-          cost: (s.Service as any)?.Cost || 0, // สมมติ cost อยู่ใน Service
-          status: s.Status?.Name || "",
-        }));
-      setData(items);
-      setFilteredData(items);
-    } catch (err) {
-      console.error("❌ Failed to fetch data:", err);
-    }
-  };
+const PaymentTab: React.FC<PaymentTabProps> = ({ rows, onPaid, onVoid }) => {
+  const [filteredData, setFilteredData] = useState<Person[]>(rows);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    setFilteredData(rows.filter(person => !person.paid));
+  }, [rows]);
 
   const handleSearch = (value: string) => {
-    const v = value.toLowerCase();
-    setFilteredData(
-      data.filter(
-        p =>
-          p.firstName.toLowerCase().includes(v) ||
-          p.lastName.toLowerCase().includes(v) ||
-          p.service.toLowerCase().includes(v)
-      )
+    const filtered = rows.filter(person => 
+      `${person.firstName} ${person.lastName}`.toLowerCase().includes(value.toLowerCase())
     );
+    setFilteredData(filtered);
   };
 
-  const columns: ColumnsType<PaymentPatient> = [
-    { title: "No.", width: "10%", render: (_v, _r, i) => i + 1 },
-    { title: "ชื่อ - นามสกุล", width: "35%", render: (_v, r) => `${r.firstName} ${r.lastName}` },
-    { title: "บริการ", dataIndex: "service", width: "35%" },
-    { title: "ราคา", dataIndex: "cost", width: "20%", render: (v) => `${v} บาท` },
+  const columns: ColumnsType<Person> = [
+    {
+      title: "ชื่อ-นามสกุล",
+      render: (_, record) => `${record.firstName} ${record.lastName}`,
+    },
+    {
+      title: "บริการ",
+      dataIndex: "service",
+    },
+    {
+      title: "จำนวนเงิน",
+      dataIndex: "amount",
+      render: (amount) => `${amount || 0} บาท`,
+    },
+    {
+      title: "การดำเนินการ",
+      render: (_, record) => (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => onPaid(record.id)}>ชำระแล้ว</button>
+          <button onClick={() => onVoid(record.id)}>ยกเลิก</button>
+        </div>
+      ),
+    },
   ];
 
   return (
     <Card
       size="small"
-      title={
+      title="ชำระเงิน"
+      extra={
         <Input.Search
-          placeholder="ค้นหาชื่อ/บริการ"
-          allowClear
-          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="ค้นหาผู้ป่วย..."
+          onSearch={handleSearch}
           style={{ width: 300 }}
         />
       }
       bodyStyle={{ padding: 0 }}
     >
-      <Table<PaymentPatient>
+      <Table<Person>
         rowKey="id"
         columns={columns}
         dataSource={filteredData}
         pagination={false}
         scroll={{ y: 400, x: 500 }}
-        size="middle"
       />
     </Card>
   );
 };
 
-export default Payment;
+export default PaymentTab;

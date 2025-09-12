@@ -1,24 +1,65 @@
 import React from "react";
-import { Card, Typography, Tag, Empty, Button, Space } from "antd";
-import { InitialSymtoms } from "../../../../services/Dashboard/dashboardStaff";
+import { Modal, Form, Input, Select, Button } from "antd";
+import { Person } from "../types";
 
-const { Paragraph, Text } = Typography;
+interface AddWalkinDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (person: Person) => void;
+  nextId: number;
+}
 
+const AddWalkinDrawer: React.FC<AddWalkinDrawerProps> = ({ open, onClose, onSubmit, nextId }) => {
+  const [form] = Form.useForm();
 
-const ActionButtonStaff: React.FC = ({ }) => {
-    return (
-        <div style={{ border: '2px none #000000', height: '180px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 20, padding: '0 16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column',justifyContent: 'center', alignItems: 'center', width: '100%',gap: '20px' }}>
-                <Button type="primary" style={{ width: "100%", height: 40 }}>ประวัติคนไข้</Button>
-                <Button type="primary" style={{ width: '100%', height: 40 }}>จองห้องและคิว</Button>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <Button type="primary" style={{ width: '45%', height: 40, backgroundColor: '#87EA85', border: '1px solid #000000', color:'#000000' }}>สำเร็จ</Button>
-                <Button type="primary" style={{ width: '45%', height: 40, backgroundColor: '#F44336', border: '1px solid #000000', color:'#000000' }}>ลบ</Button>
-            </div>
-        </div>
+  const handleSubmit = (values: any) => {
+    const newPerson: Person = {
+      id: nextId,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      service: values.service,
+      status: 'รอพบแพทย์',
+      type: 'Walk-in',
+      amount: values.amount || 0
+    };
+    onSubmit(newPerson);
+    form.resetFields();
+    onClose();
+  };
 
-    );
+  return (
+    <Modal
+      title="เพิ่มผู้ป่วย Walk-in"
+      open={open}
+      onCancel={onClose}
+      footer={null}
+    >
+      <Form form={form} onFinish={handleSubmit} layout="vertical">
+        <Form.Item name="firstName" label="ชื่อ" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="lastName" label="นามสกุล" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="service" label="บริการ" rules={[{ required: true }]}>
+          <Select>
+            <Select.Option value="ทันตกรรมทั่วไป">ทันตกรรมทั่วไป</Select.Option>
+            <Select.Option value="ทันตกรรมเด็ก">ทันตกรรมเด็ก</Select.Option>
+            <Select.Option value="ทันตกรรมจัดฟัน">ทันตกรรมจัดฟัน</Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.Item name="amount" label="จำนวนเงิน">
+          <Input type="number" />
+        </Form.Item>
+        <Form.Item>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <Button onClick={onClose}>ยกเลิก</Button>
+            <Button type="primary" htmlType="submit">เพิ่ม</Button>
+          </div>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
 };
 
-export default ActionButtonStaff;
+export default AddWalkinDrawer;

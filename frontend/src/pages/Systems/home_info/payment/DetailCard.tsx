@@ -1,12 +1,12 @@
 import React from "react";
 import { Card, Typography, Tag, Empty, Button, Space } from "antd";
-import { InitialSymtoms } from "../../../../services/Dashboard/dashboardStaff";
+import { Person } from "../types";
 import { statusColor } from "../types";
 
 const { Paragraph, Text } = Typography;
 
 interface DetailCardDentist {
-  active: InitialSymtoms | null;
+  active: Person | null;
 }
 
 const DetailCardPayment: React.FC<DetailCardDentist> = ({ active }) => (
@@ -30,7 +30,7 @@ const DetailCardPayment: React.FC<DetailCardDentist> = ({ active }) => (
         <Paragraph><Text strong>BP:</Text> {active.systolic}/{active.diastolic} mmHg</Paragraph>
         <Paragraph><Text strong>ชีพจร:</Text> {active.heartrate}</Paragraph>
         <Paragraph><Text strong>น้ำหนัก/ส่วนสูง:</Text> {active.weight} kg / {active.height} cm</Paragraph>
-        <Paragraph><Text strong>วันที่มา:</Text> {new Date(active.visit).toLocaleDateString("th-TH")}</Paragraph>
+        <Paragraph>วันที่เข้ารับบริการ: {active.visit ? new Date(active.visit).toLocaleDateString('th-TH') : 'ไม่ระบุ'}</Paragraph>
         <Paragraph><Text strong>ServiceID:</Text> {active.serviceID}</Paragraph>
         <Paragraph><Text strong>PatientID:</Text> {active.patientID}</Paragraph>
         <Paragraph><Text strong>รหัสผู้ป่วย:</Text> {active.id}</Paragraph>

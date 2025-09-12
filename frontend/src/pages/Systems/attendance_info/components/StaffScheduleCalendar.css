@@ -1,0 +1,180 @@
+.staff-schedule-calendar {
+  padding: 0;
+}
+
+.calendar-cell {
+  min-height: 60px;
+  padding: 2px;
+}
+
+.schedule-item {
+  margin-bottom: 2px;
+  font-size: 11px;
+}
+
+.schedule-text {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+  display: inline-block;
+}
+
+.no-schedule {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.no-schedule p {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.schedule-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.schedule-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.schedule-card:hover {
+  background: #e9ecef;
+  border-color: #1890ff;
+}
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.schedule-header strong {
+  color: #333;
+  font-size: 14px;
+}
+
+.schedule-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.schedule-time {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.schedule-type {
+  margin-bottom: 4px;
+}
+
+.schedule-notes {
+  color: #888;
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Calendar customization */
+.ant-picker-calendar-date-value {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.ant-picker-calendar .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-calendar-date {
+  background: #e6f7ff;
+  border: 1px solid #1890ff;
+}
+
+.ant-picker-calendar .ant-picker-cell-selected .ant-picker-calendar-date {
+  background: #1890ff;
+  color: white;
+}
+
+.ant-picker-calendar .ant-picker-cell-selected .ant-picker-calendar-date .ant-picker-calendar-date-value {
+  color: white;
+}
+
+/* Badge customization */
+.ant-badge-status-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.ant-badge-status-text {
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+/* Modal form styling */
+.ant-form-item-label > label {
+  font-weight: 500;
+}
+
+.ant-select-selector {
+  border-radius: 6px;
+}
+
+.ant-picker {
+  border-radius: 6px;
+}
+
+.ant-input {
+  border-radius: 6px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .staff-schedule-calendar .ant-col {
+    margin-bottom: 16px;
+  }
+  
+  .schedule-text {
+    max-width: 60px;
+  }
+  
+  .schedule-card {
+    padding: 8px;
+  }
+  
+  .schedule-header strong {
+    font-size: 13px;
+  }
+  
+  .schedule-time {
+    font-size: 12px;
+  }
+}
+
+/* Loading state */
+.ant-spin-nested-loading > div > .ant-spin {
+  max-height: none;
+}
+
+/* Card title styling */
+.ant-card-head-title {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Button styling in extra */
+.ant-card-extra .ant-btn {
+  border-radius: 6px;
+}
+
+.ant-card-extra .ant-btn + .ant-btn {
+  margin-left: 8px;
+}

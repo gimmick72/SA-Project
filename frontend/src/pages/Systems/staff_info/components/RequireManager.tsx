@@ -4,6 +4,7 @@ import { Modal, Input, message, Spin, Button } from "antd";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { StaffAPI } from '../../../../services/Staff/StaffAPI'
+import axios from 'axios';
 
 interface Props {
     children?: ReactNode;
@@ -50,7 +51,14 @@ export const RequireManager: React.FC<Props> = ({ children, requiredPosition = "
 
         try {
             setLoading(true);
-            const staff = await StaffAPI.getStaffByID(idNum);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`http://localhost:8080/api/staff/${idNum}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const staff = response.data;
             if (!staff) {
                 message.error("ไม่พบพนักงานนี้");
                 return;

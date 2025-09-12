@@ -35,7 +35,7 @@ export interface Patient {
 
 export interface PatientRow {
   id: string | number;
-  citizenID :string;
+  citizenID: string;
   firstname: string;
   lastname: string;
   phonenumber: string;

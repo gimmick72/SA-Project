@@ -16,7 +16,7 @@ export const menuItems = [
   { key: "6", icon: MdOutlineGroup, label: "บุคลากร", path: "/admin/staff" },
   { key: "7", icon: IoMdAddCircleOutline, label: "คิวและห้องตรวจ", path: "/admin/queue" },
   { key: "8", icon: MdPayment, label: "ชำระเงิน", path: "/admin/payment" },
-  { key: "9", icon: FaRegSave, label: "บันทึกการเข้างาน", path: "/admin/attendance" },
+  { key: "9", icon: FaRegSave, label: "การจัดการเวลาทำงานบุคลากร", path: "/admin/attendance" },
   { key: "10", icon: RiServiceLine, label: "บริการ", path: "/admin/service" },
 ].map((item) => ({
   key: item.key,

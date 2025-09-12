@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Table, message, Space, Popconfirm, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { PatientAPI } from "../../../../services/patient/patientApi";
+import { patientAPI } from "../../../../services/patientApi";
 import { useNavigate } from "react-router-dom";
 import { PatientRow } from "../../../../interface/initailPatient/patient";
 
@@ -45,7 +45,7 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const r = await PatientAPI.getAll(); // ได้ res.data โดยตรงแล้ว
+      const r = await patientAPI.getPatients(); // ได้ res.data โดยตรงแล้ว
       setData(toRows(r));
     } catch (error) {
       if(error){
@@ -108,7 +108,7 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
               cancelText="ยกเลิก"
               onConfirm={async () => {
                 if (disabled) return;
-                await PatientAPI.delete(Number(id));
+                await patientAPI.deletePatient(Number(id));
                 msg.success("ลบแล้ว");
                 fetchData();
               }}
