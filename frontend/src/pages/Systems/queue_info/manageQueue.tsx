@@ -32,9 +32,9 @@ import { BookingAPI, QueueSlotAPI } from "../../../services/booking/QSlot";
 const { Text } = Typography;
 
 interface SlotRow {
-  key: string;       // "0900"
-  time: string;      // "09:00"
-  capacity: number;  // > 0 = เปิดรับ
+  key: string; // "0900"
+  time: string; // "09:00"
+  capacity: number; // > 0 = เปิดรับ
 }
 
 export interface PeriodState {
@@ -87,7 +87,6 @@ const listBookingsByDate = async (d: Dayjs): Promise<SummaryBooking[]> => {
 const upsertSlots = async (payload: UpdateSlot) => {
   return QueueSlotAPI.createCapacity(payload);
 };
-
 
 const ManageQueue: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -203,10 +202,9 @@ const ManageQueue: React.FC = () => {
     const items: Slottime[] = buildSlots(tmpRange, tmpCap).map((s) => {
       const key = `${active}-${s.key}`;
       const isSelected = selectedKeys.includes(key);
-      const cap = isSelected ? (capByKey[key] ?? tmpCap) : 0; // ไม่เลือก = 0
+      const cap = isSelected ? capByKey[key] ?? tmpCap : 0; // ไม่เลือก = 0
       return { hhmm: s.key, capacity: cap };
     });
-    
 
     try {
       setLoading(true);
@@ -237,8 +235,8 @@ const ManageQueue: React.FC = () => {
     try {
       setLoading(true);
       const [slots, bks]: [QueueSlot[], SummaryBooking[]] = await Promise.all([
-        listSlotsByDate(d),     // GET /api/queue/slots?date=YYYY-MM-DD
-        listBookingsByDate(d),  // GET /api/bookings?date=YYYY-MM-DD
+        listSlotsByDate(d), // GET /api/queue/slots?date=YYYY-MM-DD
+        listBookingsByDate(d), // GET /api/bookings?date=YYYY-MM-DD
       ]);
 
       setPeriods((prev) => {
@@ -288,7 +286,7 @@ const ManageQueue: React.FC = () => {
       });
       setBookingsBySlot(bySlot);
     } catch (e) {
-      console.error('Error refreshing data:', e);
+      console.error("Error refreshing data:", e);
       resetQueuesToZero();
       setBookingsBySlot({});
       message.error("ไม่สามารถโหลดข้อมูลได้");
@@ -312,7 +310,12 @@ const ManageQueue: React.FC = () => {
 
   const bookingCols: ColumnsType<BookingViewRow> = [
     { title: "ชื่อผู้จอง", dataIndex: "patientName", width: 220 },
-    { title: "เบอร์", dataIndex: "phone", width: 140, render: (v?: string) => v ?? "-" },
+    {
+      title: "เบอร์",
+      dataIndex: "phone",
+      width: 140,
+      render: (v?: string) => v ?? "-",
+    },
   ];
 
   const viewData: ViewRow[] = useMemo(() => {
@@ -325,7 +328,27 @@ const ManageQueue: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: 16 }}>
-      <Divider orientation="center">จัดการการจองคิว</Divider>
+      <Divider
+        orientation="center"
+        style={{
+          margin: "32px 0",
+          position: "relative",
+        }}
+      >
+        <h2
+          style={{
+            margin: 0,
+            padding: "12px",
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: "black",
+            background: "#E8D3FF",
+            borderRadius: "30px",
+          }}
+        >
+          จัดการการจองคิว
+        </h2>
+      </Divider>
 
       {/* KPI */}
       <Row gutter={[16, 16]} justify="center">
@@ -353,7 +376,11 @@ const ManageQueue: React.FC = () => {
         <Col>
           <Space>
             <span>วันที่:</span>
-            <DatePicker value={date} onChange={onChangeDate} allowClear={false} />
+            <DatePicker
+              value={date}
+              onChange={onChangeDate}
+              allowClear={false}
+            />
           </Space>
         </Col>
       </Row>
@@ -366,10 +393,18 @@ const ManageQueue: React.FC = () => {
             title="ช่วงเช้า"
             extra={<Text type="secondary">{date.format("YYYY-MM-DD")}</Text>}
             actions={[
-              <Button key="view" type="link" onClick={() => openView("morning")}>
-                ดูตาราง
+              <Button
+                key="view"
+                type="link"
+                onClick={() => openView("morning")}
+              >
+                ดูรายการจอง
               </Button>,
-              <Button key="set" type="link" onClick={() => openModal("morning")}>
+              <Button
+                key="set"
+                type="link"
+                onClick={() => openModal("morning")}
+              >
                 เปิดรับคิว
               </Button>,
             ]}
@@ -385,10 +420,18 @@ const ManageQueue: React.FC = () => {
             title="ช่วงบ่าย"
             extra={<Text type="secondary">{date.format("YYYY-MM-DD")}</Text>}
             actions={[
-              <Button key="view" type="link" onClick={() => openView("afternoon")}>
-                ดูตาราง
+              <Button
+                key="view"
+                type="link"
+                onClick={() => openView("afternoon")}
+              >
+                ดูรายการจอง
               </Button>,
-              <Button key="set" type="link" onClick={() => openModal("afternoon")}>
+              <Button
+                key="set"
+                type="link"
+                onClick={() => openModal("afternoon")}
+              >
                 เปิดรับคิว
               </Button>,
             ]}
@@ -404,10 +447,18 @@ const ManageQueue: React.FC = () => {
             title="ช่วงเย็น"
             extra={<Text type="secondary">{date.format("YYYY-MM-DD")}</Text>}
             actions={[
-              <Button key="view" type="link" onClick={() => openView("evening")}>
-                ดูตาราง
+              <Button
+                key="view"
+                type="link"
+                onClick={() => openView("evening")}
+              >
+                ดูรายการจอง
               </Button>,
-              <Button key="set" type="link" onClick={() => openModal("evening")}>
+              <Button
+                key="set"
+                type="link"
+                onClick={() => openModal("evening")}
+              >
                 เปิดรับคิว
               </Button>,
             ]}
@@ -473,7 +524,9 @@ const ManageQueue: React.FC = () => {
           <div>
             กำหนดจำนวนรับ{" "}
             <Text type="secondary">วันที่ {date.format("DD-MM-YYYY")}</Text>
-            {active && <Text style={{ marginLeft: 8 }}>{segLabel(active)}</Text>}
+            {active && (
+              <Text style={{ marginLeft: 8 }}>{segLabel(active)}</Text>
+            )}
           </div>
         }
       >

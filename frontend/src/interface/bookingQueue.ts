@@ -13,7 +13,7 @@ export interface CapacitySummary {
 // รายการบริการ
 export interface ServiceItem {
   id: number;
-  name: string;
+  name_service: string;
 }
 
 // ใช้บอกช่วงเวลานี้รับได้จำนวนเท่าไร
@@ -60,7 +60,7 @@ export interface SummaryBooking {
   segment: SegKey;
   service?: {
     id: number;
-    name: string;
+    name_service: string;
   };
 }
 

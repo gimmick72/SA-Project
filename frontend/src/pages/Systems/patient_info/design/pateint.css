@@ -1,5 +1,15 @@
-html, body { height: 100%; }
+html, body { height: 100%; overflow-x: hidden; }
 body { overflow-y: auto; }
+
+.ant-input[disabled],
+.ant-select-disabled .ant-select-selector,
+.ant-picker-disabled {
+  background-color: #fff !important; /* บังคับให้เป็นสีขาว */
+  color: rgba(0, 0, 0, 0.88);        /* สีตัวอักษรปกติ */
+  -webkit-text-fill-color: rgba(0, 0, 0, 0.88); /* สำหรับ Safari */
+  cursor: not-allowed;               /* ให้รู้ว่ายังแก้ไม่ได้ */
+  opacity: 1;                        /* กันไม่ให้ซีด */
+}
 
 .form-shell {
     height: 100vh;            /* สูงเท่าหน้าจอ */
@@ -9,13 +19,13 @@ body { overflow-y: auto; }
   }
   
 
-.wrapper {
-    margin-left: 1rem;
-    padding: 0;
-    max-width: 100%;        
-    /* border: 1px solid #ccc; */
-    width: 100vw;
-    height: 100vh; /* ใช้ความสูงเต็มหน้าจอ */
+  .wrapper {
+    box-sizing: border-box;
+    width: 100%;          /* แทน 100vw */
+    max-width: 100%;
+    margin: 0 auto;       /* เอา margin-left ออก */
+    padding: 0 16px;      /* ใช้ padding รับ margin ติดลบของ Antd Row */
+    min-height: 100vh;
   }
   
 
@@ -24,12 +34,7 @@ body { overflow-y: auto; }
     gap: 2rem; /* ระยะห่างระหว่างคอลัมน์ */
     margin-bottom: 1.5rem;
   }
-/* .group {
-    flex: 1 ;        
-    display: flex;
-    flex-direction: column;
-  }
-   */
+
 .inputbox{
     margin-top: 0.5rem;
     width: 80%;
@@ -44,34 +49,7 @@ body { overflow-y: auto; }
 
 }
 
-/* .row {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1rem;
-    flex-wrap: wrap; 
-    margin-left: 4px;
-  } */
-  
-  
-.gender-options {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.25rem;
-    align-items: center;
-  }
 
-.header{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-weight: semi-bold;
-    margin-bottom: 1rem;
-    color: black;
-}
-.header-element {
-    border-left: 2px solid black; /* สร้างเส้นแนวตั้งสีดำ หนา 2px */
-    margin-left: 0.5rem; /* ระยะห่างจากขอบซ้าย */
-}
 .row1,.row2,.row3,.row4,.row5,.row6,.row7{
     display: flex;
     flex-direction: row;
@@ -120,6 +98,7 @@ body { overflow-y: auto; }
     font-weight: bold; /* ตัวหนา */
     margin-right: 1rem; /* ระยะห่างด้านขวา */
     margin-top: 2.5rem;
+  
     
 }
 .cancel-button{
@@ -131,6 +110,7 @@ body { overflow-y: auto; }
     cursor: pointer; /* แสดงเคอร์เซอร์เป็นมือเมื่อวางเมาส์ */
     font-size: 13px; /* ขนาดตัวอักษร */
     font-weight: bold; /* ตัวหนา */
+  
 }
 
 .button{

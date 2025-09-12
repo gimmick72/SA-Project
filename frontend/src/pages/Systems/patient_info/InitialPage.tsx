@@ -1,4 +1,3 @@
-// InitialPage.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./design/initial.css";
@@ -29,7 +28,6 @@ import { useSyncDateTime } from "../../../hooks/syncDateTime";
 
 const { Title } = Typography;
 
-// ✅ sleep ฟังก์ชันทำงานจริง
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -61,7 +59,6 @@ const InitialPage: React.FC = () => {
     };
 
     run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchPatient = async () => {
@@ -86,13 +83,15 @@ const InitialPage: React.FC = () => {
 
   const fetchService = async () => {
     try {
-      const res = await ServiceToSymtomsAPI.getService(); // GET /api/services
+      const res = await ServiceToSymtomsAPI.getService();
       const rows =
-        (Array.isArray(res) && res) || (Array.isArray(res?.data) && res.data) || [];
+        (Array.isArray(res) && res) ||
+        (Array.isArray(res?.data) && res.data) ||
+        [];
       setServiceOptions(
         rows.map((s: any) => ({
           value: Number(s.ID ?? s.id),
-          label: s.NameService ?? s.name ?? "",
+          label: s.name_service ?? s.name ?? "",
         }))
       );
     } catch (e) {
@@ -105,35 +104,32 @@ const InitialPage: React.FC = () => {
     const key = "saving-symptom";
     try {
       setSubmitting(true);
-  
-      // แสดงกำลังบันทึก (ผูกกับ contextHolder ได้)
+
       messageApi.open({
         key,
         type: "loading",
         content: "กำลังบันทึกข้อมูลอาการ...",
         duration: 0,
       });
-  
+
       await PatientSymptomsAPI.createSymtom(id!, values);
-  
-      // ปิด/ทำลาย loading เดิมก่อน
-      messageApi.destroy(key);
-  
-      // ✅ แสดง "บันทึกสำเร็จ" ด้วย global message (ไม่ผูกกับเพจนี้)
+
+      // // ปิด/ทำลาย loading เดิมก่อน
+      // messageApi.destroy(key);
+
       message.success({
         content: "บันทึกข้อมูลเรียบร้อย",
         duration: 1.5,
       });
-  
-      // 👉 เปลี่ยนหน้า “ทันที” หลังเฟรมถัดไป (ไม่หน่วงให้ผู้ใช้รู้สึก)
+
+      // เปลี่ยนหน้า “ทันที” หลังเฟรมถัดไป
       requestAnimationFrame(() => {
         navigate("/admin/patient");
-        // หรือ navigate(`/admin/patient/patient-history/${id}`);
       });
     } catch (e: any) {
       console.error(e);
       const msg = e?.response?.data?.error || e?.message || "บันทึกไม่สำเร็จ";
-      // ใช้ instance เดิมก็ได้เพราะเรายังอยู่หน้านี้
+
       messageApi.open({
         key,
         type: "error",
@@ -148,7 +144,7 @@ const InitialPage: React.FC = () => {
   return (
     <div className="wrapper">
       {contextHolder}
-     
+
       <Spin fullscreen spinning={submitting} />
 
       <div className="header">
@@ -223,12 +219,12 @@ const InitialPage: React.FC = () => {
               </Col>
               <Col xs={14} sm={8} md={5}>
                 <Form.Item name="systolic" label="Systolic">
-                  <InputNumber style={{ width: "100%" }} placeholder="mmHg" />
+                  <InputNumber style={{ width: "100%" }} placeholder="mmHg" max={250} min={40} />
                 </Form.Item>
               </Col>
               <Col xs={14} sm={8} md={5}>
                 <Form.Item name="diastolic" label="Diastolic">
-                  <InputNumber style={{ width: "100%" }} placeholder="mmHg" />
+                  <InputNumber style={{ width: "100%" }} placeholder="mmHg" min={10} max ={100} />
                 </Form.Item>
               </Col>
             </Row>
@@ -246,6 +242,7 @@ const InitialPage: React.FC = () => {
                     style={{ width: "100%" }}
                     placeholder="kg"
                     min={0}
+                    max={180}
                   />
                 </Form.Item>
               </Col>
@@ -259,6 +256,7 @@ const InitialPage: React.FC = () => {
                     style={{ width: "100%" }}
                     placeholder="เซนติเมตร"
                     min={0}
+                    max={250}
                   />
                 </Form.Item>
               </Col>
@@ -311,8 +309,25 @@ const InitialPage: React.FC = () => {
             {/* ----------------------- */}
             {/* ปุ่ม */}
             <Form.Item>
-              <div style={{ display: "flex", gap: 12 }}>
-                <Button type="primary" htmlType="submit" loading={submitting}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  justifyContent: "flex-end", 
+                  marginBottom: "2rem",
+                  border: "2px"
+                }}
+              >
+                <Button 
+                style={{
+                  backgroundColor: "#D3F4DA",
+                  color:"black", 
+                
+                }}
+                type="primary" 
+                htmlType="submit" 
+                loading={submitting}>
+                  
                   บันทึก
                 </Button>
                 <Button htmlType="button" onClick={() => window.history.back()}>

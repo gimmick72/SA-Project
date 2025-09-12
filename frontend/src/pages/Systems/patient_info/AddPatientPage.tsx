@@ -1,5 +1,3 @@
-//Okay but ยังไม่ได้จตรวจสอบดีๆ
-
 import "../patient_info/design/pateint.css";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -261,14 +259,17 @@ const AddPatientPage: React.FC = () => {
             </Row>
 
             {/* แถบแพ้ยา */}
-            <Form.Item label="แพ้ยา" colon={false} style={{ marginBottom: 8 }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>
+              แพ้ยา
+            </div>
+            <Form.Item  colon={false} style={{ marginBottom: 8 }}>
               <Space align="center" wrap>
                 {/* เลือกแพ้/ไม่แพ้ */}
                 <Form.Item name="drugAllergyType" noStyle>
                   <Radio.Group
                     onChange={({ target }) => {
                       if (target.value === "noAllergy") {
-                        form.setFieldsValue({ drug_allergy: "" });
+                        form.setFieldsValue({ drug_allergy: " " });
                       }
                     }}
                   >
@@ -309,7 +310,6 @@ const AddPatientPage: React.FC = () => {
                         ]}
                       >
                         <Input
-                          placeholder="ชื่อยาที่แพ้ (เช่น เพนิซิลลิน)"
                           disabled={disabled}
                           style={{ width: 260 }} // ปรับความกว้างตามใจ
                         />
@@ -419,23 +419,33 @@ const AddPatientPage: React.FC = () => {
             </Row>
 
             {/* ปุ่ม */}
-            <div className="buttons">
-              <button
-                type="submit"
-                className="save-button"
-                disabled={submitting}
-              >
-                {submitting ? "กำลังบันทึก..." : "บันทึก"}
+            <div className="buttons"
+             
+             style={{
+               justifyContent: "flex-end", 
+             }}
+             
+           >
+         
 
-              </button>
-              <button
-                type="button"
-                className="cancel-button"
-                onClick={() => (window.location.href = "/admin/patient")}
-              >
-                ยกเลิก
-              </button>
-            </div>
+                <button
+                  type="submit"
+                  className="save-button"
+                  disabled={submitting}
+                >
+                  {submitting ? "กำลังบันทึก..." : "บันทึก"}
+  
+                </button>
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={() => (window.location.href = "/admin/patient")}
+                >
+                  ยกเลิก
+                </button>
+              </div>
+             
+
           </Form>
         </div>
       </div>
