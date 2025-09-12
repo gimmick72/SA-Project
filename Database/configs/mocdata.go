@@ -3,6 +3,7 @@ package configs
 import (
 	"Database/entity"
 	"time"
+	"log"
 )
 
 // -------------------- DentistManagement --------------------
@@ -154,6 +155,7 @@ func GetMockStatus() []entity.Status {
 	}
 }
 
+func UintPtr(v uint) *uint { return &v }
 
 func GetMockInitialSymptomps() []entity.InitialSymptomps {
 	// แนะนำให้ seed ตามลำดับ: GetMockStatuses() -> GetMockServices() -> SeedPatient() -> GetMockInitialSymptomps()
@@ -167,113 +169,179 @@ func GetMockInitialSymptomps() []entity.InitialSymptomps {
 	return []entity.InitialSymptomps{
 		{
 			Symptomps:     "ปวดฟันซี่ 36 เสียวเมื่อโดนเย็น",
-			BloodPressure: "120/80",
 			Visit:         base.Add(15 * time.Minute), // 09:15
 			HeartRate:     "76",
 			Weight:        65.0,
 			Height:        170.0,
-			ServiceID:     1,  // ขูดหินปูน (ตัวอย่าง)
+			ServiceID:     UintPtr(1),  // ขูดหินปูน (ตัวอย่าง)
 			PatientID:     1,  // ผู้ป่วย ID=1
-			StatusID:      1,  // รอคิว
 		},
 		{
 			Symptomps:     "เหงือกบวม เลือดออกง่าย ต้องการขูดหินปูน",
-			BloodPressure: "118/76",
 			Visit:         base.Add(45 * time.Minute), // 09:45
 			HeartRate:     "74",
 			Weight:        55.0,
 			Height:        160.0,
-			ServiceID:     1,
+			ServiceID:     UintPtr(2),
 			PatientID:     2,
-			StatusID:      2, // กำลังตรวจ
 		},
 		{
 			Symptomps:     "ฟันผุด้านบดเคี้ยว เจ็บเวลาเคี้ยว",
-			BloodPressure: "125/82",
 			Visit:         base.Add(90 * time.Minute), // 10:30
 			HeartRate:     "81",
 			Weight:        70.5,
 			Height:        175.0,
-			ServiceID:     2,  // อุดฟัน
+			ServiceID:     UintPtr(3),  // อุดฟัน
 			PatientID:     3,
-			StatusID:      3, // ชำระเงิน
 		},
 		{
 			Symptomps:     "ทำครอบฟันต่อจากรักษาราก",
-			BloodPressure: "116/74",
 			Visit:         base.Add(120 * time.Minute), // 11:00
 			HeartRate:     "72",
 			Weight:        58.3,
 			Height:        162.0,
-			ServiceID:     4,  // ครอบฟัน/ประดิษฐ์
+			ServiceID:     UintPtr(4),  // ครอบฟัน/ประดิษฐ์
 			PatientID:     4,
-			StatusID:      4, // เสร็จสิ้น
 		},
 		{
 			Symptomps:     "เสียวฟันเวลาโดนลมเย็น ฟันล่างขวา",
-			BloodPressure: "122/80",
 			Visit:         base.Add(180 * time.Minute), // 12:00
 			HeartRate:     "77",
 			Weight:        68.0,
 			Height:        173.0,
-			ServiceID:     2, // อุดฟัน
+			ServiceID:     UintPtr(5), // อุดฟัน
 			PatientID:     5,
-			StatusID:      1, // รอคิว
 		},
 		{
 			Symptomps:     "ทำความสะอาดประจำปี",
-			BloodPressure: "117/75",
 			Visit:         base.Add(210 * time.Minute), // 12:30
 			HeartRate:     "73",
 			Weight:        52.4,
 			Height:        158.0,
-			ServiceID:     1, // ขูดหินปูน
+			ServiceID:     UintPtr(1), // ขูดหินปูน
 			PatientID:     6,
-			StatusID:      2, // กำลังตรวจ
 		},
 		{
 			Symptomps:     "ฟอกสีฟัน เตรียมถ่ายภาพก่อนเริ่ม",
-			BloodPressure: "119/77",
 			Visit:         base.Add(240 * time.Minute), // 13:00
 			HeartRate:     "75",
 			Weight:        60.0,
 			Height:        165.0,
-			ServiceID:     3, // ฟอกสีฟัน
+			ServiceID:     UintPtr(2), // ฟอกสีฟัน
 			PatientID:     1,
-			StatusID:      1, // รอคิว
 		},
 		{
 			Symptomps:     "ฟันปลอมหลวม ปวดบริเวณเหงือก",
-			BloodPressure: "121/79",
 			Visit:         base.Add(270 * time.Minute), // 13:30
 			HeartRate:     "78",
 			Weight:        62.0,
 			Height:        166.0,
-			ServiceID:     4, // ประดิษฐ์/ครอบฟัน/ฟันปลอม
+			ServiceID:     UintPtr(3), // ประดิษฐ์/ครอบฟัน/ฟันปลอม
 			PatientID:     2,
-			StatusID:      3, // ชำระเงิน
 		},
 		{
 			Symptomps:     "นัดอุดฟันซี่ 26 ระยะติดตามผล",
-			BloodPressure: "115/73",
 			Visit:         base.Add(300 * time.Minute), // 14:00
 			HeartRate:     "71",
 			Weight:        57.0,
 			Height:        161.0,
-			ServiceID:     2, // อุดฟัน
+			ServiceID:     UintPtr(3), // อุดฟัน
 			PatientID:     3,
-			StatusID:      4, // เสร็จสิ้น
 		},
 		{
 			Symptomps:     "ขูดหินปูน + เคลือบฟลูออไรด์",
-			BloodPressure: "119/78",
 			Visit:         base.Add(330 * time.Minute), // 14:30
 			HeartRate:     "74",
 			Weight:        66.0,
 			Height:        171.0,
-			ServiceID:     1, // ขูดหินปูน
+			ServiceID:     UintPtr(4), // ขูดหินปูน
 			PatientID:     4,
-			StatusID:      2, // กำลังตรวจ
 		},
 	}
+}
+
+
+
+//  SeedAddress
+func SeedAddress() {
+    var count int64
+    DB.Model(&entity.Address{}).Count(&count)
+    if count > 0 {
+        log.Println("ℹ️ Address already seeded, skipping...")
+        return
+    }
+
+    // ดึง patient มาใช้งาน (เอา patient คนแรก)
+    var patient entity.Patient
+    if err := DB.First(&patient).Error; err != nil {
+        log.Println("❌ Cannot seed address because no patient exists")
+        return
+    }
+
+    addresses := []entity.Address{
+        {
+            HouseNumber: "123",
+            Moo:         "1",
+            Subdistrict: "ในเมือง",
+            District:    "เมือง",
+            Province:    "ขอนแก่น",
+            Postcode:    "40000",
+            PatientID:   patient.ID, // ผูกกับ Patient
+        },
+        {
+            HouseNumber: "45",
+            Moo:         "3",
+            Subdistrict: "ศิลา",
+            District:    "เมือง",
+            Province:    "ขอนแก่น",
+            Postcode:    "40000",
+            PatientID:   patient.ID, // mock อีกที่อยู่ ให้คนไข้คนเดิม
+        },
+    }
+
+    for _, addr := range addresses {
+        if err := DB.Create(&addr).Error; err != nil {
+            log.Printf("❌ Failed to seed address: %v", err)
+        }
+    }
+
+    log.Println("✅ Seeded addresses successfully!")
+}
+
+
+func SeedContactPerson() {
+    var count int64
+    DB.Model(&entity.ContactPerson{}).Count(&count)
+    if count > 0 {
+        log.Println("ℹ️ ContactPerson already seeded, skipping...")
+        return
+    }
+
+    // ดึง patient มาใช้งาน (เอาคนแรก)
+    var patient entity.Patient
+    if err := DB.First(&patient).Error; err != nil {
+        log.Println("❌ Cannot seed contact person because no patient exists")
+        return
+    }
+
+    contacts := []entity.ContactPerson{
+        {
+            Relationship: "บิดา",
+            PhoneNumber:  "0811111111",
+            PatientID:    patient.ID, // ผูกกับ Patient
+        },
+        {
+            Relationship: "มารดา",
+            PhoneNumber:  "0822222222",
+            PatientID:    patient.ID,
+        },
+    }
+
+    for _, c := range contacts {
+        if err := DB.Create(&c).Error; err != nil {
+            log.Printf("❌ Failed to seed contact person: %v", err)
+        }
+    }
+
+    log.Println("✅ Seeded contact persons successfully!")
 }

@@ -1,15 +1,13 @@
-//Database/configs/db.go
+// Database/configs/db.go
 package configs
 
 import (
 	"Database/entity"
-	patientEntity "Database/entity/patient"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
 	"time"
-
 )
 
 var DB *gorm.DB
@@ -29,11 +27,11 @@ func SetupDatbase() {
 	//Migrate the schema
 	DB.AutoMigrate(
 		//Patient
-		&patientEntity.Patient{},
-		&patientEntity.Address{},
-		&patientEntity.ContactPerson{},
-		&patientEntity.HistoryPatient{},
-		&patientEntity.InitialSymptomps{},
+		&entity.Patient{},
+		&entity.Address{},
+		&entity.ContactPerson{},
+		&entity.HistoryPatient{},
+		&entity.InitialSymptomps{},
 
 		//service
 		&entity.Service{},
@@ -51,7 +49,6 @@ func SetupDatbase() {
 
 		// ตาราง DentistManagement
 		&entity.DentistManagement{},
-		
 
 		// ตาราง Service และ Category และ promotion
 		&entity.Category{},
@@ -59,9 +56,9 @@ func SetupDatbase() {
 		&entity.Promotion{},
 
 		// ตารารางระบบ Personal and Treatment
-		&entity.PersonalData{},	
-        &entity.Department{},
-        &entity.Patient{},
+		&entity.PersonalData{},
+		&entity.Department{},
+		// &entity.Patient{},
 		&entity.Address{},
 		&entity.ContactPerson{},
 		&entity.InitialSymptomps{},
@@ -70,14 +67,15 @@ func SetupDatbase() {
 		&entity.CaseData{},
 	)
 
-	// จำลองข้อมูล ระบบ -> ตารางแพทย์, บริการ, อุปกรณ์, คิวห้อง 
+	// จำลองข้อมูล ระบบ -> ตารางแพทย์, บริการ, อุปกรณ์, คิวห้อง
 	MockData()
 	// seed ข้อมูลเริ่มต้น ระบบ Personal and Treatment
 	SeedPatient()
 	SeedCase()
 	SeedStaff()
+	SeedAddress()
+	SeedContactPerson()
 }
-
 
 // จำลองข้อมูล
 func MockData() {
@@ -172,28 +170,28 @@ func SeedStaff() {
 
 	staffList := []struct {
 		Title, FirstName, LastName, Gender, Email, EmpNationalID, Tel string
-		HouseNumber, Subdistrict, District, VillageNumber              string
-		Age                                                            int
-		Position, EmpType,  License ,Specialization                         string
-		CompRate                                                       float32
+		HouseNumber, Subdistrict, District, VillageNumber             string
+		Age                                                           int
+		Position, EmpType, License, Specialization                    string
+		CompRate                                                      float32
 
-		StartDate                                                      time.Time
-		Password	string
+		StartDate time.Time
+		Password  string
 	}{
 		{"ทพ.", "Somsak", "Thongdee", "ชาย", "somsak@clinic.com", "1234567890123", "0812345678",
 			"123 Moo 1", "Nongprue", "Muang", "Nakhon Ratchasima", 45,
-			"ทันตแพทย์", "Part-time", "D54321",  "ทันตกรรมจัดฟัน",20000,
-			time.Date(2015, 3, 1, 0, 0, 0, 0, time.UTC),"123456"},
+			"ทันตแพทย์", "Part-time", "D54321", "ทันตกรรมจัดฟัน", 20000,
+			time.Date(2015, 3, 1, 0, 0, 0, 0, time.UTC), "123456"},
 
 		{"ทพ.ญ.", "Suda", "Kanya", "หญิง", "suda@clinic.com", "9876543210987", "0891112222",
 			"456 Sukhumvit Rd", "", "Bangkok", "", 45,
-			"ผู้ช่วย", "Full-time", "A00002", "",15000, 
-			time.Date(2021, 9, 10, 0, 0, 0, 0, time.UTC),"223456"},
+			"ผู้ช่วย", "Full-time", "A00002", "", 15000,
+			time.Date(2021, 9, 10, 0, 0, 0, 0, time.UTC), "223456"},
 
 		{"นาย", "Anan", "Chaiyos", "ชาย", "anan@clinic.com", "1122334455667", "0895551111",
 			"88 Rama 2 Rd", "", "Bangkok", "", 45,
-			"ผู้จัดการ", "Full-time", "",  "",12000,
-			time.Date(2018, 11, 1, 0, 0, 0, 0, time.UTC),"323456"},
+			"ผู้จัดการ", "Full-time", "", "", 12000,
+			time.Date(2018, 11, 1, 0, 0, 0, 0, time.UTC), "323456"},
 	}
 
 	for _, s := range staffList {
@@ -223,7 +221,7 @@ func SeedStaff() {
 			CompRate:       s.CompRate,
 			Specialization: s.Specialization,
 			StartDate:      s.StartDate,
-			Password: 		s.Password,
+			Password:       s.Password,
 		}
 		DB.Create(&d)
 	}
@@ -247,23 +245,35 @@ func SeedPatient() {
 			FirstName:        "เทส",
 			LastName:         "ระบบ",
 			NickName:         "ชาย",
-			Enthnicity:       "ไทย",
-			Nationality:      "ไทย",
 			CongenitaDisease: "ไม่มี",
 			BloodType:        "O",
 			Gender:           "ชาย",
-			BirthDay:         time.Date(1990, 5, 12, 0, 0, 0, 0, time.UTC),
+			Birthday:         time.Date(1990, 5, 12, 0, 0, 0, 0, time.UTC),
 			PhoneNumber:      "0812345678",
 			Age:              35,
 			DrugAllergy:      "ไม่มี",
-			Address: []entity.Address{
-				{HouseNumber: "123", Moo: "1", Subdistrict: "ในเมือง", District: "เมือง", Provice: "ขอนแก่น", Postcod: "40000"},
+			Address: &entity.Address{
+				HouseNumber: "123",
+				Moo:         "1",
+				Subdistrict: "ในเมือง",
+				District:    "เมือง",
+				Province:    "ขอนแก่น",
+				Postcode:    "40000",
 			},
-			ContactPerson: []entity.ContactPerson{
-				{Relationship: "บิดา", ContactperPhone: "0811111111"},
+			ContactPerson: &entity.ContactPerson{
+				Relationship: "บิดา",
+				PhoneNumber:  "0811111111",
 			},
 			InitialSymptomps: []entity.InitialSymptomps{
-				{Symptomps: "ปวดฟันกรามขวา", BloodPressure: "120/80", Visit: time.Now(), HeartRate: "72", Weight: 65.0, Height: 170.0},
+				{
+					Symptomps: "ปวดฟันกรามขวา",
+					Systolic:  120,
+					Diastolic: 80,
+					HeartRate: "72",
+					Visit:     time.Now(),
+					Weight:    65.0,
+					Height:    170.0,
+				},
 			},
 		},
 		{
@@ -272,23 +282,35 @@ func SeedPatient() {
 			FirstName:        "สุดา",
 			LastName:         "พิมพ์ดี",
 			NickName:         "ดาว",
-			Enthnicity:       "ไทย",
-			Nationality:      "ไทย",
 			CongenitaDisease: "หอบหืด",
 			BloodType:        "A",
 			Gender:           "หญิง",
-			BirthDay:         time.Date(1985, 8, 20, 0, 0, 0, 0, time.UTC),
+			Birthday:         time.Date(1985, 8, 20, 0, 0, 0, 0, time.UTC),
 			PhoneNumber:      "0891112222",
 			Age:              40,
 			DrugAllergy:      "Penicillin",
-			Address: []entity.Address{
-				{HouseNumber: "456", Moo: "2", Subdistrict: "ลาดพร้าว", District: "บางกะปิ", Provice: "กรุงเทพฯ", Postcod: "10240"},
+			Address: &entity.Address{
+				HouseNumber: "45",
+				Moo:         "3",
+				Subdistrict: "ศิลา",
+				District:    "เมือง",
+				Province:    "ขอนแก่น",
+				Postcode:    "40000",
 			},
-			ContactPerson: []entity.ContactPerson{
-				{Relationship: "มารดา", ContactperPhone: "0822222222"},
+			ContactPerson: &entity.ContactPerson{
+				Relationship: "มารดา",
+				PhoneNumber:  "0822222222",
 			},
 			InitialSymptomps: []entity.InitialSymptomps{
-				{Symptomps: "เหงือกบวม", BloodPressure: "118/76", Visit: time.Now(), HeartRate: "75", Weight: 55.0, Height: 160.0},
+				{
+					Symptomps: "เหงือกบวม",
+					Systolic:  118,
+					Diastolic: 76,
+					HeartRate: "75",
+					Visit:     time.Now(),
+					Weight:    55.0,
+					Height:    160.0,
+				},
 			},
 		},
 	}
@@ -304,7 +326,7 @@ func SeedPatient() {
 
 // ------------------- SEED CASE -------------------
 func SeedCase() {
-	
+
 	var count int64
 	DB.Model(&entity.CaseData{}).Count(&count)
 	if count > 0 {
@@ -321,15 +343,15 @@ func SeedCase() {
 
 	// สร้างเคสใหม่
 	case1 := entity.CaseData{
-		SignDate:      time.Now(),
+		SignDate:         time.Now(),
 		Appointment_date: time.Date(2072, 8, 20, 0, 0, 0, 0, time.UTC),
-		Note:         "ตรวจสุขภาพฟันประจำปี",
-		TotalPrice:    3500,
-		PatientID:    patient.ID,
-		DepartmentID: 1, // สมมติว่ามี Department ID = 1
+		Note:             "ตรวจสุขภาพฟันประจำปี",
+		TotalPrice:       3500,
+		PatientID:        patient.ID,
+		DepartmentID:     1, // สมมติว่ามี Department ID = 1
 
 		Treatment: []entity.Treatment{
-			{	
+			{
 				TreatmentName: "ขูดหินปูน",
 				Price:         1500,
 				Quadrants: []entity.Quadrant{

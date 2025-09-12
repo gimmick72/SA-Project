@@ -1,4 +1,4 @@
-package patient
+package entity
 
 import (
 	"gorm.io/gorm"
@@ -8,7 +8,6 @@ import (
 type InitialSymptomps struct {
 	gorm.Model
 	Symptomps string `json:"symptomps"`
-	//Blood Pressure (Systolic บีบตีว/Diastolic คลายตัว)
 	Systolic  int       `json:"systolic"`
 	Diastolic int       `json:"diastolic"`
 	HeartRate string    `json:"heartrate"`
@@ -23,8 +22,6 @@ type InitialSymptomps struct {
 	// FK ไปหา Service
 	ServiceID *uint `json:"serviceID,omitempty"`
 
-	StatusID uint
-	Status   Status `gorm:"foreignKey:StatusID;references:ID"`
 }
 
 type Status struct {

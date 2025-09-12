@@ -1,5 +1,5 @@
 // controllers/dto.go
-package patient
+package entity
 
 type CreateContactPersonDTO struct {
 	Relationship       string `json:"relationship"`

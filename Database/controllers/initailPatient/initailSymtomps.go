@@ -9,12 +9,12 @@ import (
 
 	"Database/configs"
 	serviceEntity "Database/entity"
-	patientEntity "Database/entity/patient"
+	"Database/entity"
 )
 
 // POST/initailPatient.go
 func CreateSymptom(c *gin.Context) {
-	var symptom patientEntity.InitialSymptomps
+	var symptom entity.InitialSymptomps
 
 	if err := c.ShouldBindJSON(&symptom); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload", "details": err.Error()})
@@ -31,7 +31,7 @@ func CreateSymptom(c *gin.Context) {
 	symptom.PatientID = uint(pid)
 
 	// เช็คว่ามี patient นี้จริงไหม (กัน FK ล้ม)
-	if tx := configs.DB.First(&patientEntity.Patient{}, symptom.PatientID); tx.Error != nil {
+	if tx := configs.DB.First(&entity.Patient{}, symptom.PatientID); tx.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "patient not found"})
 		return
 	}

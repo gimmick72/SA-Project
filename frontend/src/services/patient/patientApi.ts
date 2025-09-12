@@ -60,12 +60,20 @@ export const Get = async (url: string, requireAuth = true) => {
 };
 
 export const Update = async (url: string, data: any, requireAuth = true) => {
+  console.log("🔹 Update called:", url, data); // log ก่อนส่ง
+
   const config = requireAuth ? getConfig() : getConfigWithOutAuth();
+
   return await axios
     .put(`${API_BASE_URL}${url}`, data, config)
-    .then(res => res.data)             
+    .then(res => {
+      console.log("✅ Update response:", res.data); // log response
+      return res.data;
+    })
     .catch((error: AxiosError) => {
+      console.error("❌ Update error:", error.response?.status, error.response?.data); // log error
       if (error?.response?.status === 401) {
+        console.warn("⚠️ Unauthorized, clearing storage and reloading");
         localStorage.clear();
         window.location.reload();
       }
@@ -107,3 +115,5 @@ export const ServiceToSymtomsAPI = {
 export const GetCaseDataToHistory = {
   getCaseData: (id?: string) => Get(`/api/case-data/${id}`,false)
 }
+
+

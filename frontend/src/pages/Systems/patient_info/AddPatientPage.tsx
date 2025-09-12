@@ -27,11 +27,6 @@ const AddPatientPage: React.FC = () => {
   ) => {
     try {
       setSubmitting(true);
-
-      // const DataOnly = patient.birthday
-      //   ? dayjs(patient.birthday).startOf("day").format("YYYY-MM-DDTHH:mm:ssZ")
-      //   : "";
-
       if (patient.drugAllergyType === "noAllergy") {
         patient.drug_allergy = "none";
       }
@@ -69,8 +64,8 @@ const AddPatientPage: React.FC = () => {
             layout="vertical"
             onFinish={handleSubmit}
             onValuesChange={(changed) => {
-              if ("birthday" in changed) {
-                const d = changed.birthday as any;
+              if ("birth_day" in changed) {
+                const d = changed.birth_day as any;
                 form.setFieldsValue({
                   age: d ? dayjs().diff(d, "year") : undefined,
                 });
@@ -82,10 +77,10 @@ const AddPatientPage: React.FC = () => {
               firstname: "",
               lastname: "",
               nickname: "",
-              congenitadisease: "",
+              congenita_disease: "",
               blood_type: "",
               gender: "",
-              birthday: null,
+              birth_day: null,
               phone_number: "",
               age: 0,
               drug_allergy: "",
@@ -192,7 +187,7 @@ const AddPatientPage: React.FC = () => {
 
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
                 <Form.Item
-                  name="birthday"
+                  name="birth_day"
                   label="วันเกิด"
                   rules={[{ required: true, message: "กรุณาเลือกวันเกิด" }]}
                 >
@@ -224,7 +219,7 @@ const AddPatientPage: React.FC = () => {
               </Col>
 
               <Col xs={18} sm={12} md={8} lg={6} xl={4}>
-                <Form.Item name="congenitadisease" label="โรคประจำตัว">
+                <Form.Item name="congenita_disease" label="โรคประจำตัว">
                   <Input placeholder="โรคประจำตัว" />
                 </Form.Item>
               </Col>

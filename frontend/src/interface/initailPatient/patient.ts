@@ -22,7 +22,7 @@ export interface Patient {
   blood_type?: string;
   gender?: "male" | "female" | "";
 
-  birthday?: string;      // "YYYY-MM-DD"
+  birt_hday?: string;      // "YYYY-MM-DD"
   phone_number?: string;
   age?: number;
 

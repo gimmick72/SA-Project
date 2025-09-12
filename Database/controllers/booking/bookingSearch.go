@@ -1,13 +1,16 @@
 package controllers
+
 import (
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
 	"Database/configs"
 )
 
+// ให้วันที่เป็นเที่ยงคืน UTC เสมอ (ตัดเวลาออก)
 func normalizeUTCDate(d time.Time) time.Time {
 	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, time.UTC)
 }
@@ -17,46 +20,63 @@ type BookingResult struct {
 	FirstName   string    `json:"firstName"`
 	LastName    string    `json:"lastName"`
 	PhoneNumber string    `json:"phone_number"`
-	Date        time.Time `json:"date"`         // ใช้ time.Time กัน scan error
+	Date        time.Time `json:"date"`
 	HHMM        string    `json:"hhmm"`
 	Segment     string    `json:"segment"`
 	Status      string    `json:"status"`
 	ServiceID   uint      `json:"service_id"`
-	ServiceName string    `json:"service_name"` // อาจเป็น "" ถ้าไม่มีตาราง services
+	ServiceName string    `json:"service_name"`
 }
 
-// GET /api/bookings/search-by-phone?phone=080...&date=YYYY-MM-DD
-func SearchBookingsByPhone(c *gin.Context) {
+// GET /api/bookings/search?phone=080xxxxxxx&date=2025-09-12
+// - ใส่ phone อย่างเดียวได้
+// - ใส่ date อย่างเดียวได้
+// - หรือใส่ทั้งคู่ก็ได้ (จะ AND เงื่อนไข)
+func SearchBookings(c *gin.Context) {
 	db := configs.DB
 	if db == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "database is not initialized"})
 		return
 	}
 
+	// -------- อ่าน query params --------
 	phone := strings.TrimSpace(c.Query("phone"))
 	if phone == "" {
-		phone = strings.TrimSpace(c.Query("phone_number"))
+		phone = strings.TrimSpace(c.Query("phone_number")) // รองรับชื่อ param เดิม
 	}
-	if phone == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "phone parameter is required"})
+	dateStr := strings.TrimSpace(c.Query("date")) // รูปแบบ YYYY-MM-DD
+
+	// ต้องมีอย่างน้อย 1 เงื่อนไข
+	if phone == "" && dateStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "at least one of 'phone' or 'date' is required",
+		})
 		return
 	}
 
-	// keep digits only
-	clean := strings.Map(func(r rune) rune {
-		if r >= '0' && r <= '9' { return r }
-		return -1
-	}, phone)
-	if len(clean) < 9 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "phone number must contain at least 9 digits"})
-		return
+	// เตรียมตัวกรองเบอร์ (เก็บเฉพาะตัวเลข)
+	var phoneClean string
+	if phone != "" {
+		phoneClean = strings.Map(func(r rune) rune {
+			if r >= '0' && r <= '9' {
+				return r
+			}
+			return -1
+		}, phone)
+
+		// แปลงรูปแบบเบอร์แบบไทย +66xxxxxxxxx -> 0xxxxxxxxx ในฝั่ง SQL ด้วย
+		// แต่ในฝั่ง input ถ้า user ใส่มาเป็น +66… เราก็ clean จนเหลือตัวเลขเหมือนกัน
+		if len(phoneClean) < 9 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "phone number must contain at least 9 digits"})
+			return
+		}
 	}
 
-	// optional date filter: [00:00, nextDay)
-	var start, end time.Time
+	// เตรียมตัวกรองวันที่ (ช่วง [00:00, 24:00) ของวันนั้น)
 	useDate := false
-	if ds := strings.TrimSpace(c.Query("date")); ds != "" {
-		d, err := time.Parse("2006-01-02", ds)
+	var start, end time.Time
+	if dateStr != "" {
+		d, err := time.Parse("2006-01-02", dateStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid date format, use YYYY-MM-DD"})
 			return
@@ -66,7 +86,8 @@ func SearchBookingsByPhone(c *gin.Context) {
 		useDate = true
 	}
 
-	// ------- Query หลัก (มี service_name ด้วย subquery) -------
+	// -------- Query หลัก (พร้อม service_name) --------
+	// หมายเหตุ: ใช้ REPLACE เพื่อลบ '-', ' ', และเปลี่ยน +66 เป็น 0 ก่อนเทียบ
 	q := db.Table("bookings AS b").
 		Select(`
 			b.id,
@@ -79,17 +100,26 @@ func SearchBookingsByPhone(c *gin.Context) {
 			b.status,
 			b.service_id,
 			COALESCE((SELECT name FROM services WHERE id = b.service_id), '') AS service_name
-		`).
-		Where("REPLACE(REPLACE(REPLACE(b.phone_number, '-', ''), ' ', ''), '+66', '0') LIKE ?", "%"+clean+"%")
+		`)
 
+	// เงื่อนไขเบอร์ (optional)
+	if phoneClean != "" {
+		q = q.Where(`
+			REPLACE(
+				REPLACE(
+					REPLACE(b.phone_number, '-', ''),
+				' ', ''),
+			'+66', '0') LIKE ?`, "%"+phoneClean+"%")
+	}
+
+	// เงื่อนไขวันที่ (optional)
 	if useDate {
 		q = q.Where("b.date >= ? AND b.date < ?", start, end)
 	}
 
 	var out []BookingResult
-	err := q.Order("b.date DESC, b.hhmm ASC").Scan(&out).Error
-	if err != nil {
-		// ------- Fallback: ถ้าตาราง services ไม่มี ให้ดึงโดยไม่อ้างอิงเลย -------
+	if err := q.Order("b.date DESC, b.hhmm ASC").Scan(&out).Error; err != nil {
+		// ถ้าดึง service_name ไม่ได้ (เช่นไม่มีตาราง services) ให้ fallback
 		q2 := db.Table("bookings AS b").
 			Select(`
 				b.id,
@@ -102,11 +132,20 @@ func SearchBookingsByPhone(c *gin.Context) {
 				b.status,
 				b.service_id,
 				'' AS service_name
-			`).
-			Where("REPLACE(REPLACE(REPLACE(b.phone_number, '-', ''), ' ', ''), '+66', '0') LIKE ?", "%"+clean+"%")
+			`)
+
+		if phoneClean != "" {
+			q2 = q2.Where(`
+				REPLACE(
+					REPLACE(
+						REPLACE(b.phone_number, '-', ''),
+					' ', ''),
+				'+66', '0') LIKE ?`, "%"+phoneClean+"%")
+		}
 		if useDate {
 			q2 = q2.Where("b.date >= ? AND b.date < ?", start, end)
 		}
+
 		if err2 := q2.Order("b.date DESC, b.hhmm ASC").Scan(&out).Error; err2 != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "failed to search bookings",
@@ -116,5 +155,8 @@ func SearchBookingsByPhone(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": out, "count": len(out)})
+	c.JSON(http.StatusOK, gin.H{
+		"data":  out,
+		"count": len(out),
+	})
 }

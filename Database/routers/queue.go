@@ -19,7 +19,7 @@ func QueueRouter(router *gin.RouterGroup) {
 	router.GET("/bookings", bookingController.GetBookingsByDate)
 
 	// New search routes
-	router.GET("/bookings/search-by-phone", bookingController.SearchBookingsByPhone)
+	router.GET("/bookings/search", bookingController.SearchBookings)
 	// router.GET("/bookings/search-by-date", bookingController.SearchBookingsByDate)
 	// router.GET("/bookings/search-combined", bookingController.SearchBookingsByPhoneAndDate)
 }

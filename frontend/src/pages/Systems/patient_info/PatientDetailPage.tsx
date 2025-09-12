@@ -482,7 +482,6 @@ const PatientDetail: React.FC = () => {
           </Row>
 
           {/* ปุ่ม */}
-        </Form>
         {/* ปุ่ม */}
         <Space style={{ width: "100%", justifyContent: "flex-end" }}>
           {READONLY ? (
@@ -505,6 +504,7 @@ const PatientDetail: React.FC = () => {
             </>
           )}
         </Space> 
+        </Form>
       </Card>
     </div>
   );

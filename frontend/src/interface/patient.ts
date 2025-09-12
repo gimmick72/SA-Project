@@ -10,7 +10,7 @@ export interface Patient {
   congenita_disease: string;
   blood_type: string;
   gender: string;
-  birthday: string;
+  birth_day: string;
   phonenumber: string;
   age: number;
   drugallergy: string;
