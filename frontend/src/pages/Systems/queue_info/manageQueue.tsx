@@ -27,7 +27,7 @@ import type {
 } from "../../../interface/bookingQueue";
 
 // ใช้สองชุด API ตามที่กำหนด
-import { BookingAPI, QueueSlotAPI } from "../../../services/booking/booking";
+import { BookingAPI, QueueSlotAPI } from "../../../services/booking/QSlot";
 
 const { Text } = Typography;
 

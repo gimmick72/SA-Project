@@ -44,7 +44,7 @@ import type {
   CreateBooking,
   SummaryBooking,
 } from "../../../../interface/bookingQueue";
-import { searchBookingsByPhone } from "../../../../services/booking/bookingApi";
+import { searchBookings } from "../../../../services/booking/bookingApi";
 
 dayjs.locale("th");
 const { Content } = Layout;
@@ -171,13 +171,12 @@ const BookingPage: React.FC = () => {
       let results: SummaryBooking[] = [];
 
       if (phone) {
-        // ค้นหาด้วยเบอร์ (และส่งวันที่ถ้าเลือก)
-        results = await searchBookingsByPhone(phone, dateStr);
+        // ค้นหาด้วยเบอร์ (ถ้าเลือกวัน ก็ส่งไปด้วย)
+        results = await searchBookings(phone, dateStr);
+      } else {
+        message.warning("กรุณากรอกเบอร์หรือเลือกวันอย่างน้อยหนึ่งอย่าง");
+        return;
       }
-      //  else if (dateStr) {
-      //   // ค้นหาด้วยวันที่อย่างเดียว
-      //   results = await searchBookingsByDate(dateStr);
-      // }
 
       setSearchResults(results);
       setShowSearchResults(true);
@@ -269,8 +268,7 @@ const BookingPage: React.FC = () => {
         const dd = r.date ? dayjs(r.date) : null;
         const dateStr =
           dd && dd.isValid() ? dd.format("DD/MM/YYYY") : r.date ?? "—";
-        const timeStr = r.hhmm ? toTime(r.hhmm) : "—";
-        return `${dateStr} ${timeStr}`;
+        return `${dateStr} `;
       },
     },
     {
