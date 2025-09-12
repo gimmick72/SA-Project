@@ -19,7 +19,7 @@ const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) =
 
     useEffect(() => {
         if (event) {
-            setRoom(String(event.title ?? ''));
+            setRoom(String(event.room ?? ''));
             setTimein(event.start ? dayjs(event.start).format('HH:mm') : '');
             setTimeout(event.end ? dayjs(event.end).format('HH:mm') : '');
         }
@@ -28,10 +28,8 @@ const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) =
     const handleOk = () => {
         if (room && timein && timeout) {
             const today = event?.start ? dayjs(event.start) : dayjs();
-
             const [startHour, startMinute] = timein.split(':').map(Number);
             const [endHour, endMinute] = timeout.split(':').map(Number);
-
             const start = today.hour(startHour).minute(startMinute).second(0).toDate();
             const end = today.hour(endHour).minute(endMinute).second(0).toDate();
 
@@ -39,7 +37,6 @@ const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) =
                 message.error('เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด');
                 return;
             }
-
             onSave({ room, start, end });
             resetForm();
         } else {
@@ -53,7 +50,8 @@ const EditEventModal: React.FC<Props> = ({ event, visible, onSave, onCancel }) =
         setTimeout('');
     };
 
-    const rooms = ["B001", "B002", "B003", "B004"];
+    // mock up ห้อง
+    const rooms = ["B001" , "B002", "B003", "B004"];
 
     return (
         <Modal

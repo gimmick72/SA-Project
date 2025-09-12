@@ -3,7 +3,6 @@ import { Modal, Button } from 'antd';
 import 'antd/dist/reset.css';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
-import { dentists } from './../../../Home_page/ourDentists/dentistsData';
 
 type EventType = {
   id: number;
@@ -33,13 +32,11 @@ const ShowEven: React.FC<Props> = ({ event, visible, onClose, onEdit, onDelete }
   return (
     <Modal
       open={visible}
-      title={event ? event.room : 'รายละเอียดกิจกรรม'}
+      title={event ? event.room + "-" + event.dentists : '-'}
       footer={null}
       onCancel={onClose}
     >
       <div style={{ marginBottom: 16 }}>
-         <p><strong>ชื่อหมอ:</strong> {event?.dentists || '-'}</p>
-         
         <p><strong>ห้อง:</strong> {event?.room}</p>
         <p>
           <strong>วัน:</strong> {event ? format(event.start, 'dd/MM/yyyy', { locale: th }) : '-'}

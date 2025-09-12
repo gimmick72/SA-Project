@@ -12,42 +12,29 @@ import EditEventModal from '../Even/editeven';
 import './calendar.custom.css';
 import { getAllDentists, DentistManagement, createDentist, updateDentist, deleteDentist } from "../../../../services/DentistMenagement/DentistMenagement"
 
-
-
 const locales = { 'th-TH': th };
 const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
 
-// เพิ่ม id ให้ชัดเจน
+
 interface EventType {
   id: number;
   room: string;
   start: Date;
   end: Date;
-  dentist: string ;
+  dentist: string;
 }
-
-// type EventData = {
-//   room: string;
-//   start: Date;
-//   end: Date;
-// };
-
 
 const MyCalendar: React.FC = () => {
   const [events, setEvents] = useState<EventType[]>([]);
-  const [view, setView] = useState<typeof Views[keyof typeof Views]>(Views.MONTH);
   const [date, setDate] = useState(new Date());
   const idRef = useRef(1);
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<SlotInfo | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventType>();
   const [showEventModal, setShowEventModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-
-
-  // โหลดข้อมูลจาก DB เมื่อคอมโพเนนต์ mount
+  // โหลดข้อมูลจาก DB 
   useEffect(() => {
     let mounted = true;
 
@@ -57,13 +44,12 @@ const MyCalendar: React.FC = () => {
         if (!mounted) return;
 
         console.log("โหลดข้อมูล1222:", data);
-        // map ข้อมูลจาก backend ให้ตรงกับ EventType ของ Calendar
         const mappedEvents: EventType[] = data.map((item, index) => ({
           id: item.id ?? index + 1,
           room: item.room,  // ใช้ room ที่ backend ส่งมา
           start: new Date(item.time_in),
           end: new Date(item.time_out),
-          dentist: item.dentist ?? "สมชาย", // ต้องเป็น string
+          dentist: item.dentist ?? "สมชาย",
 
         }));
 
@@ -84,13 +70,11 @@ const MyCalendar: React.FC = () => {
   }, []);
 
 
-
   // เลือกช่องว่างเพื่อเพิ่ม
   const handleSelectSlot = (slot: SlotInfo) => {
     setSelectedSlot(slot);
     setShowAddModal(true);
   };
-
 
   const handleAddEvent = async (event: { room: string; start: Date; end: Date; dentist: string }) => {
     try {
@@ -106,36 +90,30 @@ const MyCalendar: React.FC = () => {
       const res = await createDentist(data);
       console.log('Created dentist schedule:', res);
 
-
       // ปิด modal หลังเพิ่ม
       setShowAddModal(false);
 
       // 2. อัปเดต state ของ calendar
       const newEvent = {
-        id: res.id!,  // ใช้ id จาก API, ! บอก TypeScript ว่าไม่ null/undefined
+        id: res.id!,
         room: res.room,
         dentist: res.dentist,
         start: new Date(res.time_in),
         end: new Date(res.time_out),
       };
-
       setEvents(prev => [...prev, newEvent]);
-
-
+      message.success('เพิ่มกิจกรรมสำเร็จ')
     } catch (err) {
       console.error('Failed to create dentist schedule', err);
     }
   };
 
-
   const handleEditEvent = async (data: { room: string; start: Date; end: Date }) => {
     if (!selectedEvent) return;
-
     try {
-      // map EventType -> DentistManagement
       const updateData: DentistManagement = {
         room: data.room,
-        dentist: selectedEvent.dentist, // เก็บ dentist เดิม
+        dentist: selectedEvent.dentist,
         time_in: data.start.toISOString(),
         time_out: data.end.toISOString(),
       };
@@ -168,31 +146,26 @@ const MyCalendar: React.FC = () => {
     }
   };
 
-
   const handleDeleteEvent = async (id: number, skipConfirm = false) => {
     const ev = events.find(e => e.id === id);
     if (!ev) return;
 
-    const doDelete = async () => {
-      try {
-        // เรียก API ลบ
-        await deleteDentist(id); // สมมติฟังก์ชัน deleteDentistSchedule อยู่ใน API service
-        // ลบออกจาก state ของ calendar
-        setEvents(prev => prev.filter(ev => ev.id !== id));
+  const doDelete = async () => {
+    try {
+      await deleteDentist(id);
+      setEvents(prev => prev.filter(ev => ev.id !== id));
         message.success('ลบกิจกรรมสำเร็จ');
-      } catch (err) {
+    } catch (err) {
         console.error('ลบกิจกรรมไม่สำเร็จ', err);
         message.error('ลบกิจกรรมไม่สำเร็จ');
-      }
-    };
+    }
+  };
 
     if (skipConfirm) {
       doDelete();
       return;
     };
   };
-
-
 
   // เลือก event เพื่อดูรายละเอียด
   const handleSelectEvent = (event: EventType) => {
@@ -215,9 +188,6 @@ const MyCalendar: React.FC = () => {
         endAccessor="end"
         titleAccessor={(e: EventType) => `${e.room} — ${e.dentist}`}
         selectable
-        views={[Views.MONTH, Views.WEEK, Views.DAY]}
-        view={view}
-        onView={setView}
         date={date}
         onNavigate={setDate}
         onSelectSlot={handleSelectSlot}
@@ -238,12 +208,13 @@ const MyCalendar: React.FC = () => {
       />
 
       {selectedEvent && (<><ShowEven
-        event={selectedEvent}
+        event={{ ...selectedEvent, dentists: selectedEvent.dentist ?? [] }}
         visible={showEventModal}
         onClose={() => setShowEventModal(false)}
         onEdit={handleEditClick}
         onDelete={handleDeleteEvent}
       />
+
         <EditEventModal
           event={selectedEvent}
           visible={showEditModal}
@@ -251,8 +222,10 @@ const MyCalendar: React.FC = () => {
           onCancel={() => {
             setShowEditModal(false);
             setSelectedEvent(undefined);
+            
           }}
         />
+
       </>
       )
       }

@@ -11,8 +11,6 @@ type EventData = {
   dentist: string;
 };
 
-
-
 type Props = {
   visible: boolean;
   onAdd: (event: EventData) => void;
