@@ -50,7 +50,7 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
     } catch (error) {
       if(error){
         
-        message.error("Network error.");
+        message.error("error.");
         setData([]);
       }
     } finally {
@@ -90,6 +90,10 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
               size="small"
               disabled={disabled}
               onClick={() => navigate(`initial-symptoms/${id}`)}
+              style={{
+                background:"#FFFDD3",
+                borderRadius:"8px"
+              }}
             >
               บันทึกบริการ
             </Button>
@@ -98,6 +102,10 @@ const PatienTable: React.FC<PatienTableProps> = ({ searchTerm = "" }) => {
               size="small"
               disabled={disabled}
               onClick={() => navigate(`/admin/patient/detail/${id}`)}
+              style={{
+                background:"#D3FFFF",
+                borderRadius:"8px"
+              }}
             >
               รายละเอียด
             </Button>

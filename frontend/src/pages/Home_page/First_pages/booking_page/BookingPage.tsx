@@ -27,7 +27,7 @@ import {
   UserOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import SiteHeader from "./siteHeader";
+
 import {
   TimeSlot,
   IServiceItem,
@@ -111,7 +111,6 @@ const BookingPage: React.FC = () => {
   }, []);
 
   // Load capacity when date changes
-  // แทนที่ useEffect เดิมทั้งบล็อกนี้
   useEffect(() => {
     (async () => {
       if (!date) {
@@ -134,7 +133,7 @@ const BookingPage: React.FC = () => {
         setLoadingCapacity(false);
       }
     })();
-  }, [date]); // ✅ ผูกเฉพาะ date
+  }, [date]);
   const allFull = !loadingCapacity && Math.max(...Object.values(capacity)) <= 0;
 
   // Summary for booking
@@ -142,17 +141,14 @@ const BookingPage: React.FC = () => {
     () => ({
       name: firstName && lastName ? `${firstName} ${lastName}` : "—",
       phone: phone || "—",
-      service: services.find((s) => s.id === serviceId)?.name ?? "—",
+      service: services.find((s) => s.id === serviceId)?.name_service ?? "—",
       date: date ? date.format("DD MMMM YYYY") : "—",
       slot: slot ? timeSlotLabel[slot] : "—",
     }),
     [firstName, lastName, phone, serviceId, services, date, slot]
   );
 
-  // Enhanced search function - supports phone and date
-  // ... ใน BookingPage.tsx
-
-  // แทนที่ handleSearch เดิมทั้งหมดด้วยเวอร์ชันนี้
+  //Search
   const handleSearch = async (values: {
     phone_number?: string;
     date?: Dayjs;
@@ -182,9 +178,9 @@ const BookingPage: React.FC = () => {
       setShowSearchResults(true);
 
       if (results.length === 0) {
-        message.info("ไม่พบข้อมูลการจองที่ตรงกับเงื่อนไขการค้นหา");
+        message.info("ไม่พบการจอง");
       } else {
-        message.success(`พบข้อมูลการจอง ${results.length} รายการ`);
+        message.success(`การจองของคุณ`);
       }
     } catch (e: any) {
       message.error(e?.response?.data?.error ?? "ค้นหาไม่สำเร็จ");
@@ -200,53 +196,57 @@ const BookingPage: React.FC = () => {
       return;
     }
     if (capacity[slot as TimeSlot] <= 0) {
-      message.error("ช่วงเวลาที่เลือกคิวเต็มแล้ว กรุณาเลือกช่วงเวลาอื่น");
+      message.error("คิวเต็มแล้ว กรุณาเลือกช่วงเวลาอื่น");
       return;
     }
     if (!values.serviceId) {
       message.error("กรุณาเลือกบริการ");
       return;
     }
-  
+
     const payload: CreateBooking = {
       firstName: values.firstName,
       lastName: values.lastName,
-      // ฟิลด์ในฟอร์มชื่อ 'phone' แต่ API ต้องการ 'phone_number'
+      
       phone_number: values.phone,
       serviceId: values.serviceId,
       dateText: date.format("YYYY-MM-DD"),
       timeSlot: slot, // "morning" | "afternoon" | "evening"
     };
-  
+
     try {
       setSubmitting(true);
-  
-      // 🔥 เรียก API สร้างการจองจริง ๆ
-      const result = await createBooking(payload); 
-      // สมมติ backend คืน hhmm/segment กลับมา
+
+      //จองคิว
+      const result = await createBooking(payload);
+      
       message.success(
         result?.hhmm
-          ? `จองคิวสำเร็จ เวลา ${result.hhmm.slice(0,2)}:${result.hhmm.slice(2)}`
+          ? `จองคิวสำเร็จ เวลา ${result.hhmm.slice(0, 2)}:${result.hhmm.slice(
+              2
+            )}`
           : "จองคิวสำเร็จ!"
       );
-  
+
       // รีเฟรชคิวคงเหลือของวันนั้น
       const fresh = await getCapacityByDate(date);
       setCapacity(fresh);
-  
+
       // เคลียร์ฟอร์ม
       form.resetFields();
       setSlot(undefined);
-      // ถ้าอยากคงวันที่ไว้ ให้คอมเมนต์บรรทัดนี้:
-      // setDate(null);
+
+      setDate(null);
     } catch (err: any) {
       message.error(err?.response?.data?.error ?? "จองคิวไม่สำเร็จ");
     } finally {
       setSubmitting(false);
     }
   };
+  const serviceNameById = (id?: number) =>
+    id ? services.find(s => s.id === id)?.name_service ?? "—" : "—";
   
-
+  
   // Table columns for search results
   const searchResultColumns: ColumnsType<SummaryBooking> = [
     {
@@ -281,16 +281,14 @@ const BookingPage: React.FC = () => {
       title: "บริการ",
       dataIndex: "service_name",
       key: "service_name",
-      render: (v) => v ?? "—",
+      render: (_, r) => serviceNameById(r.id),
     },
   ];
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#F3EDF9" }}>
-      <SiteHeader />
-
       {/* Enhanced Search Section */}
-      <Row justify="center" style={{ marginTop: 16 }}>
+      <Row justify="center" style={{ marginTop: "5rem" }}>
         <Col xs={24} lg={22} xxl={18}>
           <Card
             bordered={false}
@@ -444,6 +442,7 @@ const BookingPage: React.FC = () => {
                           >
                             <Input
                               placeholder="08xxxxxxxx"
+                              maxLength={10}
                               prefix={<PhoneOutlined />}
                             />
                           </Form.Item>
@@ -476,9 +475,9 @@ const BookingPage: React.FC = () => {
                             <Select
                               placeholder="เลือกบริการ"
                               loading={loadingServices}
-                              options={services.map((s) => ({
+                              options={services.map((s: any) => ({
                                 value: s.id,
-                                label: s.name,
+                                label: s.name_service,   
                               }))}
                               notFoundContent={
                                 loadingServices ? "กำลังโหลด..." : "ไม่พบบริการ"
@@ -500,7 +499,7 @@ const BookingPage: React.FC = () => {
                                 style={{ marginBottom: 12 }}
                                 type="error"
                                 showIcon
-                                message="คิวเต็มทุกช่วงเวลาในวันที่เลือก"
+                                message="ไม่มีคิว"
                               />
                             )}
                             <Spin spinning={loadingCapacity}>

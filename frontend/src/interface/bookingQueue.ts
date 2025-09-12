@@ -13,7 +13,7 @@ export interface CapacitySummary {
 // รายการบริการ
 export interface ServiceItem {
   id: number;
-  name: string;
+  name_service: string;
 }
 
 // ใช้บอกช่วงเวลานี้รับได้จำนวนเท่าไร
@@ -60,69 +60,7 @@ export interface SummaryBooking {
   segment: SegKey;
   service?: {
     id: number;
-    name: string;
+    name_service: string;
   };
 }
 
-// // src/interface/bookingQueue.ts
-// export type SegKey = "morning" | "afternoon" | "evening";
-// export type TimeSlot = SegKey;
-
-// // สรุปจำนวนคิวคงเหลือรายวัน
-// export interface CapacitySummary {
-//   morning: number;
-//   afternoon: number;
-//   evening: number;
-// }
-
-// // รายการบริการ
-// export interface ServiceItem {
-//   id: number;
-//   name: string;
-// }
-
-// // โครงสร้าง slot รายชั่วโมง
-// export interface Slottime {
-//   hhmm: string;     // "0900"
-//   capacity: number; // เปิดรับกี่คิว
-// }
-
-// export interface UpdateSlot {
-//   date: string;     // "YYYY-MM-DD"
-//   segment: SegKey;
-//   slots: Slottime[];
-// }
-
-// // ตารางคิวจริงในระบบ
-// export interface QueueSlot {
-//   id: number;
-//   date: string;     // ISO string
-//   hhmm: string;     // "0900"
-//   segment: SegKey;
-//   capacity: number;
-//   used: number;
-// }
-
-// // payload สำหรับสร้างการจอง (ตรงกับ backend)
-// export interface CreateBooking {
-//   firstName: string;
-//   lastName: string;
-//   phone_number: string; // ใช้ underscore
-//   serviceId: number;
-//   dateText: string;     // "YYYY-MM-DD"
-//   timeSlot: TimeSlot;   // "morning" | "afternoon" | "evening"
-// }
-
-// // ผลลัพธ์เวลาค้นหาหรือดึงรายการจอง
-// export interface SummaryBooking {
-//   id: number;
-//   firstName: string;
-//   lastName: string;
-//   phone_number?: string;     // บาง API อาจส่งหรือไม่ส่ง
-//   date: string;              // ISO
-//   hhmm: string;              // "0900"
-//   segment: SegKey;
-//   // รองรับทั้งแบบชื่อบริการแยกฟิลด์ และแบบเป็นอ็อบเจ็กต์
-//   service_name?: string;
-//   service?: { id: number; name: string };
-// }

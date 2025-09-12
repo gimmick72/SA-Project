@@ -167,6 +167,8 @@ func GetSlotsByDate(c *gin.Context) {
 }
 
 // GET  รายการ Booking ต่อวัน (ฝั่งแอดมิน)
+// GET /api/bookings  รายการ Booking ต่อวัน (ฝั่งแอดมิน)
+// ตัวอย่าง: /api/bookings?date=2025-09-13
 func GetBookingsByDate(c *gin.Context) {
 	ds := c.Query("date")
 	d, err := time.Parse("2006-01-02", ds)
@@ -176,11 +178,12 @@ func GetBookingsByDate(c *gin.Context) {
 	}
 	d = normalizeUTCDate(d)
 
+	// ดึงเฉพาะที่ไม่ถูกยกเลิก และเรียงตามเวลา
 	var rows []entity.Booking
 	if err := configs.DB.
 		Preload("Service").
 		Where("date = ? AND status <> ?", d, "cancelled").
-		Order("hhmm asc").
+		Order("hhmm ASC").
 		Find(&rows).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -190,21 +193,33 @@ func GetBookingsByDate(c *gin.Context) {
 	out := make([]gin.H, 0, len(rows))
 	for _, b := range rows {
 		item := gin.H{
-			"id":        b.ID,
-			"firstName": b.FirstName,
-			"lastName":  b.LastName,
-			"phone":     b.PhoneNumber,
-			"date":      b.Date.Format("2006-01-02"),
-			"hhmm":      b.HHMM,
-			"segment":   b.Segment,
+			"id":           b.ID,
+			"firstName":    b.FirstName,
+			"lastName":     b.LastName,
+			"phone_number": b.PhoneNumber,                 // << ใช้คีย์นี้ให้ตรงกับ FE
+			"date":         b.Date.Format("2006-01-02"),
+			"hhmm":         b.HHMM,
+			"segment":      b.Segment,
 		}
+		// เผื่อหน้าบางจุดยังอ่านเป็น "phone" อยู่
+		item["phone"] = b.PhoneNumber
+
+		// แนบชื่อบริการ (ถ้ามี)
 		if b.Service.ID != 0 {
-			item["service"] = gin.H{"id": b.Service.ID, "name": b.Service.NameService}
+			item["service"] = gin.H{
+				"id":   b.Service.ID,
+				"name": b.Service.NameService,
+			}
+			// สะดวกใช้ตรง ๆ ก็ส่งเป็น service_name ด้วย
+			item["service_name"] = b.Service.NameService
 		}
+
 		out = append(out, item)
 	}
+
 	c.JSON(http.StatusOK, gin.H{"data": out})
 }
+
 
 // DELETE /api/queue/slots/:id
 func DeleteQueueSlot(c *gin.Context) {

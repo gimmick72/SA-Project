@@ -20,86 +20,99 @@ type CreateBookingPayload struct {
 	ServiceID   uint   `json:"service_id"  binding:"required"`
 	DateText    string `json:"dateText"    binding:"required"`                            // "YYYY-MM-DD"
 	TimeSlot    string `json:"timeSlot"    binding:"required,oneof=morning afternoon evening"`
+	ServiceName string    `json:"service_name"`
 }
 
 
 // POST /api/bookings
 func CreateBooking(c *gin.Context) {
-	var p CreateBookingPayload
-	if err := c.ShouldBindJSON(&p); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload", "details": err.Error()})
-		return
-	}
+    var p CreateBookingPayload
+    if err := c.ShouldBindJSON(&p); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload", "details": err.Error()})
+        return
+    }
 
-	d, err := time.Parse("2006-01-02", p.DateText)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad date"})
-		return
-	}
-	d = normalizeUTCDate(d)
+    d, err := time.Parse("2006-01-02", p.DateText)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "bad date"})
+        return
+    }
+    d = normalizeUTCDate(d)
 
-	tx := configs.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+    tx := configs.DB.Begin()
+    defer func() {
+        if r := recover(); r != nil { tx.Rollback() }
+    }()
 
-	// lock หา slot ที่ยังว่าง (capacity > used) ตามช่วงที่เลือก
-	var slot entity.QueueSlot
-	if err := tx.
-		Clauses(clause.Locking{Strength: "UPDATE"}).
-		Where("date = ? AND segment = ? AND capacity > used", d, p.TimeSlot).
-		Order("hhmm asc").
-		First(&slot).Error; err != nil {
+    // ---- NEW: ห้ามจองวันเดียวกันซ้ำ (ยกเว้นเคสที่ถูกยกเลิกแล้ว) ----
+    var cnt int64
+    if err := tx.Model(&entity.Booking{}).
+        Where("phone_number = ? AND date = ? AND status <> ?", p.PhoneNumber, d, "cancelled").
+        Count(&cnt).Error; err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    if cnt > 0 {
+        tx.Rollback()
+        c.JSON(http.StatusConflict, gin.H{"error": "ผู้ใช้นี้มีการจองในวันดังกล่าวอยู่แล้ว"})
+        return
+    }
+    // -------------------------------------------------------------
 
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			tx.Rollback()
-			c.JSON(http.StatusConflict, gin.H{"error": "no free slot"})
-			return
-		}
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+    // lock หา slot ว่าง
+    var slot entity.QueueSlot
+    if err := tx.
+        Clauses(clause.Locking{Strength: "UPDATE"}).
+        Where("date = ? AND segment = ? AND capacity > used", d, p.TimeSlot).
+        Order("hhmm asc").
+        First(&slot).Error; err != nil {
 
-	// บันทึกการจอง
-	b := entity.Booking{
-		FirstName:   p.FirstName,
-		LastName:    p.LastName,
-		PhoneNumber: p.PhoneNumber,
-		ServiceID:   p.ServiceID,
-		
-		SlotID:      slot.ID,
-	
-		Date:    d,
-		HHMM:    slot.HHMM,
-		Segment: p.TimeSlot,
-		Status:  "confirmed",
-	}
-	if err := tx.Create(&b).Error; err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            tx.Rollback()
+            c.JSON(http.StatusConflict, gin.H{"error": "no free slot"})
+            return
+        }
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-	// อัปเดต used ของ queue slot
-	if err := tx.Model(&slot).UpdateColumn("used", gorm.Expr("used + 1")).Error; err != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+    // บันทึกการจอง
+    b := entity.Booking{
+        FirstName:   p.FirstName,
+        LastName:    p.LastName,
+        PhoneNumber: p.PhoneNumber,
+        ServiceID:   p.ServiceID,
+        SlotID:      slot.ID,
+        Date:        d,
+        HHMM:        slot.HHMM,
+        Segment:     p.TimeSlot,
+       
+    }
+    if err := tx.Create(&b).Error; err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-	if err := tx.Commit().Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+    // เพิ่ม used
+    if err := tx.Model(&slot).UpdateColumn("used", gorm.Expr("used + 1")).Error; err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-	c.JSON(http.StatusCreated, gin.H{
-		"id":      b.ID,
-		"hhmm":    b.HHMM,
-		"segment": b.Segment,
-	})
+    if err := tx.Commit().Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusCreated, gin.H{
+        "id":      b.ID,
+        "hhmm":    b.HHMM,
+        "segment": b.Segment,
+    })
 }
 
 // CancelBookingByID — ยกเลิกคิว (คืน used ให้ slot)

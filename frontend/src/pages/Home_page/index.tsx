@@ -17,7 +17,7 @@ const HomePageRoutes: React.FC = () => {
         <Route path="/dentists" element={<OurDentists />} />
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<ContactPage />} />
-        {/* <Route path="/bookingPage" element={<BookingPage />} /> */}
+      
       </Routes>
     </div>
   );

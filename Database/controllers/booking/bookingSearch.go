@@ -25,7 +25,7 @@ type BookingResult struct {
 	Segment     string    `json:"segment"`
 	Status      string    `json:"status"`
 	ServiceID   uint      `json:"service_id"`
-	ServiceName string    `json:"service_name"`
+	ServiceName string    `json:"name_service"`
 }
 
 // GET /api/bookings/search?phone=080xxxxxxx&date=2025-09-12

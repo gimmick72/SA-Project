@@ -24,6 +24,11 @@ import { Patient } from "../../../interface/initailPatient/patient";
 
 dayjs.locale(th);
 
+const normAllergy = (v: any) => {
+  const s = (v ?? "").toString().trim();
+  return s && s.toLowerCase() !== "none" ? s : "";
+};
+
 /* ---------- helpers ---------- */
 function toDateInputValue(v?: string | Date) {
   if (!v) return "";
@@ -51,7 +56,7 @@ const mapPatientToForm = (p: any) =>
         congenitaldisease: p.congenitaldisease ?? "",
         bloodtype: p.blood_type ?? "",
         phone_number: p.phonenumber ?? p.phone_number ?? "",
-        drug_allergy: p.drugallergy ?? p.drug_allergy ?? "",
+        drug_allergy: normAllergy(p.drugallergy ?? p.drug_allergy ?? ""),
         relationship: p?.contactperson?.relationship ?? "",
         emergency_phone:
           p?.contactperson?.phoneNumber ??
@@ -75,6 +80,7 @@ const calcAgeFromBirth = (yyyy_mm_dd: string): string => {
     now < new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
   return String(hasntBirthday ? age - 1 : age);
 };
+
 
 /* ---------- Component ---------- */
 const PatientDetail: React.FC = () => {
@@ -103,18 +109,24 @@ const PatientDetail: React.FC = () => {
     try {
       const resp = await PatientAPI.getByID(id);
       const patient = resp?.data ?? resp;
+  
       const f = mapPatientToForm(patient);
       const initial = {
         ...f,
         birthdate: f.birthdate ? dayjs(f.birthdate) : undefined,
+        drug_allergy: normAllergy(f.drug_allergy), // กันไว้ซ้ำอีกชั้น
       };
-
-      // อัพเดทค่าในฟอร์ม
-      form.setFieldsValue(initial);
+  
+      form.setFieldsValue({
+        ...initial,
+        // ถ้าไม่แพ้ยา ให้ล้าง name ออกจากฟอร์มเพื่อไม่ส่งค่า
+        ...(initial.drug_allergy ? {} : { drug_allergy: undefined }),
+      });
+  
       setInitialValues(patient);
-
-      // ตั้งค่า mode แพ้ยา
-      setAllergyMode(initial.drug_allergy ? "has" : "none");
+  
+      const hasAllergy = Boolean(initial.drug_allergy && initial.drug_allergy.trim() !== "");
+      setAllergyMode(hasAllergy ? "has" : "none");
     } catch (e) {
       console.error("Error fetching patient:", e);
       message.error("โหลดข้อมูลผู้ป่วยไม่สำเร็จ");
@@ -122,6 +134,7 @@ const PatientDetail: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   // เปิดโหมดแก้ไข
   const handleEdit = () => {
@@ -246,7 +259,6 @@ const PatientDetail: React.FC = () => {
           layout="vertical"
           onFinish={onFinish}
           disabled={READONLY}
-          requiredMark="optional"
         >
           {/* แถว 1 */}
           <Row gutter={16}>
@@ -481,8 +493,9 @@ const PatientDetail: React.FC = () => {
             </Col>
           </Row>
 
-          {/* ปุ่ม */}
+       
         {/* ปุ่ม */}
+        </Form>
         <Space style={{ width: "100%", justifyContent: "flex-end" }}>
           {READONLY ? (
             // โหมดดูอย่างเดียว → มีเฉพาะปุ่มกลับ
@@ -498,13 +511,12 @@ const PatientDetail: React.FC = () => {
             // โหมดแก้ไข → ซ่อนปุ่มกลับ, แสดงยกเลิก/บันทึกเท่านั้น
             <>
               <Button onClick={handleCancel}>ยกเลิกการแก้ไข</Button>
-              <Button type="primary" htmlType="submit" loading={saving}>
+              <Button type="primary" htmlType="submit" loading={saving} onClick={() => form.submit()}>
                 บันทึก
               </Button>
             </>
           )}
         </Space> 
-        </Form>
       </Card>
     </div>
   );
