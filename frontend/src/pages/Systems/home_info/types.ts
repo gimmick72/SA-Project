@@ -1,13 +1,6 @@
-import axios from "axios";
-import type { AxiosError } from "axios";
+// เก็บ type ที่ใช้ใน QueueTable
 
-import {} from "../../interface/initailPatient/patient"
-import {} from "../../interface/initailPatient/initailSym"
-const API_URL = "http://localhost:8080/api";
-
-
-
-
+/** -------------------- API Response Type -------------------- **/
 export interface Symptomps {
   ID: number;
   Symptomps: string;
@@ -63,10 +56,11 @@ export interface Category {
   name_category: string;
 }
 
-// ฟังก์ชันดึงข้อมูลของวันนี้
+/** -------------------- Utilities -------------------- **/
 
-
-export const getTodayInitialSymptomps = async (): Promise<{ symptomps: Symptomps[] }> => {
-  const res = await fetch(`${API_URL}/dashboardStaff`);
-  return res.json();
+export const statusColor: Record<string, string> = {
+  "รอพบแพทย์": "orange",
+  "กำลังตรวจ": "blue",
+  "รอชำละเงิน": "ัyellow",
+  "เสร็จสิ้น": "green",
 };

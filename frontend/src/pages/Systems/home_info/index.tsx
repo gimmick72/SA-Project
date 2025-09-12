@@ -1,6 +1,6 @@
 import React from "react";
 import { HomeOutlined } from "@ant-design/icons";
-import HomePage from "./home_info";
+import HomePage from "./dashBoard";
 
 const HomeInfoPage = () => {
   return (
