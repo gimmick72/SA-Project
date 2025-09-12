@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Tabs } from "antd";
 import { InitialSymtoms, getTodayInitialSymptomps } from "../../../services/Dashboard/dashboardStaff";
-import QueueTableDentist from "./dentist/QueueTable";
-import DetailCardDentist  from "./payment/DetailCard"
+import QueueTableDentist from "./dentist/TableDentist";
+import DetailCardDentist from "./payment/DetailCard"
+
 import QueueTableStaff from "./staff/QueueTable";
 import DetailCardStaff from "./staff/DetailCard";
+import ActionButtonDentist from "./dentist/Action_Button";
+
 import ActionButtonStaff from "./staff/Action_Button";
-import ActionButtonDentist from "./payment/Action_Button";
+
 import Payment from "./payment/payment";
 import DetailCardPayment from "./payment/DetailCard";
 import ActionButtonPayment from "./payment/Action_Button";
+import { dentists } from './../../Home_page/First_pages/OurDentistsPage/dentistsData';
 
 
 const { TabPane } = Tabs;
@@ -64,9 +68,9 @@ const HomePage: React.FC = () => {
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="ชำระเงิน" key="2">
-                    <Row gutter={16}>
+          <Row gutter={16}>
             <Col span={14}>
-              <Payment/>
+              <Payment />
             </Col>
             <Col span={10}>
               <DetailCardPayment active={activePatient} />

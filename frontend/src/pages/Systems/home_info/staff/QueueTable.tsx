@@ -40,8 +40,8 @@ const QueueTableStaff: React.FC<QueueTableProps> = ({ data, onSelect }) => {
   const columns: ColumnsType<InitialSymtoms> = [
     { title: "No.", width: "10%", align: "center", render: (_v, _r, i) => i + 1 },
     { title: "ชื่อ - นามสกุล", width: "35%", align: "center", render: (_v, r) => <div>{r.firstName} {r.lastName}</div> },
-    { title: "บริการ", dataIndex: "service", width: '20%', render: (v) => <Tag>{v}</Tag> },
-    { title: "วันที่มา", dataIndex: "visit", width: '20%', render: (v) => new Date(v).toLocaleDateString("th-TH") },
+    { title: "บริการ", dataIndex: "service", width: '20%', align: "center",render: (v) => <Tag>{v}</Tag> },
+    { title: "วันที่มา", dataIndex: "visit", width: '20%', align: "center",render: (v) => new Date(v).toLocaleDateString("th-TH") },
   ];
 
   return (
@@ -70,7 +70,7 @@ const QueueTableStaff: React.FC<QueueTableProps> = ({ data, onSelect }) => {
         onRow={(rec) => ({ onClick: () => handleSelect(rec) })}
         rowClassName={(rec) => (rec.id === activeId ? "active-row" : "")}
         size="middle"
-        scroll={{ y: 380, x: 500 }}
+        scroll={{ y: 340, x: 500 }}
         pagination={false}
       />
     </Card>

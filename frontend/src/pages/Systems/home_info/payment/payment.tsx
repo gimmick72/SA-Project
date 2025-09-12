@@ -53,22 +53,27 @@ const Payment: React.FC = () => {
   };
 
   const columns: ColumnsType<PaymentPatient> = [
-    { title: "No.", width: "10%", render: (_v, _r, i) => i + 1 },
-    { title: "ชื่อ - นามสกุล", width: "35%", render: (_v, r) => `${r.firstName} ${r.lastName}` },
-    { title: "บริการ", dataIndex: "service", width: "35%" },
-    { title: "ราคา", dataIndex: "cost", width: "20%", render: (v) => `${v} บาท` },
+    { title: "No.", width: "10%", align: "center", render: (_v, _r, i) => i + 1 },
+    { title: "ชื่อ - นามสกุล", width: "35%", align: "center",render: (_v, r) => `${r.firstName} ${r.lastName}` },
+    { title: "บริการ", dataIndex: "service", width: "20%", align: "center",},
+    { title: "ราคา", dataIndex: "cost", width: "20%", align: "center",render: (v) => `${v} บาท` },
   ];
 
   return (
     <Card
       size="small"
       title={
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <div style={{display: 'flex', gap: '10px',justifyContent:'center', alignItems: 'center'}}>
+          <span>รายการวันนี้</span>
         <Input.Search
           placeholder="ค้นหาชื่อ/บริการ"
           allowClear
           onChange={(e) => handleSearch(e.target.value)}
-          style={{ width: 300 }}
+          style={{ width: 240 }}
         />
+         </div>
+        </div>
       }
       bodyStyle={{ padding: 0 }}
     >
@@ -77,7 +82,7 @@ const Payment: React.FC = () => {
         columns={columns}
         dataSource={filteredData}
         pagination={false}
-        scroll={{ y: 400, x: 500 }}
+        scroll={{ y: 340, x: 500 }}
         size="middle"
       />
     </Card>

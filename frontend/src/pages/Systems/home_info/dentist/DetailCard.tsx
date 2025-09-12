@@ -5,15 +5,16 @@ import { statusColor } from "../types";
 
 const { Paragraph, Text } = Typography;
 
-interface DetailCardProps {
+interface DetailCardDentist {
   active: InitialSymtoms | null;
 }
 
-const DetailCardStaff: React.FC<DetailCardProps> = ({ active }) => (
+const DetailCardPayment: React.FC<DetailCardDentist> = ({ active }) => (
   <Card
     title="รายละเอียด"
     size="small"
     style={{
+
       borderRadius: 12,
       height: 270,
       overflowY: 'auto',
@@ -42,4 +43,4 @@ const DetailCardStaff: React.FC<DetailCardProps> = ({ active }) => (
   </Card>
 );
 
-export default DetailCardStaff;
+export default DetailCardPayment;

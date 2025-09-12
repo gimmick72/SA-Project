@@ -1,13 +1,12 @@
 import React from "react";
 import { Card, Typography, Tag, Empty, Button, Space } from "antd";
-import { InitialSymtoms } from "../../../../services/Dashboard/dashboardStaff";
 
 const { Paragraph, Text } = Typography;
 
 
 const ActionButtonStaff: React.FC = ({ }) => {
     return (
-        <div style={{ border: '2px none #000000', height: '180px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 20, padding: '0 16px' }}>
+        <div style={{ border: '1px none #ccc', height: '205px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 20, padding: '0 16px' }}>
             <div style={{ display: 'flex', flexDirection: 'column',justifyContent: 'center', alignItems: 'center', width: '100%',gap: '20px' }}>
                 <Button type="primary" style={{ width: "100%", height: 40 }}>ประวัติคนไข้</Button>
                 <Button type="primary" style={{ width: '100%', height: 40 }}>จองห้องและคิว</Button>

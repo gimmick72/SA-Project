@@ -14,7 +14,6 @@ const DetailCardPayment: React.FC<DetailCardDentist> = ({ active }) => (
     title="รายละเอียด"
     size="small"
     style={{
-      border: '2px solid #000000',
       borderRadius: 12,
       height: 270,
       overflowY: 'auto',

@@ -40,8 +40,8 @@ const QueueTableDentist: React.FC<QueueTableProps> = ({ data, onSelect }) => {
   const columns: ColumnsType<InitialSymtoms> = [
     { title: "No.", width: "10%", align: "center", render: (_v, _r, i) => i + 1 },
     { title: "ชื่อ - นามสกุล", width: "35%", align: "center", render: (_v, r) => <div>{r.firstName} {r.lastName}</div> },
-    { title: "บริการ", dataIndex: "service", width: '20%', render: (v) => <Tag>{v}</Tag> },
-    { title: "วันที่มา", dataIndex: "visit", width: '20%', render: (v) => new Date(v).toLocaleDateString("th-TH") },
+    { title: "บริการ", dataIndex: "service", width: '20%', align: "center",render: (v) => <Tag>{v}</Tag> },
+    { title: "วันที่มา", dataIndex: "visit", width: '20%', align: "center",render: (v) => new Date(v).toLocaleDateString("th-TH") },
   ];
 
   return (
@@ -50,7 +50,7 @@ const QueueTableDentist: React.FC<QueueTableProps> = ({ data, onSelect }) => {
       title={
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
           <div style={{display: 'flex', gap: '10px',justifyContent:'center', alignItems: 'center'}}>
-          <span>รายการวันนี้ (จอง + วอล์คอิน)</span>
+          <span>รายการวันนี้</span>
           <Input.Search
             placeholder="ค้นหาชื่อ/บริการ"
             allowClear
