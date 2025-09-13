@@ -18,7 +18,7 @@ function ConfigRoutes() {
     ...StaffRoutes.map(route => ({
       ...route,
       element: (
-        <ProtectedRoute requiredRole="staff">
+        <ProtectedRoute requiredRole="admin">
           {route.element}
         </ProtectedRoute>
       )

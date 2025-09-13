@@ -6,16 +6,13 @@ import CustomToolbar from "./Toobar/toobar";
 
 const ScheduleInfoPage = () => {
   return (
-    <div style={{
-      maxWidth: '100%',
-      margin: '0 auto',
-      height: '100%',
-      background: '#ffffff',
-      borderRadius: '12px',
-      padding: '24px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-      minHeight: 'calc(100vh - 128px)'
-    }}>
+    <div className="admin-page-container">
+      <div className="admin-mb-24">
+        <h2 className="admin-page-title">
+          <CalendarOutlined style={{ marginRight: '8px' }} />
+          ระบบจัดการตารางงาน
+        </h2>
+      </div>
       <MyCalendar/>
     </div>
   );

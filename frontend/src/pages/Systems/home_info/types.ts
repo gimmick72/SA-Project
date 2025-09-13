@@ -56,11 +56,48 @@ export interface Category {
   name_category: string;
 }
 
-/** -------------------- Utilities -------------------- **/
+/** -------------------- Person Type for Queue -------------------- */
+export interface Person {
+  id: number;
+  firstName: string;
+  lastName: string;
+  service: string;
+  status: string;
+  type: string;
+  room?: string;
+  doctor?: string;
+  amount?: number;
+  paid?: boolean;
+  // Additional properties for DetailCard compatibility
+  symptomps?: string;
+  systolic?: number;
+  diastolic?: number;
+  heartrate?: string;
+  weight?: number;
+  height?: number;
+  visit?: Date;
+  serviceID?: number;
+  patientID?: number;
+}
+
+/** -------------------- Utilities -------------------- */
 
 export const statusColor: Record<string, string> = {
   "รอพบแพทย์": "orange",
   "กำลังตรวจ": "blue",
-  "รอชำละเงิน": "ัyellow",
+  "รอชำระเงิน": "yellow",
   "เสร็จสิ้น": "green",
+};
+
+export const serviceColor: Record<string, string> = {
+  "ทันตกรรมทั่วไป": "blue",
+  "ทันตกรรมเด็ก": "green",
+  "ทันตกรรมจัดฟัน": "purple",
+  "ศัลยกรรมช่องปาก": "red",
+};
+
+export const typeColor: Record<string, string> = {
+  "นัดหมาย": "blue",
+  "Walk-in": "orange",
+  "ฉุกเฉิน": "red",
 };

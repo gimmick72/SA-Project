@@ -1,9 +1,12 @@
 import React from 'react';
-import StaffWorkTimeManagement from './StaffWorkTimeManagement';
-import './index.css';
+import AttendanceCalendar from './AttendanceCalendar';
 
-const AttendanceInfoPage: React.FC = () => {
-  return <StaffWorkTimeManagement />;
+const AttendanceInfo: React.FC = () => {
+  return (
+    <div>
+      <AttendanceCalendar />
+    </div>
+  );
 };
 
-export default AttendanceInfoPage;
+export default AttendanceInfo;
