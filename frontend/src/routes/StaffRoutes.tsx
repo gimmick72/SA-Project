@@ -32,12 +32,12 @@ const AdminRoutes: RouteObject[] = [
     path: "/admin",
     element: <FullLayout />,
     children: [
+      // {
+      //   index: true,
+      //   element: <HomeInfoPage />,
+      // },
       {
         index: true,
-        element: <HomeInfoPage />,
-      },
-      {
-        path: "patient",
         element: <PatientInfoPage />,
       },
         // children of patient

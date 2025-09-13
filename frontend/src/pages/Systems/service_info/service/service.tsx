@@ -22,7 +22,7 @@ interface Category {
 
 
 const Servicecomponent = () => {
-    const [service, setService] = useState<Service[]>([]);
+    // const [service, setService] = useState<Service[]>([]);
     const [category, setCategory] = useState<Category[]>([]);
     const [searchText, setSearchText] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -51,11 +51,6 @@ const Servicecomponent = () => {
             try {
                 const servicesData = await getAllService();
                 const categoriesData = await getAllCategory();
-
-                // console.log("Raw servicesData:", servicesData);
-                // console.log("Raw categoriesData:", categoriesData);
-
-                // เก็บเฉพาะ field ที่จำเป็นสำหรับ Service
                 const formattedServices = servicesData.map(s => ({
                     id: s.id,
                     name_service: s.name_service,
@@ -70,7 +65,7 @@ const Servicecomponent = () => {
                     name_category: c.name_category,
                 }));
 
-                setService(formattedServices);
+                // setService(formattedServices);
                 setCategory(formattedCategories);
                 setItems(formattedServices); // สำหรับ edit/delete/add
             } catch (error) {
@@ -84,10 +79,9 @@ const Servicecomponent = () => {
     const getCategoryName = (id: number) => {
         const foundCategory = category.find(cat => cat.id === id);
         return foundCategory ? foundCategory.name_category : "-";
-
     };
 
-    // ฟังก์ชันเปลี่ยนค่า field ของ service
+
     const handleChange = (field: keyof Service, value: any, index?: number) => {
         if (index === undefined) {
             setNewItem(prev => ({ ...prev, [field]: value }));
@@ -98,40 +92,29 @@ const Servicecomponent = () => {
         }
     };
 
-
-
     const [tempCategory, setTempCategory] = useState<string | null>(null);
-
     const handleAddItem = async () => {
         try {
             if (!newItem.name_service || isNaN(newItem.cost)) {
                 return;
             }
-
             let categoryId = newItem.category_id;
-
-            // ✅ เช็คก่อนว่าเลือกหมวดหมู่หรือยัง
             if (tempCategory) {
-                // ถ้าเป็นตัวเลข → คือ id เดิม
                 if (!isNaN(Number(tempCategory))) {
                     categoryId = Number(tempCategory);
                 } else {
-                    // ถ้าเป็น string → แปลว่าพิมพ์ใหม่ → สร้าง category ใหม่
                     const newCat = await createCategory({ name_category: tempCategory });
-                    setCategory(prev => [...prev, newCat]); // อัปเดต state ให้มีใน dropdown ด้วย
+                    setCategory(prev => [...prev, newCat]);
                     categoryId = newCat.id!;
                 }
             }
 
-            // ✅ สุดท้ายสร้าง service โดยใช้ categoryId ที่ได้
             const createdService = await createService({
                 ...newItem,
                 category_id: categoryId!,
             });
 
             setItems([...items, createdService]);
-
-            // reset form
             setNewItem({
                 name_service: "",
                 cost: undefined!,
@@ -144,10 +127,9 @@ const Servicecomponent = () => {
         }
     };
 
+
     // แก้ไขข้อมูล
     const handleEdit = (index: number) => setEditIndex(index);
-
-
     const handleSave = async () => {
         if (editIndex !== null) {
             const item = items[editIndex];
@@ -244,15 +226,6 @@ const Servicecomponent = () => {
         }
     };
 
-    const handleDeleteCategory = async (id: number) => {
-        try {
-            await deleteCategory(id);
-            setCategory(prev => prev.filter(c => c.id !== id));
-        } catch (err) {
-            console.error("❌ Failed to delete category:", err);
-        }
-    };
-
     // สำหรับ confirm delete category
     const [isCategoryConfirmVisible, setIsCategoryConfirmVisible] = useState(false);
     const [catIdToDelete, setCatIdToDelete] = useState<null | number>(null);
@@ -285,7 +258,7 @@ const Servicecomponent = () => {
         // กล่องใหญ่ครอบทั้งหมด
         <div style={{
             maxWidth: '100%',
-            height:500,
+            height: 500,
             margin: '0 auto 0 auto',
             display: 'flex',
             flexDirection: 'column',
@@ -451,7 +424,7 @@ const Servicecomponent = () => {
                 title={modal.type === 'add' ? 'เพิ่มบริการใหม่' : 'ดูรายละเอียด'}
                 onOk={() => {
                     if (modal.type === 'add') {
-                        handleAddItem();   // ดึงค่าจาก newItem โดยตรง
+                        handleAddItem();
                     } else {
                         handleModalSave();
                     }
@@ -496,7 +469,7 @@ const Servicecomponent = () => {
                         <Input.TextArea
                             rows={4}
                             placeholder="รายละเอียด"
-                            value={newItem.DetailService}   // ใช้ newItem.detail
+                            value={newItem.DetailService}
                             onChange={e => handleChange('DetailService', e.target.value)}
                         />
                     </div>
