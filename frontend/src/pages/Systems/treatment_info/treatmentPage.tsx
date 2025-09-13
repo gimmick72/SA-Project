@@ -326,7 +326,7 @@ const TreatmentPage: React.FC = () => {
 
                                     <Col xs={24} sm={12} md={8}><Text strong>หมู่เลือด</Text><div>{form.getFieldValue("bloodType") || "-"}</div></Col>
                                     <Col xs={24} sm={12} md={8}><Text strong>อัตราการเต้นหัวใจ</Text><div>{form.getFieldValue("heartRate") || "-"}</div></Col>
-                                    <Col xs={24} sm={12} md={8}><Text strong>ความดัน</Text><div>{form.getFieldValue("bloodPressure") || "-"}</div></Col>
+                                    <Col xs={24} sm={12} md={8}><Text strong>ความดัน</Text><div>{form.getFieldValue("bloodpressure") || "-"}</div></Col>
 
                                     <Col xs={24} sm={12} md={8}><Text strong>อาการ</Text><div>{form.getFieldValue("symptomps") || "-"}</div></Col>
                                     <Col xs={24} sm={12} md={8}><Text strong>ประวัติแพ้ยา</Text><div>{form.getFieldValue("allergyHistory") || "-"}</div></Col>

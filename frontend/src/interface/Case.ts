@@ -15,7 +15,9 @@ export interface ContactPerson {
 
 export interface InitialSymptomps {
   Symptomps?: string;
-  BloodPressure?: string;
+  systolic?: number;   // ต้องตรงกับ API key
+  diastolic
+  ?: number;  // ต้องตรงกับ API key
   Visit?: string | Date; // ถ้าใช้ date จาก backend
   HeartRate?: string;
   Weight?: number;
@@ -29,14 +31,17 @@ export interface Patients {
   FirstName?: string;
   LastName?: string;
   NickName?: string;
-  PhoneNumber?: string;
+  phone_number?: string;
   Age?: number;
-  DrugAllergy?: string;
-  Address?:Address[]; 
-  ContactPerson?:ContactPerson[];
-  InitialSymptomps?:InitialSymptomps[];
-  CongenitaDisease?: string;
+  drug_allergy
+  ?: string;
+  Address?: Address[];
+  ContactPerson?: ContactPerson[];
+  InitialSymptomps?: InitialSymptomps[];
+  congenital_disease?: string;
   BloodType?: string
+
+  patient?: any
 }
 export interface CaseData {
   ID?: number;
@@ -77,13 +82,13 @@ export interface Treatment {
 }
 
 export type CaseRow = {
-    id: number;
-    patientId: number;
-    appointment_date?: string | null;
-    treatments: Treatment[];
-    note?: string;
-    patient?: any; // can tighten type if you have Patient interface
-    SignDate?: string;
-    totalPrice?: number;   // ✅ new field
-    
+  id: number;
+  patientId: number;
+  appointment_date?: string | null;
+  treatments: Treatment[];
+  note?: string;
+  patient?: any; // can tighten type if you have Patient interface
+  SignDate?: string;
+  totalPrice?: number;   // ✅ new field
+
 };

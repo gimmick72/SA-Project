@@ -136,7 +136,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ initialValues, onFormSubmit
               <Option value="ผู้ช่วยทันตแพทย์">ผู้ช่วยทันตแพทย์</Option>
               <Option value="เจ้าหน้าที่การเงิน">เจ้าหน้าที่การเงิน</Option>
               <Option value="เจ้าหน้าที่ต้อนรับ">เจ้าหน้าที่ต้อนรับ</Option>
-              <Option value="ผู้จัดการ">ผู้จัดการ</Option>
+              {/* <Option value="ผู้จัดการ">ผู้จัดการ</Option> */}
               {/* <Option value="ผู้อำนวยการ">ผู้อำนวยการ</Option> */}
             </Select>
           </Form.Item>
