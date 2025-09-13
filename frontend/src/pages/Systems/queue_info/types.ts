@@ -6,6 +6,7 @@ export type Patient = {
   caseCode?: string;
   note?: string;
   durationMin?: number;
+  uiType?: "appointment" | "walkin";
 };
 
 export type TimeSlot = { time: string; patient: Patient | null };

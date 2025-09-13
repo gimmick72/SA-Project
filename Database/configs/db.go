@@ -150,16 +150,16 @@ func MockData() {
 	}
 
 	// เพิ่ม mock data สำหรับ Appointments ถ้ายังว่าง
-	DB.Model(&entity.Appointment{}).Count(&count)
-	if count == 0 {
-		mockData := GetMockAppointments()
-		for _, d := range mockData {
-			DB.Create(&d)
-		}
-		log.Println("✅ Added mock Appointment data")
-	} else {
-		log.Println("⚡ Appointment table already has data")
-	}
+	// DB.Model(&entity.Appointment{}).Count(&count)
+	// if count == 0 {
+	// 	mockData := GetMockAppointments()
+	// 	for _, d := range mockData {
+	// 		DB.Create(&d)
+	// 	}
+	// 	log.Println("✅ Added mock Appointment data")
+	// } else {
+	// 	log.Println("⚡ Appointment table already has data")
+	// }
 
 	
 	// เพิ่ม mock data สำหรับ Booking  ถ้ายังว่าง
