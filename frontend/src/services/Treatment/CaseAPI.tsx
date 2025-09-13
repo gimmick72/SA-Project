@@ -2,7 +2,7 @@
 import axios from "axios";
 const API_BASE = "http://localhost:8080/api";
 import type { CaseData, Treatment, Patients, CaseRow } from "../../interface/Case";
-import type {Patient} from "../../interface/patient";
+import type { Patient } from "../../interface/patient";
 import dayjs from "dayjs";   // ✅ ต้องใส่ตรงนี้
 
 const normalizeDateString = (s?: any): string | undefined => {
@@ -71,23 +71,26 @@ export const CaseAPI = {
   getCaseFormValuesByID: async (
     id: number,
     row: CaseRow,
-    patientsList: Patients[]
+    patientsList: Patient[]
   ): Promise<{
     formValues: any;
-    patient: Patients | null;
+    patient: Patient | null;
   }> => {
     const data = await CaseAPI.getCaseByID(id);
 
     // หา patient
     const patient =
       row.patient ||
-      patientsList.find((x) => x.ID === row.patientId) ||
+      patientsList.find((x) => x.id === row.patientId) ||
       null;
 
     const init =
-      data.Patient?.initialsymptomps &&
-        data.Patient.initialsymptomps.length
-        ? data.Patient.initialsymptomps[0]
+      data.Patient?.initialsymptomps
+ &&
+        data.Patient.initialsymptomps
+.length
+        ? data.Patient.initialsymptomps
+[0]
         : null;
 
     // เตรียมค่าไว้ใส่ใน Form
@@ -102,9 +105,11 @@ export const CaseAPI = {
         }`
         : "",
       age: patient?.age,
-      preExistingConditions: patient?.congenita_disease ?? "ดึงผิด",
-      phonenumber: patient?.phonenumber ?? "ดึงผิด",
-      allergyHistory: patient?.drugallergy ?? "ดึงผิด",
+      preExistingConditions: patient?.congenital_disease ?? "",
+      phonenumber: patient?.phone_number
+        ?? "",
+      allergyHistory: patient?.drug_allergy
+        ?? "",
       note: row.note,
       appointment_date: row.appointment_date ? dayjs(row.appointment_date) : null,
       treatments: (row.treatments || []).map((t) => ({
@@ -113,8 +118,10 @@ export const CaseAPI = {
       })),
       SignDate: data.SignDate ? dayjs(data.SignDate) : null,
       symptomps: init?.symptomps ?? "",
-      bloodPressure: init?.bloodpressure ?? "ดึงผิด",
-      heartRate: init?.heartrate?? "",
+       bloodpressure: init?.systolic && init?.diastolic
+    ? `${init.systolic}/${init.diastolic}`
+    : "",
+      heartRate: init?.heartrate ?? "",
       weight: init?.weight ?? "",
       height: init?.height ?? "",
       bloodType: patient?.blood_type ?? "",
@@ -260,45 +267,116 @@ export const CaseAPI = {
   },
 
   // ✅ new: ดึง patient + map formValues
-  getPatientFormValuesByCitizenId: async (
-    nid: string
-  ): Promise<{ patient: Patient | null; formValues: any | null }> => {
-    if (!nid || nid.length !== 13) {
-      return { patient: null, formValues: null };
+getPatientFormValuesByCitizenId: async (
+  nid: string
+): Promise<{ patient: Patients | Patient | null; formValues: any | null }> => {
+  if (!nid || nid.length !== 13) {
+    return { patient: null, formValues: null };
+  }
+
+  const found = (await CaseAPI.getPatientByCitizenId(nid)) as Patients | Patient | null;
+  if (!found) {
+    return { patient: null, formValues: null };
+  }
+
+  try {
+    const allCases = await CaseAPI.getAllCases();
+
+    const matched = allCases.find((c) => {
+      if (typeof c.PatientID !== "undefined" && typeof (found as any).ID !== "undefined") {
+        return c.PatientID === (found as any).ID;
+      }
+      return !!(
+        c.Patient &&
+        (
+          (c.Patient.CitizenID && String(c.Patient.CitizenID) === nid) ||
+          (c.Patient.citizenID && String(c.Patient.citizenID) === nid) ||
+          (c.Patient.citizenId && String(c.Patient.citizenId) === nid) ||
+          (c.Patient.nationalID && String(c.Patient.nationalID) === nid) ||
+          (c.Patient.nationalId && String(c.Patient.nationalId) === nid)
+        )
+      );
+    });
+
+    if (matched) {
+      const row: CaseRow = {
+        id: (matched.ID ?? 0) as number,
+        patientId: (matched.PatientID ?? ((found as any).ID ?? 0)) as number,
+        appointment_date: matched.appointment_date ?? null,
+        treatments: matched.Treatment ?? [],
+        note: matched.Note ?? "",
+        patient: (matched as any).Patient ?? null,
+        SignDate: matched.SignDate ?? "",
+        totalPrice: matched.TotalPrice ?? 0,
+      };
+
+      // รีใช้ mapping ของ getCaseFormValuesByID
+      const { formValues, patient } = await CaseAPI.getCaseFormValuesByID(
+        matched.ID as number,
+        row,
+        [found as unknown as Patient]
+      );
+
+      // สร้างสำเนาแล้วกรอง/ลบฟิลด์ที่ไม่ต้องการคืน
+      const cleaned: any = { ...(formValues ?? {}) };
+
+      // ลบ/ไม่ส่งข้อมูลรหัสบุคลากร / staff
+      delete cleaned.departmentID;
+      delete cleaned.staffID;
+      delete cleaned.staffCode;
+
+      // ลบ/ไม่ส่งชื่อ/ลายเซ็นทันตแพทย์
+      delete cleaned.dentist_Name;
+      delete cleaned.dentistSignature;
+      delete cleaned.dentistName;
+
+      // ลบวันที่ลงชื่อ / วันที่เซ็น
+      delete cleaned.SignDate;
+
+      // ลบหมายเหตุ
+      delete cleaned.note;
+      delete cleaned.notes;
+
+      // ลบ/ไม่ส่งข้อมูลการรักษาทั้งหมด
+      delete cleaned.treatments;
+      // เพื่อความแน่นอน ให้เคลียร์ appointment_date จากเคสก่อนหน้า (ไม่ต้องการดึงนัดหมายต่อเนื่อง)
+      cleaned.appointment_date = null;
+
+      return { patient: patient as Patients | Patient | null, formValues: cleaned };
     }
+  } catch (err) {
+    console.warn("❗ couldn't look up cases while building patient form values:", err);
+    // ถ้า error ให้ fallback สร้าง formValues จาก patient
+  }
 
-    const found = await CaseAPI.getPatientByCitizenId(nid);
+  // Fallback: สร้าง formValues จาก found โดยตรง (รองรับหลายรูปแบบ key)
+  const init =
+    (found as any).InitialSymptomps ||
+    (found as any).initialsymptomps ||
+    null;
 
-    if (!found) {
-      return { patient: null, formValues: null };
-    }
+  const firstInit = Array.isArray(init) && init.length ? init[0] : null;
+  const systolic = firstInit?.systolic ?? firstInit?.Systolic ?? null;
+  const diastolic = firstInit?.diastolic ?? firstInit?.Diastolic ?? null;
 
-    const init =
-      found.initialsymptomps && found.initialsymptomps.length
-        ? found.initialsymptomps[0]
-        : null;
+  const formValues: any = {
+    fullName: `${(found as any).Prefix ?? (found as any).prefix ?? ""} ${(found as any).FirstName ?? (found as any).firstname ?? ""} ${(found as any).LastName ?? (found as any).lastname ?? ""}`.trim(),
+    age: (found as any).Age ?? (found as any).age ?? "",
+    preExistingConditions: (found as any).congenital_disease ?? (found as any).congenitalDisease ?? "",
+    phonenumber: (found as any).phone_number ?? (found as any).phonenumber ?? (found as any).PhoneNumber ?? "",
+    allergyHistory: (found as any).drug_allergy ?? (found as any).drugallergy ?? "",
+    symptomps: firstInit?.Symptomps ?? firstInit?.symptomps ?? "",
+    bloodpressure: systolic && diastolic ? `${systolic}/${diastolic}` : "",
+    heartRate: firstInit?.HeartRate ?? firstInit?.heartrate ?? "",
+    bloodType: (found as any).BloodType ?? (found as any).blood_type ?? "",
+    // ไม่เติม department/staff, SignDate, note, treatments — ตามที่ขอ
+    appointment_date: null,
+  };
 
-    const Init =
-      found.initialsymptomps && found.initialsymptomps.length
-        ? found.initialsymptomps[0]
-        : null;
+  return { patient: found as Patients | Patient, formValues };
+},
 
-    const formValues: any = {
-      fullName: `${found.prefix ?? ""} ${found.firstname ?? ""} ${found.lastname ?? ""}`.trim(),
-      age: found.age ?? "",
-      preExistingConditions: found.congenita_disease ?? "ดึงผิด",
-      phonenumber: found.phonenumber ?? "ดึงผิด",
-      allergyHistory: found.drugallergy ?? "ดึงผิด",
-      symptomps: init?.symptomps ?? "",
-      bloodPressure: init?.bloodpressure ?? "ดึงผิด",
-      heartRate: init?.heartrate ?? "",
-      weight: init?.weight ?? "",
-      height: init?.height ?? "",
-      bloodType: found.blood_type ?? "",
-    };
 
-    return { patient: found, formValues };
-  },
 
   deleteCase: async (id: number): Promise<void> => {
     await axios.delete(`${API_BASE}/cases/${id}`);
