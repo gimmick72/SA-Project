@@ -127,34 +127,34 @@ func GetMockSupplies() []entity.Supply {
 }
 
 // -------------------- Appointment  --------------------
-func GetMockAppointments() []entity.Appointment {
-	return []entity.Appointment{
-		{Date: time.Date(2025, 9, 10, 10, 0, 0, 0, time.UTC), RoomID: "1", Time: "10:00", PatientID: "P001", PatientName: "สมชาย ใจดี", Type: "appointment", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 10, 0, 0, 0, time.UTC), RoomID: "2", Time: "10:00", PatientID: "P002", PatientName: "วิภา สายสุข", Type: "walkin", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 11, 0, 0, 0, time.UTC), RoomID: "3", Time: "11:00", PatientID: "P003", PatientName: "อนันต์ รักเรียน", Type: "appointment", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 11, 0, 0, 0, time.UTC), RoomID: "4", Time: "11:00", PatientID: "P004", PatientName: "ศิริพร นุ่มนวล", Type: "walkin", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 12, 0, 0, 0, time.UTC), RoomID: "1", Time: "12:00", PatientID: "P005", PatientName: "ธีระ กล้าหาญ", Type: "appointment", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 12, 0, 0, 0, time.UTC), RoomID: "1", Time: "12:00", PatientID: "P006", PatientName: "สมหญิง ใจดี", Type: "walkin", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 13, 0, 0, 0, time.UTC), RoomID: "2", Time: "13:00", PatientID: "P007", PatientName: "วิชาญ แกร่งกล้า", Type: "appointment", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 13, 0, 0, 0, time.UTC), RoomID: "3", Time: "13:00", PatientID: "P008", PatientName: "รัตนา งามดี", Type: "walkin", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 14, 0, 0, 0, time.UTC), RoomID: "4", Time: "14:00", PatientID: "P009", PatientName: "สมบัติ สุขใจ", Type: "appointment", DurationMin: ptrInt(60)},
-		{Date: time.Date(2025, 9, 10, 14, 0, 0, 0, time.UTC), RoomID: "4", Time: "14:00", PatientID: "P010", PatientName: "วิไลพร สดใส", Type: "walkin", DurationMin: ptrInt(60)},
-	}
-}
+// func GetMockAppointments() []entity.Appointment {
+// 	return []entity.Appointment{
+// 		{Date: time.Date(2025, 9, 10, 10, 0, 0, 0, time.UTC), RoomID: "1", Time: "10:00", PatientID: "P001", PatientName: "สมชาย ใจดี", Type: "appointment", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 10, 0, 0, 0, time.UTC), RoomID: "2", Time: "10:00", PatientID: "P002", PatientName: "วิภา สายสุข", Type: "walkin", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 11, 0, 0, 0, time.UTC), RoomID: "3", Time: "11:00", PatientID: "P003", PatientName: "อนันต์ รักเรียน", Type: "appointment", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 11, 0, 0, 0, time.UTC), RoomID: "4", Time: "11:00", PatientID: "P004", PatientName: "ศิริพร นุ่มนวล", Type: "walkin", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 12, 0, 0, 0, time.UTC), RoomID: "1", Time: "12:00", PatientID: "P005", PatientName: "ธีระ กล้าหาญ", Type: "appointment", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 12, 0, 0, 0, time.UTC), RoomID: "1", Time: "12:00", PatientID: "P006", PatientName: "สมหญิง ใจดี", Type: "walkin", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 13, 0, 0, 0, time.UTC), RoomID: "2", Time: "13:00", PatientID: "P007", PatientName: "วิชาญ แกร่งกล้า", Type: "appointment", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 13, 0, 0, 0, time.UTC), RoomID: "3", Time: "13:00", PatientID: "P008", PatientName: "รัตนา งามดี", Type: "walkin", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 14, 0, 0, 0, time.UTC), RoomID: "4", Time: "14:00", PatientID: "P009", PatientName: "สมบัติ สุขใจ", Type: "appointment", DurationMin: ptrInt(60)},
+// 		{Date: time.Date(2025, 9, 10, 14, 0, 0, 0, time.UTC), RoomID: "4", Time: "14:00", PatientID: "P010", PatientName: "วิไลพร สดใส", Type: "walkin", DurationMin: ptrInt(60)},
+// 	}
+// }
 
-func ptrInt(v int) *int {
-	return &v
-}
+// func ptrInt(v int) *int {
+// 	return &v
+// }
 
 
-func GetMockStatus() []entity.Status {
-	return []entity.Status{
-		{StatusName: "รอคิว"},
-		{StatusName: "กำลังตรวจ"},
-		{StatusName: "ชำระเงิน"},
-		{StatusName: "เสร็จสิ้น"},
-	}
-}
+// func GetMockStatus() []entity.Status {
+// 	return []entity.Status{
+// 		{StatusName: "รอคิว"},
+// 		{StatusName: "กำลังตรวจ"},
+// 		{StatusName: "ชำระเงิน"},
+// 		{StatusName: "เสร็จสิ้น"},
+// 	}
+// }
 
 func UintPtr(v uint) *uint { return &v }
 

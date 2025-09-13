@@ -10,6 +10,7 @@ export default function DraggableCard({ patient }: { patient: Patient }) {
     collect: (m) => ({ isDragging: m.isDragging() }),
   }), [patient]);
 
+  const visualType = patient.uiType ?? patient.type;
   const bg = patient.type === "appointment" ? "#FAAD14" : "#722ED1";
 
   return (

@@ -2,7 +2,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import {
   Row, Col, Layout, Card, DatePicker, Button,
-  Space, Typography, message, Spin, Empty
+  Space, message, Spin, Empty
 } from "antd";
 import QueueSidebar from "./QueueSidebar";
 import RoomSchedule from "./RoomSchedule";
@@ -19,47 +19,50 @@ dayjs.locale("th");
 const { Content } = Layout;
 
 const API_BASE = "http://localhost:8080";
-async function fetchPatients(): Promise<Patient[]> {
-  const res = await fetch(`${API_BASE}/api/patients`);
+
+// โหลดรายชื่อคิวฝั่งซ้ายจาก /api/queue/patients?date=YYYY-MM-DD
+async function fetchQueuePatients(d: Dayjs): Promise<Patient[]> {
+  const date = d.format("YYYY-MM-DD");
+  const res = await fetch(`${API_BASE}/api/queue/patients?date=${encodeURIComponent(date)}`);
   if (!res.ok) throw new Error(await res.text());
   const data = await res.json();
   return Array.isArray(data) ? data : [];
 }
 
 const QueuePage: React.FC = () => {
-
   const navigate = useNavigate();
 
   const [date, setDate] = useState<Dayjs>(dayjs());
-
   const [patients, setPatients] = useState<Patient[]>([]);
   const [rooms, setRooms] = useState<RoomDataFromTypes[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false);
 
-  // ปรับเลขตามความสูง header/topbar ของโปรเจกต์จริง
-  const PANEL_HEIGHT = "calc(150vh - 200px)";
-
-  // โหลดคิวทั้งหมด (sidebar)
+  // โหลดคิวทั้งหมด (sidebar) ใหม่เมื่อเปลี่ยนวัน
   useEffect(() => {
     let alive = true;
-    const run = async () => {
+    (async () => {
       setLoadingPatients(true);
       try {
-        const data = await fetchPatients();
-        if (alive) setPatients(data);
+        const data = await fetchQueuePatients(date);
+        const isToday = date.isSame(dayjs(), "day");
+
+        // ✅ ใช้ as const เพื่อให้ uiType เป็น literal type ("walkin" | "appointment")
+        const withUiType: Patient[] = data.map((p): Patient => ({
+          ...p,
+          uiType: isToday ? ("walkin" as const) : ("appointment" as const),
+        }));
+
+        if (alive) setPatients(withUiType);
       } catch {
         message.warning("โหลดรายชื่อผู้ป่วยไม่สำเร็จ");
         if (alive) setPatients([]);
       } finally {
         if (alive) setLoadingPatients(false);
       }
-    };
-    run();
-    return () => {
-      alive = false;
-    };
-  }, []);
+    })();
+    return () => { alive = false; };
+  }, [date]);
 
   // โหลดตารางห้องตามวันที่
   const load = useCallback(async () => {
@@ -116,7 +119,6 @@ const QueuePage: React.FC = () => {
           type: patient?.type,
           patientName: patient?.name,
           caseCode: patient?.caseCode,
-          note: patient?.note,
           durationMin: patient?.durationMin,
         });
         await load();
@@ -138,7 +140,6 @@ const QueuePage: React.FC = () => {
         overflowY: "auto",
         overflowX: "auto",
         border: "none 2px #000000",
-
       }}
     >
       <DndProvider backend={HTML5Backend}>
@@ -157,25 +158,24 @@ const QueuePage: React.FC = () => {
           </Space>
         </Card>
 
-
-        {/* Panels: ใต้วันที่ = ซ้าย (คิวทั้งหมด) | ขวา (ตารางห้อง) */}
+        {/* Panels */}
         <Row gutter={10} style={{ height: "40%", minHeight: 0, border: "none 2px #000000" }}>
           {/* ซ้าย: คิวทั้งหมด */}
           <Col xs={24} md={6} style={{ height: "40%", minHeight: 0, border: "none 2px #000000" }}>
-
-            <Button style={{
-              backgroundColor: "#CBFEFF",
-              color: "black",
-              border: "black",
-              borderRadius: 12,
-              fontWeight: 600,
-              width: "100%",
-              marginBottom: 10,
-              marginTop: 10
-            }}
+            <Button
+              style={{
+                backgroundColor: "#CBFEFF",
+                color: "black",
+                border: "black",
+                borderRadius: 12,
+                fontWeight: 600,
+                width: "100%",
+                marginBottom: 10,
+                marginTop: 10
+              }}
               type="primary"
-              onClick={() => navigate("/admin/queue/manage-queue")
-              }>
+              onClick={() => navigate("/admin/queue/manage-queue")}
+            >
               จัดการการจองคิว
             </Button>
 
@@ -194,7 +194,7 @@ const QueuePage: React.FC = () => {
           </Col>
 
           {/* ขวา: ตารางห้อง */}
-          <Col xs={20} md={18} style={{ height: "40%", border: "none 2px #000000", }}>
+          <Col xs={20} md={18} style={{ height: "40%", border: "none 2px #000000" }}>
             <div
               style={{
                 height: "40%",
@@ -212,14 +212,15 @@ const QueuePage: React.FC = () => {
                     <Empty description="ยังไม่มีข้อมูลห้องในวันนี้" />
                   </div>
                 ) : (
-
                   <Row gutter={[16, 16]}>
                     {rooms.map((room) => (
                       <Col key={room.roomId} xs={24} sm={12} lg={6}>
                         <RoomSchedule
                           room={room}
                           onAssignPatient={handleAssignPatient}
-                          currentDate={date} viewMode={"week"} />
+                          currentDate={date}
+                          viewMode={"week"}
+                        />
                       </Col>
                     ))}
                   </Row>
@@ -228,11 +229,9 @@ const QueuePage: React.FC = () => {
             </div>
           </Col>
         </Row>
-
       </DndProvider>
     </div>
   );
-
 };
 
 export default QueuePage;

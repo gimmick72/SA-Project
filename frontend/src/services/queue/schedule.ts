@@ -59,22 +59,32 @@ export async function assignPatientApi(payload: any) {
 }
 
 /** โหลดรายชื่อคนไข้ให้ Sidebar (ถ้ายังไม่มีที่อื่น) */
-export async function fetchPatients() {
-  const url = `${BASE}/api/patients`;
+export async function fetchPatients(date: Dayjs) {
+  const d = date.format("YYYY-MM-DD");
+  const url = buildUrl("/api/queue/patients", { date: d });
   console.debug("[fetchPatients] GET", url);
 
   const res = await fetch(url);
   const text = await res.text();
+
   if (!res.ok) {
     console.error("[fetchPatients] error", res.status, text);
     throw new Error(text || `HTTP ${res.status}`);
   }
+
   try {
     const data = JSON.parse(text);
     console.debug("[fetchPatients] patients:", Array.isArray(data) ? data.length : 0);
-    return data as Array<{ id: string; name: string; type: "appointment" | "walkin" }>;
+    // caseCode/durationMin เผื่อไว้ (optional) ตามที่ backend ส่งมา
+    return data as Array<{
+      id: string;
+      name: string;
+      type: "appointment" | "walkin";
+      caseCode?: string;
+      durationMin?: number;
+    }>;
   } catch {
     console.error("[fetchPatients] invalid JSON:", text);
-    throw new Error("Invalid JSON from /api/patients");
+    throw new Error("Invalid JSON from /api/queue/patients");
   }
 }

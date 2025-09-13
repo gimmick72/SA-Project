@@ -16,4 +16,5 @@ func PatientRouter(router *gin.RouterGroup) {
 	router.POST("/patients/:id/symptoms", ControlerInitailPatient.CreateSymptom) //AddSymptom
 	router.GET("/services", ControlerInitailPatient.GetServicetoSymtompOption)   //ดึง service มาเลือกตอนเพิ่มอาการ
 	router.GET("/case-data/:id", ControlerInitailPatient.GetCaseHistory)         //ดึง case data
+	
 }
