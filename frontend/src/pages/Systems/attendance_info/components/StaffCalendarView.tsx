@@ -66,6 +66,9 @@ const StaffCalendarView: React.FC<CalendarViewProps> = ({
   onScheduleEdit,
   onScheduleDelete
 }) => {
+  console.log('StaffCalendarView received schedules:', schedules);
+  console.log('StaffCalendarView received staffMembers:', staffMembers);
+  
   const [currentWeek, setCurrentWeek] = useState(dayjs().startOf('week'));
   const [viewMode, setViewMode] = useState<'week' | 'day'>('week');
   const [selectedStaff, setSelectedStaff] = useState<string>('all');
@@ -96,19 +99,36 @@ const StaffCalendarView: React.FC<CalendarViewProps> = ({
 
   // Filter schedules by selected staff
   const filteredSchedules = useMemo(() => {
-    if (selectedStaff === 'all') return schedules;
-    return schedules.filter(schedule => schedule.staffId === selectedStaff);
+    console.log('Filtering schedules. All schedules:', schedules);
+    console.log('Selected staff:', selectedStaff);
+    
+    if (selectedStaff === 'all') {
+      console.log('Showing all schedules:', schedules);
+      return schedules;
+    }
+    
+    const filtered = schedules.filter(schedule => schedule.staffId === selectedStaff);
+    console.log('Filtered schedules:', filtered);
+    return filtered;
   }, [schedules, selectedStaff]);
 
   // Get schedules for a specific date and time
   const getSchedulesForSlot = (date: string, time: string) => {
-    return filteredSchedules.filter(schedule => {
+    const schedulesForSlot = filteredSchedules.filter(schedule => {
       if (schedule.date !== date) return false;
       const scheduleStart = dayjs(`${date} ${schedule.startTime}`);
       const scheduleEnd = dayjs(`${date} ${schedule.endTime}`);
       const slotTime = dayjs(`${date} ${time}`);
-      return slotTime.isBetween(scheduleStart, scheduleEnd, 'minute', '[)');
+      const isInRange = slotTime.isBetween(scheduleStart, scheduleEnd, 'minute', '[)');
+      
+      if (isInRange) {
+        console.log(`Schedule found for ${date} ${time}:`, schedule);
+      }
+      
+      return isInRange;
     });
+    
+    return schedulesForSlot;
   };
 
   // Get staff member by ID

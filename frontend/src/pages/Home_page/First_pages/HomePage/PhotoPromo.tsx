@@ -17,7 +17,7 @@ const PhotoPromo: React.FC = () => {
       }}
     >
       <img
-        src="src/assets/clinic.jpeg" // 🔁 เปลี่ยนชื่อไฟล์ตามที่คุณมี
+        src="/src/assets/clinic.jpeg"
         alt="คลินิกทันตกรรม"
         style={{
           maxHeight: "100%",

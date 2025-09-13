@@ -23,7 +23,7 @@ const IndexRoutes: RouteObject[] = [
         element: <Navigate to="/home" replace />, // redirect ไป /home
       },
       {
-        path: "home",                  
+        path: "home/*",                  
         element: <HomePage />,
       },
       {

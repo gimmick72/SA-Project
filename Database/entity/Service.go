@@ -7,7 +7,7 @@ import (
 type Service struct{
 	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	NameService string  `json:"name_service"`
-	DetailService string  `json:"detail_service`
+	DetailService string  `json:"detail_service"`
 	Cost float32  `json:"cost"`
 
 	CategoryID uint `json:"category_id"`

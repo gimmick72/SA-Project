@@ -29,11 +29,18 @@ func (c *InitialSymptompsController) GetTodayInitialSymptomps(ctx *gin.Context) 
 
 	var symptomps []entity.InitialSymptomps
 
-	// Query ข้อมูลที่ Visit อยู่ระหว่าง [today, tomorrow)
-	if err := c.DB.Preload("Service").
-		Preload("Patient").
-		Preload("Status").
-		Where("visit >= ? AND visit < ?", today, tomorrow).
+	// Query ข้อมูลที่ Visit อยู่ระหว่าง [today, tomorrow) with optional preloads
+	query := c.DB.Preload("Patient")
+	
+	// Only preload Service and Status if they exist
+	if c.DB.Migrator().HasTable(&entity.Service{}) {
+		query = query.Preload("Service")
+	}
+	if c.DB.Migrator().HasTable(&entity.Status{}) {
+		query = query.Preload("Status")
+	}
+
+	if err := query.Where("visit >= ? AND visit < ?", today, tomorrow).
 		Find(&symptomps).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

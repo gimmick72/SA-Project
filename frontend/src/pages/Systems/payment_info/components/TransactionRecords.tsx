@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Table, Card, Row, Col, DatePicker, Select, Input, Button, Space, Tag, Statistic, Modal, Typography } from 'antd';
-import { SearchOutlined, EyeOutlined, DollarOutlined, CreditCardOutlined, MobileOutlined, FileTextOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Card, Table, Tag, Space, Button, Input, Select, DatePicker, Typography, message, Row, Col, Statistic, Modal } from 'antd';
+import { SearchOutlined, EyeOutlined, PrinterOutlined, DownloadOutlined, DollarOutlined, MobileOutlined, CreditCardOutlined, FileTextOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { paymentAPI, Payment } from '../../../../services/api';
 import './TransactionRecords.css';
 
 const { Option } = Select;
@@ -16,8 +17,8 @@ interface Transaction {
   date: string;
   time: string;
   amount: number;
-  paymentMethod: 'cash' | 'promptpay' | 'credit_card';
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  paymentMethod: 'cash' | 'promptpay' | 'credit_card' | 'bank_transfer';
+  status: 'completed' | 'pending' | 'failed' | 'cancelled';
   receiptNumber?: string;
   treatments: string[];
   staff: string;
@@ -25,70 +26,53 @@ interface Transaction {
 }
 
 const TransactionRecords: React.FC = () => {
-  const [transactions] = useState<Transaction[]>([
-    {
-      id: '1',
-      transactionId: 'TXN2025010001',
-      customerName: 'นายสมชาย ใจดี',
-      customerPhone: '081-234-5678',
-      date: '2025-01-09',
-      time: '14:30',
-      amount: 2000,
-      paymentMethod: 'cash',
-      status: 'completed',
-      receiptNumber: 'RCP2025010001',
-      treatments: ['ขูดหินปูน', 'อุดฟัน'],
-      staff: 'ทพ.สมหญิง จันทร์เพ็ญ',
-      notes: 'ชำระเงินสดครบถ้วน'
-    },
-    {
-      id: '2',
-      transactionId: 'TXN2025010002',
-      customerName: 'นางสาวสมหญิง รักสะอาด',
-      customerPhone: '082-345-6789',
-      date: '2025-01-08',
-      time: '16:15',
-      amount: 8000,
-      paymentMethod: 'promptpay',
-      status: 'completed',
-      receiptNumber: 'RCP2025010002',
-      treatments: ['ฟอกสีฟัน'],
-      staff: 'ทพ.สมชาย ยิ้มแย้ม',
-      notes: 'โอนเงินผ่านพร้อมเพย์'
-    },
-    {
-      id: '3',
-      transactionId: 'TXN2025010003',
-      customerName: 'นายวิชัย มั่งคั่ง',
-      customerPhone: '083-456-7890',
-      date: '2025-01-07',
-      time: '10:45',
-      amount: 25000,
-      paymentMethod: 'credit_card',
-      status: 'completed',
-      receiptNumber: 'RCP2025010003',
-      treatments: ['จัดฟัน'],
-      staff: 'ทพ.สมหญิง จันทร์เพ็ญ',
-      notes: 'ชำระด้วยบัตรเครดิต Visa'
-    },
-    {
-      id: '4',
-      transactionId: 'TXN2025010004',
-      customerName: 'นางสาววิภา สวยงาม',
-      customerPhone: '084-567-8901',
-      date: '2025-01-06',
-      time: '13:20',
-      amount: 1500,
-      paymentMethod: 'promptpay',
-      status: 'failed',
-      treatments: ['ถอนฟัน'],
-      staff: 'ทพ.สมชาย ยิ้มแย้ม',
-      notes: 'การโอนเงินไม่สำเร็จ'
-    }
-  ]);
-
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [detailVisible, setDetailVisible] = useState(false);
+
+  // Load transactions from backend
+  const loadTransactions = async () => {
+    setLoading(true);
+    try {
+      const response = await paymentAPI.getPayments({ page: 1, page_size: 100 });
+      setPayments(response.data || []);
+    } catch (error) {
+      console.error('Error loading transactions:', error);
+      message.error('ไม่สามารถโหลดข้อมูลการทำรายการได้');
+      setPayments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
+
+  // Convert Payment to Transaction format for display
+  const convertToTransaction = (payment: Payment): Transaction => ({
+    id: payment.id.toString(),
+    transactionId: payment.transaction_number,
+    customerName: 'ไม่ระบุ', // Will be populated from patient data
+    customerPhone: 'ไม่ระบุ', // Will be populated from patient data
+    date: payment.payment_date.split('T')[0],
+    time: payment.payment_date.split('T')[1]?.slice(0, 5) || '00:00',
+    amount: payment.amount,
+    paymentMethod: payment.payment_method as 'cash' | 'promptpay' | 'credit_card' | 'bank_transfer',
+    status: payment.status === 'cancelled' ? 'cancelled' : payment.status as 'completed' | 'pending' | 'failed',
+    receiptNumber: `RCP${payment.id}`,
+    treatments: ['การรักษา'], // Default since we don't have treatment details
+    staff: 'ไม่ระบุ', // Will be populated from staff data
+    notes: payment.description || ''
+  });
+
+  // Convert payments to transactions for display
+  const transactions = payments.map(convertToTransaction);
 
   const getPaymentMethodIcon = (method: string) => {
     switch (method) {
@@ -133,13 +117,63 @@ const TransactionRecords: React.FC = () => {
     setDetailVisible(true);
   };
 
-  // Calculate statistics
-  const totalTransactions = transactions.length;
-  const completedTransactions = transactions.filter(t => t.status === 'completed').length;
-  const totalRevenue = transactions
+  const handleDeleteTransaction = (transactionId: string) => {
+    Modal.confirm({
+      title: 'ยืนยันการลบ',
+      icon: <ExclamationCircleOutlined />,
+      content: 'คุณแน่ใจหรือไม่ที่จะลบรายการชำระเงินนี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้',
+      okText: 'ลบ',
+      okType: 'danger',
+      cancelText: 'ยกเลิก',
+      onOk: async () => {
+        try {
+          await paymentAPI.deletePayment(Number(transactionId));
+          message.success('ลบรายการชำระเงินเรียบร้อยแล้ว');
+          loadTransactions(); // Reload the list
+        } catch (error) {
+          console.error('Error deleting payment:', error);
+          message.error('ไม่สามารถลบรายการชำระเงินได้');
+        }
+      },
+    });
+  };
+
+  // Filter transactions based on search criteria
+  const filteredTransactions = transactions.filter(transaction => {
+    const matchesSearch = !searchText || 
+      transaction.transactionId.toLowerCase().includes(searchText.toLowerCase()) ||
+      transaction.customerName.toLowerCase().includes(searchText.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
+    const matchesPaymentMethod = paymentMethodFilter === 'all' || transaction.paymentMethod === paymentMethodFilter;
+    
+    const matchesDateRange = !dateRange || (
+      dayjs(transaction.date).isAfter(dateRange[0].subtract(1, 'day')) &&
+      dayjs(transaction.date).isBefore(dateRange[1].add(1, 'day'))
+    );
+    
+    return matchesSearch && matchesStatus && matchesPaymentMethod && matchesDateRange;
+  });
+
+  const handleSearch = () => {
+    // Trigger re-render with current filters
+    console.log('Searching with filters:', { searchText, statusFilter, paymentMethodFilter, dateRange });
+  };
+
+  const handleReset = () => {
+    setSearchText('');
+    setStatusFilter('all');
+    setPaymentMethodFilter('all');
+    setDateRange(null);
+  };
+
+  // Calculate statistics from filtered transactions
+  const totalTransactions = filteredTransactions.length;
+  const completedTransactions = filteredTransactions.filter(t => t.status === 'completed').length;
+  const totalRevenue = filteredTransactions
     .filter(t => t.status === 'completed')
     .reduce((sum, t) => sum + t.amount, 0);
-  const todayTransactions = transactions.filter(t => t.date === dayjs().format('YYYY-MM-DD')).length;
+  const todayTransactions = filteredTransactions.filter(t => t.date === dayjs().format('YYYY-MM-DD')).length;
 
   const columns = [
     {
@@ -149,7 +183,7 @@ const TransactionRecords: React.FC = () => {
       width: 130,
     },
     {
-      title: 'ลูกค้า',
+      title: 'ผู้ป่วย',
       dataIndex: 'customerName',
       key: 'customerName',
       width: 150,
@@ -208,19 +242,30 @@ const TransactionRecords: React.FC = () => {
       dataIndex: 'staff',
       key: 'staff',
       width: 150,
+      render: (staff: string) => staff || 'Admin',
     },
     {
       title: 'จัดการ',
       key: 'actions',
-      width: 80,
+      width: 120,
       render: (_: any, record: Transaction) => (
-        <Button
-          type="text"
-          icon={<EyeOutlined />}
-          onClick={() => handleViewDetail(record)}
-          size="small"
-          title="ดูรายละเอียด"
-        />
+        <Space>
+          <Button
+            type="text"
+            icon={<EyeOutlined />}
+            onClick={() => handleViewDetail(record)}
+            size="small"
+            title="ดูรายละเอียด"
+          />
+          <Button
+            type="text"
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteTransaction(record.transactionId)}
+            size="small"
+            title="ลบรายการ"
+            danger
+          />
+        </Space>
       ),
     },
   ];
@@ -272,24 +317,52 @@ const TransactionRecords: React.FC = () => {
         <Col span={24}>
           <Card title="ค้นหาและกรองข้อมูล" size="small">
             <Row gutter={16}>
-              <Col span={6}>
-                <Input placeholder="รหัสรายการ" prefix={<SearchOutlined />} />
+              <Col span={5}>
+                <Input 
+                  placeholder="รหัสรายการ/ชื่อผู้ป่วย" 
+                  prefix={<SearchOutlined />}
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                />
               </Col>
-              <Col span={6}>
-                <Input placeholder="ชื่อลูกค้า" />
+              <Col span={5}>
+                <Select 
+                  placeholder="สถานะ" 
+                  value={statusFilter}
+                  onChange={setStatusFilter}
+                  allowClear
+                >
+                  <Option value="all">ทั้งหมด</Option>
+                  <Option value="completed">สำเร็จ</Option>
+                  <Option value="pending">รอดำเนินการ</Option>
+                  <Option value="failed">ไม่สำเร็จ</Option>
+                  <Option value="cancelled">ยกเลิก</Option>
+                </Select>
               </Col>
-              <Col span={6}>
-                <RangePicker placeholder={['วันที่เริ่ม', 'วันที่สิ้นสุด']} className="date-range-picker" />
-              </Col>
-              <Col span={3}>
-                <Select placeholder="วิธีชำระ" className="payment-method-select" allowClear>
+              <Col span={5}>
+                <Select 
+                  placeholder="วิธีชำระ" 
+                  value={paymentMethodFilter}
+                  onChange={setPaymentMethodFilter}
+                  allowClear
+                >
+                  <Option value="all">ทั้งหมด</Option>
                   <Option value="cash">เงินสด</Option>
                   <Option value="promptpay">พร้อมเพย์</Option>
                   <Option value="credit_card">บัตรเครดิต</Option>
+                  <Option value="bank_transfer">โอนธนาคาร</Option>
                 </Select>
               </Col>
+              <Col span={6}>
+                <RangePicker 
+                  placeholder={['วันที่เริ่ม', 'วันที่สิ้นสุด']} 
+                  value={dateRange}
+                  onChange={(dates) => setDateRange(dates as [dayjs.Dayjs, dayjs.Dayjs] | null)}
+                  className="date-range-picker" 
+                />
+              </Col>
               <Col span={3}>
-                <Button type="primary" icon={<SearchOutlined />} className="search-button">
+                <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                   ค้นหา
                 </Button>
               </Col>
@@ -302,8 +375,9 @@ const TransactionRecords: React.FC = () => {
           <Card title="บันทึกการทำรายการ" size="small">
             <Table
               columns={columns}
-              dataSource={transactions}
+              dataSource={filteredTransactions}
               rowKey="id"
+              loading={loading}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: true,

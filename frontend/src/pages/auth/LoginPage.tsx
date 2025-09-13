@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Card, Typography, Radio, Alert, Space, Divider } from 'antd';
 import { UserOutlined, LockOutlined, MedicineBoxOutlined, TeamOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
-// Removed authService import - using mock authentication
+import { authAPI } from '../../services/api';
 import './AuthPages.css';
 
 const { Title, Text } = Typography;
@@ -11,7 +11,7 @@ const LoginPage: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<'patient' | 'staff'>('patient');
+  const [selectedRole, setSelectedRole] = useState<'patient' | 'admin'>('patient');
   const navigate = useNavigate();
 
   const handleLogin = async (values: any) => {
@@ -19,36 +19,21 @@ const LoginPage: React.FC = () => {
     setError('');
 
     try {
-      // Mock authentication - simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock validation
-      const { email, password } = values;
+      // Real authentication API call
+      const response = await authAPI.login(values.email, values.password, selectedRole);
       
-      // Demo credentials validation
-      const validCredentials = [
-        { email: 'admin@clinic.com', password: 'admin123', role: 'staff' },
-        { email: 'patient@example.com', password: 'patient123', role: 'patient' }
-      ];
+      // Store token and user info
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userRole', selectedRole);
+      localStorage.setItem('userEmail', values.email);
 
-      const isValid = validCredentials.some(cred => 
-        cred.email === email && cred.password === password && cred.role === selectedRole
-      );
-
-      if (isValid) {
-        // Mock storing auth data
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userRole', selectedRole);
-        localStorage.setItem('userEmail', email);
-
-        // Redirect based on role
-        if (selectedRole === 'staff') {
-          navigate('/admin');
-        } else {
-          navigate('/home');
-        }
+      // Redirect based on role
+      if (selectedRole === 'admin') {
+        navigate('/admin');
       } else {
-        setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง หรือเลือกประเภทผู้ใช้ไม่ตรงกัน');
+        navigate('/home');
       }
     } catch (error) {
       setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
@@ -96,7 +81,7 @@ const LoginPage: React.FC = () => {
             <Radio.Button value="patient" className="role-button">
               <UserOutlined /> ผู้ป่วย
             </Radio.Button>
-            <Radio.Button value="staff" className="role-button">
+            <Radio.Button value="admin" className="role-button">
               <TeamOutlined /> เจ้าหน้าที่
             </Radio.Button>
           </Radio.Group>
@@ -188,7 +173,7 @@ const LoginPage: React.FC = () => {
               </Text>
               <div style={{ fontSize: '11px', color: '#666' }}>
                 <div>เจ้าหน้าที่: admin@clinic.com / admin123</div>
-                <div>ผู้ป่วย: patient@example.com / patient123</div>
+                <div>ผู้ป่วย: patient@clinic.com / patient123</div>
               </div>
             </div>
           </Space>

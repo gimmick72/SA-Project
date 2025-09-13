@@ -19,6 +19,7 @@ const PaymentRoutes: React.FC = () => {
         
         {/* Transaction history */}
         <Route path="transactions" element={<TransactionRecords />} />
+        <Route path="history" element={<TransactionRecords />} />
         
         {/* Redirect unknown routes to main page */}
         <Route path="*" element={<Navigate to="/admin/payment" replace />} />

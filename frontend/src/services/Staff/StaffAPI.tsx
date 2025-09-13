@@ -35,7 +35,13 @@ const mapToDepartment = (values: any, staff?: Staff): Department => ({
 
 export const StaffAPI = {
   getAllStaff: async (): Promise<Staff[]> => {
-    const response = await axios.get(`${API_BASE}/staff`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${API_BASE}/staff`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     const data = response.data as any;
     // backend คืนค่าเป็น Department + PersonalData
     // map เป็น interface Staff
@@ -50,7 +56,13 @@ export const StaffAPI = {
     }));
   },
   getStaffByID: async (id: number): Promise<Staff> => {
-    const response = await axios.get(`${API_BASE}/staff/${id}`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${API_BASE}/staff/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     const data = response.data as any;
     const dept = data.Department || {};
     // map เป็น interface Staff
@@ -85,22 +97,40 @@ export const StaffAPI = {
     };
   },
   updateStaff: async (id: number, values: any, staff: Staff): Promise<Staff> => {
+    const token = localStorage.getItem('token');
     const payload = {
       personalData: mapToPersonalData(values),
       department: mapToDepartment(values, staff),
     };
-    const { data } = await axios.put<Staff>(`${API_BASE}/staff/${id}`, payload);
+    const { data } = await axios.put<Staff>(`${API_BASE}/staff/${id}`, payload, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     return data;
   },
   addStaff: async (newStaff: NewStaffData): Promise<Staff> => {
+    const token = localStorage.getItem('token');
     const payload = {
       personalData: mapToPersonalData(newStaff),
       department: mapToDepartment(newStaff),
     };
-    const { data } = await axios.post<Staff>(`${API_BASE}/staff`, payload);
+    const { data } = await axios.post<Staff>(`${API_BASE}/staff`, payload, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     return data;
   },
   deleteStaff: async (id: number): Promise<void> => {
-    await axios.delete(`${API_BASE}/staff/${id}`);
+    const token = localStorage.getItem('token');
+    await axios.delete(`${API_BASE}/staff/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
   },
 }; 

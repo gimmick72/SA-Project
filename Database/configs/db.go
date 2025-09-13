@@ -63,9 +63,28 @@ func SetupDatbase() {
 		&entity.Address{},
 		&entity.ContactPerson{},
 		&entity.InitialSymptomps{},
+		&entity.Status{},
+		&entity.Service{},
+		&entity.Category{},
 		&entity.Treatment{},
 		&entity.Quadrant{},
 		&entity.CaseData{},
+
+		// Payment System
+		&entity.Payment{},
+		&entity.Receipt{},
+
+		// Attendance System
+		&entity.Attendance{},
+
+		// Schedule System
+		&entity.Schedule{},
+
+		// Work Schedule System
+		&entity.WorkSchedule{},
+
+		// Authentication System
+		&entity.User{},
 
 		//BookingQueue
 		&entity.QueueSlot{},
@@ -75,6 +94,7 @@ func SetupDatbase() {
 	// จำลองข้อมูล ระบบ -> ตารางแพทย์, บริการ, อุปกรณ์, คิวห้อง
 	MockData()
 	// seed ข้อมูลเริ่มต้น ระบบ Personal and Treatment
+	SeedUsers() // Add staff users with proper login credentials
 	SeedPatient()
 	SeedCase()
 	SeedStaff()
@@ -323,12 +343,12 @@ func SeedPatient() {
 			Age:              40,
 			DrugAllergy:      "Penicillin",
 			Address: &entity.Address{
-				HouseNumber: "45",
-				Moo:         "3",
-				Subdistrict: "ศิลา",
-				District:    "เมือง",
-				Province:    "ขอนแก่น",
-				Postcode:    "40000",
+				HouseNumber: "456",
+				Moo:         "2",
+				Subdistrict: "ลาดพร้าว",
+				District:    "บางกะปิ",
+				Province:    "กรุงเทพฯ",
+				Postcode:    "10240",
 			},
 			ContactPerson: &entity.ContactPerson{
 				Relationship: "มารดา",
@@ -354,7 +374,327 @@ func SeedPatient() {
 		}
 	}
 
-	log.Println("✅ Seeded patients successfully!")
+	// Seed additional users for frontend
+	seedAdditionalUsers()
+	
+	// Seed payment data
+	seedPaymentData()
+	
+	// Seed attendance data
+	seedAttendanceData()
+	
+	log.Println("✅ Database seeded successfully!")
+}
+
+// seedAdditionalUsers creates additional users for frontend testing
+func seedAdditionalUsers() {
+	// Create admin users
+	adminUsers := []entity.User{
+		{
+			Email:       "admin@clinic.com",
+			Password:    "$2a$14$example_hashed_password_admin123", // password: admin123
+			Role:        "admin",
+			FirstName:   "Dr. Sarah",
+			LastName:    "Johnson",
+			PhoneNumber: "0812345678",
+			IsActive:    true,
+			Department:  "Management",
+			Position:    "Chief Administrator",
+		},
+		{
+			Email:       "dentist@clinic.com", 
+			Password:    "$2a$14$example_hashed_password_dentist123", // password: dentist123
+			Role:        "admin",
+			FirstName:   "Dr. Michael",
+			LastName:    "Chen",
+			PhoneNumber: "0823456789",
+			IsActive:    true,
+			Department:  "Dental",
+			Position:    "Senior Dentist",
+		},
+		{
+			Email:       "nurse@clinic.com",
+			Password:    "$2a$14$example_hashed_password_nurse123", // password: nurse123
+			Role:        "admin", 
+			FirstName:   "Lisa",
+			LastName:    "Williams",
+			PhoneNumber: "0834567890",
+			IsActive:    true,
+			Department:  "Nursing",
+			Position:    "Head Nurse",
+		},
+	}
+
+	// Create patient users
+	patientUsers := []entity.User{
+		{
+			Email:       "patient1@example.com",
+			Password:    "$2a$14$example_hashed_password_patient123", // password: patient123
+			Role:        "patient",
+			FirstName:   "John",
+			LastName:    "Smith",
+			PhoneNumber: "0845678901",
+			DateOfBirth: "1985-03-15",
+			CitizenID:   "1234567890123",
+			IsActive:    true,
+		},
+		{
+			Email:       "patient2@example.com",
+			Password:    "$2a$14$example_hashed_password_patient123",
+			Role:        "patient", 
+			FirstName:   "Emma",
+			LastName:    "Davis",
+			PhoneNumber: "0856789012",
+			DateOfBirth: "1990-07-22",
+			CitizenID:   "2345678901234",
+			IsActive:    true,
+		},
+		{
+			Email:       "patient3@example.com",
+			Password:    "$2a$14$example_hashed_password_patient123",
+			Role:        "patient",
+			FirstName:   "David",
+			LastName:    "Wilson",
+			PhoneNumber: "0867890123",
+			DateOfBirth: "1988-11-08",
+			CitizenID:   "3456789012345",
+			IsActive:    true,
+		},
+	}
+
+	// Insert admin users
+	for _, user := range adminUsers {
+		var existingUser entity.User
+		if err := DB.Where("email = ?", user.Email).First(&existingUser).Error; err != nil {
+			if err := DB.Create(&user).Error; err != nil {
+				log.Printf("❌ Failed to create admin user %s: %v", user.Email, err)
+			} else {
+				log.Printf("✅ Created admin user: %s", user.Email)
+			}
+		}
+	}
+
+	// Insert patient users
+	for _, user := range patientUsers {
+		var existingUser entity.User
+		if err := DB.Where("email = ?", user.Email).First(&existingUser).Error; err != nil {
+			if err := DB.Create(&user).Error; err != nil {
+				log.Printf("❌ Failed to create patient user %s: %v", user.Email, err)
+			} else {
+				log.Printf("✅ Created patient user: %s", user.Email)
+			}
+		}
+	}
+}
+
+// seedPaymentData creates sample payment records
+func seedPaymentData() {
+	payments := []entity.Payment{
+		{
+			TransactionNumber: "TXN20250912001",
+			Amount:           1500.00,
+			PaymentMethod:    "cash",
+			Status:           "completed",
+			PaymentDate:      time.Now().AddDate(0, 0, -5),
+			Description:      "ขูดหินปูน - ทำความสะอาดฟัน",
+			PatientID:        1,
+			StaffID:          1,
+			ServiceID:        1,
+		},
+		{
+			TransactionNumber: "TXN20250912002", 
+			Amount:           2500.00,
+			PaymentMethod:    "credit_card",
+			Status:           "completed",
+			PaymentDate:      time.Now().AddDate(0, 0, -3),
+			Description:      "อุดฟัน - รักษาฟันผุ",
+			PatientID:        2,
+			StaffID:          1,
+			ServiceID:        2,
+		},
+		{
+			TransactionNumber: "TXN20250912003",
+			Amount:           3500.00,
+			PaymentMethod:    "promptpay",
+			Status:           "completed", 
+			PaymentDate:      time.Now().AddDate(0, 0, -1),
+			Description:      "ถอนฟัน - ฟันคุด",
+			PatientID:        3,
+			StaffID:          2,
+			ServiceID:        3,
+		},
+		{
+			TransactionNumber: "TXN20250912004",
+			Amount:           5000.00,
+			PaymentMethod:    "bank_transfer",
+			Status:           "pending",
+			PaymentDate:      time.Now(),
+			Description:      "จัดฟัน - ใส่เครื่องมือจัดฟัน",
+			PatientID:        1,
+			StaffID:          2,
+			ServiceID:        4,
+		},
+		{
+			TransactionNumber: "TXN20250912005",
+			Amount:           800.00,
+			PaymentMethod:    "cash",
+			Status:           "completed",
+			PaymentDate:      time.Now().AddDate(0, 0, -7),
+			Description:      "ตรวจสุขภาพฟัน - ตรวจประจำปี",
+			PatientID:        2,
+			StaffID:          1,
+			ServiceID:        5,
+		},
+	}
+
+	for _, payment := range payments {
+		var existingPayment entity.Payment
+		if err := DB.Where("transaction_number = ?", payment.TransactionNumber).First(&existingPayment).Error; err != nil {
+			if err := DB.Create(&payment).Error; err != nil {
+				log.Printf("❌ Failed to create payment %s: %v", payment.TransactionNumber, err)
+			} else {
+				log.Printf("✅ Created payment: %s", payment.TransactionNumber)
+			}
+		}
+	}
+}
+
+// seedAttendanceData creates sample attendance records
+func seedAttendanceData() {
+	now := time.Now()
+	attendances := []entity.Attendance{
+		{
+			StaffID:      1,
+			Date:         now.AddDate(0, 0, -5),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -5).Add(8 * time.Hour)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -5).Add(17 * time.Hour)}[0],
+			WorkHours:    9.0,
+			Status:       "present",
+			Notes:        "Regular work day",
+			Location:     "Main Clinic",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+		{
+			StaffID:      2,
+			Date:         now.AddDate(0, 0, -5),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -5).Add(8*time.Hour + 15*time.Minute)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -5).Add(17 * time.Hour)}[0],
+			WorkHours:    8.75,
+			Status:       "late",
+			Notes:        "Traffic jam",
+			Location:     "Main Clinic",
+			IsLate:       true,
+			LateMinutes:  15,
+		},
+		{
+			StaffID:      1,
+			Date:         now.AddDate(0, 0, -4),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -4).Add(8 * time.Hour)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -4).Add(17 * time.Hour)}[0],
+			WorkHours:    9.0,
+			Status:       "present",
+			Notes:        "Regular work day",
+			Location:     "Main Clinic",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+		{
+			StaffID:      2,
+			Date:         now.AddDate(0, 0, -4),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -4).Add(8 * time.Hour)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -4).Add(12 * time.Hour)}[0],
+			WorkHours:    4.0,
+			Status:       "half_day",
+			Notes:        "Medical appointment",
+			Location:     "Main Clinic",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+		{
+			StaffID:      1,
+			Date:         now.AddDate(0, 0, -3),
+			CheckInTime:  nil,
+			CheckOutTime: nil,
+			WorkHours:    0.0,
+			Status:       "absent",
+			Notes:        "Sick leave",
+			Location:     "",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+		{
+			StaffID:      2,
+			Date:         now.AddDate(0, 0, -3),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -3).Add(8 * time.Hour)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -3).Add(17 * time.Hour)}[0],
+			WorkHours:    9.0,
+			Status:       "present",
+			Notes:        "Regular work day",
+			Location:     "Main Clinic",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+		{
+			StaffID:      1,
+			Date:         now.AddDate(0, 0, -2),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -2).Add(8 * time.Hour)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -2).Add(17 * time.Hour)}[0],
+			WorkHours:    9.0,
+			Status:       "present",
+			Notes:        "Regular work day",
+			Location:     "Main Clinic",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+		{
+			StaffID:      2,
+			Date:         now.AddDate(0, 0, -2),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -2).Add(8*time.Hour + 30*time.Minute)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -2).Add(17 * time.Hour)}[0],
+			WorkHours:    8.5,
+			Status:       "late",
+			Notes:        "Car trouble",
+			Location:     "Main Clinic",
+			IsLate:       true,
+			LateMinutes:  30,
+		},
+		{
+			StaffID:      1,
+			Date:         now.AddDate(0, 0, -1),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -1).Add(8 * time.Hour)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -1).Add(17 * time.Hour)}[0],
+			WorkHours:    9.0,
+			Status:       "present",
+			Notes:        "Regular work day",
+			Location:     "Main Clinic",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+		{
+			StaffID:      2,
+			Date:         now.AddDate(0, 0, -1),
+			CheckInTime:  &[]time.Time{now.AddDate(0, 0, -1).Add(8 * time.Hour)}[0],
+			CheckOutTime: &[]time.Time{now.AddDate(0, 0, -1).Add(17 * time.Hour)}[0],
+			WorkHours:    9.0,
+			Status:       "present",
+			Notes:        "Regular work day",
+			Location:     "Main Clinic",
+			IsLate:       false,
+			LateMinutes:  0,
+		},
+	}
+
+	for _, attendance := range attendances {
+		var existingAttendance entity.Attendance
+		if err := DB.Where("staff_id = ? AND date = ?", attendance.StaffID, attendance.Date.Format("2006-01-02")).First(&existingAttendance).Error; err != nil {
+			if err := DB.Create(&attendance).Error; err != nil {
+				log.Printf("❌ Failed to create attendance for staff %d on %s: %v", attendance.StaffID, attendance.Date.Format("2006-01-02"), err)
+			} else {
+				log.Printf("✅ Created attendance for staff %d on %s", attendance.StaffID, attendance.Date.Format("2006-01-02"))
+			}
+		}
+	}
 }
 
 // ------------------- SEED CASE -------------------

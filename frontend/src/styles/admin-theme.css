@@ -1,0 +1,167 @@
+/* Admin Theme - Consistent Typography and Layout */
+
+/* Font Sizes */
+.admin-page-title {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  margin-bottom: 24px !important;
+}
+
+.admin-section-title {
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  color: #262626 !important;
+  margin-bottom: 16px !important;
+}
+
+.admin-card-title {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #262626 !important;
+  margin-bottom: 12px !important;
+}
+
+.admin-table-title {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #262626 !important;
+}
+
+.admin-body-text {
+  font-size: 14px !important;
+  color: #595959 !important;
+  line-height: 1.5 !important;
+}
+
+.admin-small-text {
+  font-size: 12px !important;
+  color: #8c8c8c !important;
+}
+
+/* Layout Consistency */
+.admin-page-container {
+  padding: 24px !important;
+  background: #f5f5f5 !important;
+  min-height: calc(100vh - 56px) !important;
+}
+
+.admin-content-card {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  padding: 24px !important;
+  margin-bottom: 24px !important;
+}
+
+.admin-stats-card {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  padding: 16px !important;
+  text-align: center !important;
+}
+
+.admin-table-card {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  padding: 24px !important;
+}
+
+/* Button Consistency */
+.admin-primary-button {
+  height: 36px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+}
+
+.admin-secondary-button {
+  height: 32px !important;
+  font-size: 14px !important;
+  border-radius: 6px !important;
+}
+
+/* Form Elements */
+.admin-form-label {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #262626 !important;
+}
+
+.admin-form-input {
+  font-size: 14px !important;
+  height: 36px !important;
+  border-radius: 6px !important;
+}
+
+/* Table Styling */
+.admin-table .ant-table-thead > tr > th {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  background: #fafafa !important;
+}
+
+.admin-table .ant-table-tbody > tr > td {
+  font-size: 14px !important;
+  color: #595959 !important;
+}
+
+/* Tab Styling */
+.admin-tabs .ant-tabs-tab {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.admin-tabs .ant-tabs-tab-active {
+  font-weight: 600 !important;
+}
+
+/* Statistics Cards */
+.admin-statistic .ant-statistic-title {
+  font-size: 14px !important;
+  color: #8c8c8c !important;
+  font-weight: 500 !important;
+}
+
+.admin-statistic .ant-statistic-content {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+}
+
+/* Tag Styling */
+.admin-tag {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-page-container {
+    padding: 16px !important;
+  }
+  
+  .admin-content-card {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .admin-page-title {
+    font-size: 20px !important;
+  }
+  
+  .admin-section-title {
+    font-size: 16px !important;
+  }
+}
+
+/* Spacing Utilities */
+.admin-mb-8 { margin-bottom: 8px !important; }
+.admin-mb-16 { margin-bottom: 16px !important; }
+.admin-mb-24 { margin-bottom: 24px !important; }
+.admin-mt-16 { margin-top: 16px !important; }
+.admin-mt-24 { margin-top: 24px !important; }
