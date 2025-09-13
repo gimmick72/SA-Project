@@ -49,7 +49,7 @@ const Promotion = () => {
                 const formattedService = serviceData.map(s => ({
                     id: s.id,
                     name_service: s.name_service,
-                    detail_service: s.detail_service,
+                    detail_service: s.DetailService,
                     cost: s.cost || 0,
                     category_id: s.category_id,
                 }));

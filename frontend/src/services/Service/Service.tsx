@@ -7,7 +7,7 @@ import axios, { AxiosResponse } from "axios";
 export interface Service {
     id?: number;
     name_service: string;
-    detail_service: string;
+    DetailService: string;
     cost: number;
     category_id: number;
 }

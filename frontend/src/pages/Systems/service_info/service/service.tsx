@@ -9,7 +9,7 @@ import { updateService, getAllService, getAllCategory, createService, deleteServ
 interface Service {
     id?: number;
     name_service: string;
-    detail_service: string;
+    DetailService: string;
     cost: number;
     category_id: number;
 }
@@ -30,7 +30,7 @@ const Servicecomponent = () => {
     const [newItem, setNewItem] = useState<Omit<Service, 'id'>>({
         name_service: "",
         cost: undefined!,
-        detail_service: "",
+        DetailService: "",
         category_id: undefined!,
     });
     const [items, setItems] = useState<Service[]>([]);
@@ -59,7 +59,7 @@ const Servicecomponent = () => {
                 const formattedServices = servicesData.map(s => ({
                     id: s.id,
                     name_service: s.name_service,
-                    detail_service: s.detail_service,
+                    DetailService: s.DetailService,
                     cost: s.cost,
                     category_id: s.category_id,
                 }));
@@ -135,7 +135,7 @@ const Servicecomponent = () => {
             setNewItem({
                 name_service: "",
                 cost: undefined!,
-                detail_service: "",
+                DetailService: "",
                 category_id: undefined!,
             });
             setTempCategory(null);
@@ -194,13 +194,13 @@ const Servicecomponent = () => {
         if (type === 'add') {
             setModal({ visible: true, type, detail: '', itemIndex: null });
         } else if (index !== null) {
-            setModal({ visible: true, type, detail: items[index].detail_service, itemIndex: index });
+            setModal({ visible: true, type, detail: items[index].DetailService, itemIndex: index });
         }
     };
     const handleModalSave = () => {
         if (modal.type === 'view' && modal.itemIndex !== null) {
             const updated = [...items];
-            updated[modal.itemIndex].detail_service = modal.detail;
+            updated[modal.itemIndex].DetailService = modal.detail;
             setItems(updated);
         }
         setModal({ visible: false, type: null, detail: '', itemIndex: null });
@@ -210,7 +210,7 @@ const Servicecomponent = () => {
     const filteredServices = items.filter(s => {
         const matchesSearch =
             (s.name_service?.toLowerCase() ?? "").includes(searchText.toLowerCase()) ||
-            (s.detail_service?.toLowerCase() ?? "").includes(searchText.toLowerCase());
+            (s.DetailService?.toLowerCase() ?? "").includes(searchText.toLowerCase());
 
         const matchesCategory =
             selectedCategory === null || s.category_id === selectedCategory;
@@ -496,8 +496,8 @@ const Servicecomponent = () => {
                         <Input.TextArea
                             rows={4}
                             placeholder="รายละเอียด"
-                            value={newItem.detail_service}   // ใช้ newItem.detail
-                            onChange={e => handleChange('detail_service', e.target.value)}
+                            value={newItem.DetailService}   // ใช้ newItem.detail
+                            onChange={e => handleChange('DetailService', e.target.value)}
                         />
                     </div>
                 ) : (
